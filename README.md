@@ -44,6 +44,36 @@ python -m http.server 8765
 | `sw.js` | Service worker for offline support |
 | `icon.svg` | App icon |
 
+## 🗺 Roadmap
+
+Ideas for future updates (contributions/suggestions welcome):
+
+**New games & content kids love**
+- 🦕 Dinosaurs world (counting eggs, big/small dinos, dino sounds)
+- 🐶🐱 Pets world (feed the puppy, match cats & kittens)
+- 🍦 Treat shop (build an ice-cream cone — counting scoops & colors)
+- 👑 Princess & castle world (royal dress-up, shape crowns)
+- 🦖 Dress-up / build-a-face creative toy (mix & match outfits)
+- ☀️🌧 Weather & 🍂 Seasons (match clothes to weather, sort the seasons)
+- 👵👴 Grandparents / family world (name family members, video-call pretend)
+
+**Personalization**
+- ✅ Choose your name (done)
+- ✅ Choose your buddy character — snowman, dino, puppy, kitty, princess, unicorn, robot, bear, dragon (done)
+- ✅ Selectable background music styles (done)
+- 🎙 **Record your own voice** for instructions & praise (a parent records "Tap the red fish!" in their own voice — huge for pre-readers)
+- 🔤 Trace your child's *actual* name (full A–Z letter set)
+
+**Audio**
+- ✅ Built-in synthesized music styles: Bouncy / Calm / March (done)
+- 🎵 Optional richer recorded music tracks (royalty-free audio files)
+- 🔊 Per-game sound themes
+
+**Polish**
+- 🌙 Calm/bedtime mode (softer sounds, dimmer colors)
+- 👶 Extra-simple 2-year-old mode
+- 📊 Grown-up progress peek (what they're playing & learning)
+
 ## 🔒 Privacy
 
 The child's name is stored only in the browser's local storage on that device — it is never uploaded or shared anywhere. All progress (stars, stickers, settings) is local-only.

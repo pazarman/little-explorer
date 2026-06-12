@@ -9,7 +9,7 @@
 <title>{n}'s World</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent;
-      user-select:none; -webkit-user-select:none; }
+      user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
   html, body { height:100%; overflow:hidden; }
   body {
     font-family:"Comic Sans MS","Segoe UI",system-ui,sans-serif;
@@ -117,6 +117,24 @@
   #nameSkip { border:none; background:none; color:#aaa; font-family:inherit; font-size:clamp(13px,2.8vmin,18px); text-decoration:underline; }
   #setName { background:#cdeafe; color:#1b4e7a; }
 
+  /* buddy chooser */
+  #charscreen { background:linear-gradient(#b8a0ee,#c9efb0 75%,#8fd06a); z-index:78; }
+  .char-card { background:#fff; border-radius:30px; padding:3.5vmin 4vmin; display:flex; flex-direction:column;
+               align-items:center; gap:2.4vmin; box-shadow:0 8px 0 rgba(0,0,0,.2); max-width:94%; }
+  .char-card h2 { font-size:clamp(20px,4.6vmin,34px); color:#444; text-align:center; }
+  .char-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2vmin; }
+  @media (max-width:420px) { .char-grid { grid-template-columns:repeat(2,1fr); } }
+  .char-btn { border:none; background:#f4f0fc; border-radius:20px; padding:1.6vmin 1vmin; display:flex;
+              flex-direction:column; align-items:center; gap:.4vmin; box-shadow:0 4px 0 rgba(0,0,0,.12); }
+  .char-btn:active { transform:scale(.92); }
+  .char-btn.sel { background:#ffd23e; outline:4px solid #f0a813; }
+  .char-btn .ch-e { font-size:clamp(34px,8vmin,58px); line-height:1; }
+  .char-btn .ch-n { font-size:clamp(12px,2.6vmin,18px); font-weight:bold; color:#555; }
+  #charDone { border:none; border-radius:20px; padding:1.8vmin 5vmin; font-family:inherit;
+              font-size:clamp(18px,4vmin,28px); font-weight:bold; background:#ffd23e; color:#5b3c00; box-shadow:0 5px 0 rgba(0,0,0,.22); }
+  #charDone:active { transform:scale(.95); }
+  #setBuddy { background:#e7dcff; color:#5a3aa0; }
+
   .corner-btn { position:absolute; z-index:6; border:none; border-radius:50%;
     width:clamp(44px,9vmin,66px); height:clamp(44px,9vmin,66px); font-size:clamp(20px,4.4vmin,32px);
     background:#fff; box-shadow:0 4px 0 rgba(0,0,0,.2); }
@@ -136,9 +154,10 @@
   @keyframes blink { 0%,93%,100% { transform:scaleY(1);} 95.5% { transform:scaleY(.1);} }
   .mascot .armR { transform-box:fill-box; transform-origin:0% 100%; animation:wave 3.4s ease-in-out infinite; }
   @keyframes wave { 0%,68%,100% { transform:rotate(0);} 78% { transform:rotate(-24deg);} 88% { transform:rotate(6deg);} }
-  #hubMascot   { position:absolute; left:1%; bottom:3%; width:clamp(74px,15vmin,140px); z-index:4; }
-  #gameMascot  { position:fixed; left:1vmin; bottom:1vmin; width:clamp(58px,11.5vmin,100px); z-index:30; }
-  #celebMascot { width:clamp(95px,21vmin,180px); }
+  #hubMascot   { position:absolute; left:1%; bottom:3%; width:clamp(74px,15vmin,140px); font-size:clamp(64px,13vmin,124px); z-index:4; }
+  #gameMascot  { position:fixed; left:1vmin; bottom:1vmin; width:clamp(58px,11.5vmin,100px); font-size:clamp(50px,10vmin,90px); z-index:30; }
+  #celebMascot { width:clamp(95px,21vmin,180px); font-size:clamp(84px,19vmin,164px); }
+  .mascot .buddy { display:block; line-height:1; text-align:center; filter:drop-shadow(0 4px 4px rgba(0,0,0,.25)); }
 
   /* ================= GAME ================= */
   #game header {
@@ -492,6 +511,14 @@
   </div>
 </div>
 
+<div id="charscreen" class="screen hidden">
+  <div class="char-card">
+    <h2>Pick your buddy!</h2>
+    <div class="char-grid" id="charGrid"></div>
+    <button id="charDone">Let's go! 🎉</button>
+  </div>
+</div>
+
 <div id="game" class="screen hidden">
   <header>
     <button class="round-btn" id="homeBtn" aria-label="Home">🏠</button>
@@ -552,7 +579,17 @@
         <button data-v="0">Off</button>
       </div>
     </div>
+    <div class="row">
+      <span>Music</span>
+      <div class="seg" id="segMusic">
+        <button data-m="bouncy">Bouncy</button>
+        <button data-m="calm">Calm</button>
+        <button data-m="march">March</button>
+        <button data-m="off">Off</button>
+      </div>
+    </div>
     <div class="closeRow">
+      <button id="setBuddy">🧸 Buddy</button>
       <button id="setName">✏️ Name</button>
       <button id="setReset">Reset stars</button>
       <button id="setDone">Done</button>
@@ -594,7 +631,7 @@ function plural(noun, n) {
 /* ================= Persistent state ================= */
 const completions = JSON.parse(localStorage.getItem("fionaStars") || "{}"); // per-level completion count
 const stickers = JSON.parse(localStorage.getItem("fionaStickers") || "[]");
-let settings = Object.assign({ diff: "auto", voice: 1 },
+let settings = Object.assign({ diff: "auto", voice: 1, music: "bouncy" },
   JSON.parse(localStorage.getItem("fionaSettings") || "{}"));
 const saveCompletions = () => localStorage.setItem("fionaStars", JSON.stringify(completions));
 const saveStickers = () => localStorage.setItem("fionaStickers", JSON.stringify(stickers));
@@ -638,6 +675,24 @@ function mascotSVG() {
   </svg>`;
 }
 function setMascots(cls, on) { document.querySelectorAll(".mascot").forEach(m => m.classList.toggle(cls, on)); }
+
+/* ================= Buddy (choosable guide character) ================= */
+const BUDDIES = [
+  { id: "snowman", e: "⛄", name: "Snowman" }, { id: "dino", e: "🦕", name: "Dino" },
+  { id: "puppy", e: "🐶", name: "Puppy" },     { id: "kitty", e: "🐱", name: "Kitty" },
+  { id: "princess", e: "👑", name: "Princess" }, { id: "unicorn", e: "🦄", name: "Unicorn" },
+  { id: "robot", e: "🤖", name: "Robot" },     { id: "bear", e: "🧸", name: "Bear" },
+  { id: "dragon", e: "🐉", name: "Dragon" }
+];
+let BUDDY = localStorage.getItem("fionaBuddy") || "snowman";
+function buddyMarkup() {
+  if (BUDDY === "snowman") return mascotSVG();
+  const b = BUDDIES.find(x => x.id === BUDDY) || BUDDIES[0];
+  return `<span class="buddy">${b.e}</span>`;
+}
+function refreshBuddies() {
+  ["hubMascot", "gameMascot", "celebMascot", "nameMascot"].forEach(id => { const el = $(id); if (el) el.innerHTML = buddyMarkup(); });
+}
 
 /* ================= Speech & sound ================= */
 let talkTimer = null, speakResume = null, lastSpeakEnd = 0;
@@ -695,29 +750,47 @@ const sfx = {
   win()  { [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * .12, .35, "triangle")); }
 };
 
-// bouncy, silly looping tunes — [freq, beats]
-const TUNES = [
-  [[523, 1], [523, 1], [784, 1], [659, 1], [523, 1], [587, 1], [659, 2], [0, 1], [440, 1], [392, 1], [330, 1], [392, 2], [0, 1]],
-  [[392, 1], [440, 1], [523, 1], [440, 1], [392, 1], [330, 1], [392, 2], [523, 1], [494, 1], [440, 1], [392, 2], [0, 1]],
-  [[659, 1], [587, 1], [523, 1], [587, 1], [659, 1], [659, 2], [587, 1], [587, 1], [587, 2], [659, 1], [784, 1], [784, 2], [0, 1]]
-];
+// selectable background music styles — each tune is [freq, beats]
+const MUSIC = {
+  bouncy: {
+    beat: 300, wave: "triangle", bass: true, boing: true, tunes: [
+      [[523, 1], [523, 1], [784, 1], [659, 1], [523, 1], [587, 1], [659, 2], [0, 1], [440, 1], [392, 1], [330, 1], [392, 2], [0, 1]],
+      [[392, 1], [440, 1], [523, 1], [440, 1], [392, 1], [330, 1], [392, 2], [523, 1], [494, 1], [440, 1], [392, 2], [0, 1]],
+      [[659, 1], [587, 1], [523, 1], [587, 1], [659, 1], [659, 2], [587, 1], [587, 1], [587, 2], [659, 1], [784, 1], [784, 2], [0, 1]]
+    ]
+  },
+  calm: {
+    beat: 540, wave: "sine", bass: false, boing: false, tunes: [
+      [[392, 2], [440, 2], [523, 2], [440, 2], [349, 2], [392, 4], [0, 2]],
+      [[523, 2], [494, 2], [440, 2], [392, 4], [440, 2], [392, 4], [0, 2]],
+      [[330, 2], [392, 2], [440, 2], [392, 2], [330, 4], [294, 4], [0, 2]]
+    ]
+  },
+  march: {
+    beat: 250, wave: "square", bass: true, boing: false, tunes: [
+      [[392, 1], [392, 1], [523, 1], [392, 1], [330, 1], [392, 1], [262, 2], [0, 1]],
+      [[440, 1], [440, 1], [440, 1], [349, 1], [523, 1], [523, 2], [0, 1]],
+      [[523, 1], [392, 1], [523, 1], [659, 1], [523, 1], [392, 1], [523, 2], [0, 1]]
+    ]
+  }
+};
 let musicOn = false, musicTimer = null;
-function playStep(tune, i, beat) {
+function curStyle() { return MUSIC[settings.music] || MUSIC.bouncy; }
+function playStep(tune, i, st) {
   if (!musicOn) return;
   const [f, b] = tune[i % tune.length];
   if (f > 0) {
-    tone(f, 0, beat * b * 0.00085, "triangle", .06);     // melody
-    if (i % 2 === 0) tone(f / 2, 0, beat * b * 0.0006, "sine", .05);  // bouncy bass
+    tone(f, 0, st.beat * b * 0.00085, st.wave, .06);
+    if (st.bass && i % 2 === 0) tone(f / 2, 0, st.beat * b * 0.0006, "sine", .05);
   }
-  const atLoopEnd = i % tune.length === tune.length - 1;
-  if (atLoopEnd && Math.random() < .35) tone(rand([180, 200, 240]), beat * b * 0.0004, .18, "sawtooth", .05); // silly boing
-  const nextTune = atLoopEnd && Math.random() < .4 ? rand(TUNES) : tune;
-  musicTimer = setTimeout(() => playStep(nextTune, i + 1, beat), beat * b);
+  const atEnd = i % tune.length === tune.length - 1;
+  if (atEnd && st.boing && Math.random() < .35) tone(rand([180, 200, 240]), st.beat * b * 0.0004, .18, "sawtooth", .05);
+  const nextTune = atEnd && Math.random() < .4 ? rand(st.tunes) : tune;
+  musicTimer = setTimeout(() => playStep(nextTune, i + 1, st), st.beat * b);
 }
-function toggleMusic() {
-  if (musicOn) { musicOn = false; clearTimeout(musicTimer); $("musicBtn").classList.remove("on"); }
-  else { audio(); musicOn = true; $("musicBtn").classList.add("on"); playStep(rand(TUNES), 0, 300); }
-}
+function startMusic() { audio(); musicOn = true; $("musicBtn").classList.add("on"); const st = curStyle(); playStep(rand(st.tunes), 0, st); }
+function stopMusic() { musicOn = false; clearTimeout(musicTimer); $("musicBtn").classList.remove("on"); }
+function toggleMusic() { if (musicOn) stopMusic(); else startMusic(); }
 
 /* ================= Fireworks + floaters ================= */
 let fxRaf = null;
@@ -1920,6 +1993,24 @@ function openSettings() {
   $("settings").classList.remove("hidden");
   document.querySelectorAll("#segDiff button").forEach(b => b.classList.toggle("sel", b.dataset.d === settings.diff));
   document.querySelectorAll("#segVoice button").forEach(b => b.classList.toggle("sel", String(settings.voice) === b.dataset.v));
+  document.querySelectorAll("#segMusic button").forEach(b => b.classList.toggle("sel", b.dataset.m === settings.music));
+}
+function showCharScreen(returnTo) {
+  ["hub", "game", "celebrate", "stickerbook", "story", "settings", "paint", "games", "namescreen"].forEach(id => $(id).classList.add("hidden"));
+  $("charscreen").classList.remove("hidden");
+  $("charDone").dataset.return = returnTo || "hub";
+  const grid = $("charGrid"); grid.innerHTML = "";
+  BUDDIES.forEach(b => {
+    const btn = document.createElement("button");
+    btn.className = "char-btn" + (b.id === BUDDY ? " sel" : "");
+    btn.innerHTML = `<span class="ch-e">${b.e}</span><span class="ch-n">${b.name}</span>`;
+    btn.onclick = () => {
+      BUDDY = b.id; localStorage.setItem("fionaBuddy", BUDDY); localStorage.setItem("fionaBuddySet", "1");
+      refreshBuddies(); sfx.tap(); speak(b.name + "!");
+      grid.querySelectorAll(".char-btn").forEach(x => x.classList.remove("sel")); btn.classList.add("sel");
+    };
+    grid.appendChild(btn);
+  });
 }
 
 /* ================= Navigation ================= */
@@ -1943,10 +2034,9 @@ function startLevel(name) {
 }
 
 /* ================= Boot ================= */
-$("hubMascot").innerHTML = mascotSVG();
-$("gameMascot").innerHTML = mascotSVG();
-$("celebMascot").innerHTML = mascotSVG();
+refreshBuddies();
 buildHub();
+document.addEventListener("contextmenu", e => e.preventDefault());   // no right-click / long-press menus for little hands
 $("homeBtn").onclick = showHub;
 $("gamesHome").onclick = showHub;
 $("celebHome").onclick = showHub;
@@ -1966,6 +2056,13 @@ $("setReset").onclick = () => {
 $("setName").onclick = () => { $("settings").classList.add("hidden"); showNameScreen(NAME); };
 document.querySelectorAll("#segDiff button").forEach(b => b.onclick = () => { settings.diff = b.dataset.d; saveSettings(); openSettings(); });
 document.querySelectorAll("#segVoice button").forEach(b => b.onclick = () => { settings.voice = +b.dataset.v; saveSettings(); openSettings(); });
+document.querySelectorAll("#segMusic button").forEach(b => b.onclick = () => {
+  settings.music = b.dataset.m; saveSettings();
+  if (settings.music === "off") stopMusic(); else { stopMusic(); startMusic(); }
+  openSettings();
+});
+$("setBuddy").onclick = () => { $("settings").classList.add("hidden"); showCharScreen("settings"); };
+$("charDone").onclick = () => { $("charDone").dataset.return === "settings" ? openSettings() : showHub(); };
 $("storyHome").onclick = showHub;
 $("storyPrev").onclick = () => storyNav(-1);
 $("storyNext").onclick = () => storyNav(1);
@@ -1997,15 +2094,18 @@ function commitName() {
   localStorage.setItem("fionaNameSet", "1");
   applyName();
   $("namescreen").classList.add("hidden");
-  showHub();
+  if (settings.music !== "off" && !musicOn) startMusic();   // kick off the happy background tune
   speak(`Hi ${NAME}! Let's play!`);
-  if (!musicOn) toggleMusic();      // kick off the happy background tune
+  if (!localStorage.getItem("fionaBuddySet")) showCharScreen("hub");   // first run: pick a buddy next
+  else showHub();
 }
 $("nameStart").onclick = commitName;
 $("nameSkip").onclick = () => {
   NAME = $("nameInput").value.trim().slice(0, 12) || "Explorer";
   localStorage.setItem("fionaName", NAME); localStorage.setItem("fionaNameSet", "1");
-  applyName(); $("namescreen").classList.add("hidden"); showHub();
+  applyName(); $("namescreen").classList.add("hidden");
+  if (settings.music !== "off" && !musicOn) startMusic();
+  if (!localStorage.getItem("fionaBuddySet")) showCharScreen("hub"); else showHub();
 };
 $("nameInput").addEventListener("keydown", e => { if (e.key === "Enter") commitName(); });
 
