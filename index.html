@@ -27,6 +27,9 @@
   body.theme-whosays{ background:linear-gradient(#2f9e6e, #57c98a 55%, #bdeccf); }
   body.theme-story  { background:linear-gradient(#244b8f, #6f8fd0 60%, #f0d6a8); }
   body.theme-space  { background:linear-gradient(#070726, #181848 50%, #34215c); }
+  body.theme-dragon { background:linear-gradient(#3a1c4a, #7a3b8a 50%, #e08a5a); }
+  body.theme-dino   { background:linear-gradient(#5c9e57, #9ed07e 55%, #e6dba0); }
+  body.theme-icecream { background:linear-gradient(#ffd1e8, #ffe6c0 55%, #bfe8ff); }
 
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
             align-items:center; justify-content:center; padding:2vmin; animation:fadeIn .35s ease; }
@@ -78,6 +81,10 @@
   .b-rocket { background:linear-gradient(#5a6bd8,#2a2f7a); }
   .b-sort   { background:linear-gradient(#7a5fd0,#3a2a7a); }
   .b-pattern{ background:linear-gradient(#9b6fe0,#5a3aa0); }
+  .b-dragon { background:linear-gradient(#a05bc0,#6a2f8a); }
+  .b-dino   { background:linear-gradient(#7fc96a,#3f8e35); }
+  .b-icecream { background:linear-gradient(#ff9ec9,#e84393); }
+  .c-fantasy{ background:linear-gradient(#b57fe0,#6a3a9a); }
   .c-num    { background:linear-gradient(#7fb6f7,#3a6fd0); }
   .c-shape  { background:linear-gradient(#ff9f4f,#e0701e); }
   .c-brain  { background:linear-gradient(#5ad29a,#2f9e6e); }
@@ -120,7 +127,8 @@
   /* buddy chooser */
   #charscreen { background:linear-gradient(#b8a0ee,#c9efb0 75%,#8fd06a); z-index:78; }
   .char-card { background:#fff; border-radius:30px; padding:3.5vmin 4vmin; display:flex; flex-direction:column;
-               align-items:center; gap:2.4vmin; box-shadow:0 8px 0 rgba(0,0,0,.2); max-width:94%; }
+               align-items:center; gap:2.4vmin; box-shadow:0 8px 0 rgba(0,0,0,.2); max-width:94%;
+               max-height:92vh; overflow-y:auto; }
   .char-card h2 { font-size:clamp(20px,4.6vmin,34px); color:#444; text-align:center; }
   .char-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2vmin; }
   @media (max-width:420px) { .char-grid { grid-template-columns:repeat(2,1fr); } }
@@ -378,6 +386,35 @@
   .patchoice { width:clamp(64px,15vmin,120px); height:clamp(64px,15vmin,120px); border-radius:24px; border:none;
                font-size:clamp(34px,8vmin,64px); background:rgba(255,255,255,.95); box-shadow:0 6px 0 rgba(0,0,0,.3); }
   .patchoice:active { transform:scale(.93); }
+
+  /* ----- dragon feed ----- */
+  .dragon-wrap { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+                 justify-content:center; gap:2.5vmin; z-index:5; }
+  .dragon { font-size:clamp(96px,26vmin,220px); line-height:1; filter:drop-shadow(0 5px 6px rgba(0,0,0,.35)); }
+  .dragon.chomp { animation:chomp .3s ease; }
+  @keyframes chomp { 50% { transform:scale(1.14) rotate(-3deg); } }
+  .treat-row { display:flex; gap:2.6vmin; flex-wrap:wrap; justify-content:center;
+               background:rgba(255,255,255,.28); border-radius:20px; padding:1.6vmin 2.2vmin; }
+  .treat { width:clamp(50px,11.5vmin,84px); height:clamp(50px,11.5vmin,84px); border:none; background:none;
+           font-size:clamp(34px,8vmin,60px); touch-action:none; filter:drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
+
+  /* ----- dino eggs ----- */
+  .dino-egg { position:absolute; border:none; background:none; font-size:clamp(46px,11vmin,86px); z-index:5;
+              animation:floaty 3s ease-in-out infinite; filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)); line-height:1; }
+  .dino-egg.hatched { animation:bounceIn .5s; }
+
+  /* ----- ice cream ----- */
+  .icecream-wrap { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+                   justify-content:flex-end; padding:2vmin 2vmin 4vmin; z-index:5; }
+  .cone-stack { display:flex; flex-direction:column; align-items:center; }
+  .scoops { display:flex; flex-direction:column-reverse; align-items:center; }
+  .scoop { width:clamp(58px,15vmin,118px); height:clamp(42px,11vmin,84px); border-radius:50% 50% 48% 48%;
+           margin-bottom:-12%; box-shadow:inset -6px -8px 0 rgba(0,0,0,.12), 0 2px 3px rgba(0,0,0,.2); animation:land .4s ease; }
+  .cone { font-size:clamp(64px,16vmin,128px); line-height:1; margin-top:-4%; }
+  .scoop-choices { display:flex; gap:2.6vmin; flex-wrap:wrap; justify-content:center; margin-top:3vmin; }
+  .scoopbtn { width:clamp(54px,12.5vmin,94px); height:clamp(54px,12.5vmin,94px); border-radius:50%;
+              border:3px solid #fff; box-shadow:0 5px 0 rgba(0,0,0,.22); }
+  .scoopbtn:active { transform:scale(.92); }
 
   /* ================= STICKER BOOK ================= */
   #stickerbook { overflow:hidden; }
@@ -685,6 +722,7 @@ const BUDDIES = [
   { id: "dragon", e: "🐉", name: "Dragon" }
 ];
 let BUDDY = localStorage.getItem("fionaBuddy") || "snowman";
+let charTimer = null;
 function buddyMarkup() {
   if (BUDDY === "snowman") return mascotSVG();
   const b = BUDDIES.find(x => x.id === BUDDY) || BUDDIES[0];
@@ -1743,10 +1781,124 @@ const patternLevel = {
   }
 };
 
+/* ================= LEVEL: Dragon Feed (counting) ================= */
+const TREATS = ["🍪", "🍖", "🧁", "🍩", "🍰", "🍗"];
+const dragonLevel = {
+  theme: "theme-dragon", rounds: 5,
+  startRound() {
+    if (state.round === 0) this.treat = rand(TREATS);
+    const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
+    const need = counts[state.round];
+    this.need = need; this.fed = 0;
+    setInstruction(`🐉 Feed the dragon ${need} ${plural("treat", need)}!`, `Feed the dragon ${need} ${need === 1 ? "treat" : "treats"}!`);
+    $("playArea").innerHTML = `<div class="dragon-wrap">
+        <div class="dragon" id="dragonEl">🐉</div>
+        <div class="treat-row" id="treatRow"></div></div>`;
+    for (let i = 0; i < need; i++) {
+      const t = document.createElement("button");
+      t.className = "treat"; t.textContent = this.treat;
+      makeDraggable(t, (el, ev, info) => this.release(el, ev, info));
+      $("treatRow").appendChild(t);
+    }
+  },
+  release(el, ev, info) {
+    if (state.busy) { info.reset(); return; }
+    if (inside(centerOf(el), $("dragonEl")) || !info.moved) this.feed(el, ev);
+    else info.reset();
+  },
+  feed(el, ev) {
+    el.style.visibility = "hidden"; el.classList.add("on-plate");
+    const d = $("dragonEl"); d.classList.remove("chomp"); void d.offsetWidth; d.classList.add("chomp");
+    sfx.tap(); tone(200, 0, .15, "square", .14); miniStar(ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2);
+    this.fed++;
+    if (this.fed < this.need) speak(NUM_WORDS[this.fed] + "!");
+    else {
+      floaters(["🔥", "✨", "💛"], innerWidth / 2, innerHeight / 2.5, 9);
+      tone(120, 0, .5, "sawtooth", .18);
+      speak(`${this.need} ${plural("treat", this.need)}! Yum yum! ${praise()}`);
+      roundComplete();
+    }
+  }
+};
+
+/* ================= LEVEL: Dino Eggs (counting + hatching) ================= */
+const BABY_DINOS = ["🦕", "🦖", "🐊", "🐲"];
+const dinoLevel = {
+  theme: "theme-dino", rounds: 5,
+  startRound() {
+    const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
+    const count = counts[state.round];
+    this.left = count; this.count = count;
+    setInstruction(`🥚 Tap ${count} ${plural("egg", count)} to hatch the dinos!`, `Tap ${count} ${count === 1 ? "egg" : "eggs"} to hatch the baby dinosaurs!`);
+    const area = $("playArea"); area.innerHTML = "";
+    scatter(count).forEach(pos => {
+      const b = document.createElement("button");
+      b.className = "dino-egg"; b.textContent = "🥚";
+      b.style.left = pos.left; b.style.top = pos.top; b.style.animationDelay = Math.random() * 2 + "s";
+      b.onclick = e => this.tap(b, e);
+      area.appendChild(b);
+    });
+  },
+  tap(el, e) {
+    if (state.busy || el.dataset.hatched) return;
+    el.dataset.hatched = "1"; el.textContent = rand(BABY_DINOS); el.classList.add("hatched");
+    sfx.tap(); tone(500, 0, .12, "triangle"); miniStar(e.clientX, e.clientY);
+    const n = this.count - (--this.left);
+    if (this.left > 0) speak(NUM_WORDS[n] + "!");
+    else { speak(`${NUM_WORDS[n]}! ${this.count} baby ${this.count === 1 ? "dino" : "dinos"}! ${praise()}`); roundComplete(); }
+  }
+};
+
+/* ================= LEVEL: Ice Cream Shop (colors + building) ================= */
+const icecreamLevel = {
+  theme: "theme-icecream", rounds: 5,
+  startRound() {
+    const k = [2, 3, 3][state.tier] + (state.round > 2 ? 1 : 0);
+    this.need = k; this.on = 0;
+    $("playArea").innerHTML = `<div class="icecream-wrap">
+        <div class="cone-stack"><div class="scoops" id="scoops"></div><div class="cone">🍦</div></div>
+        <div class="scoop-choices" id="scoopChoices"></div></div>`;
+    this.nextColor();
+  },
+  nextColor() {
+    const palette = COLOR_TIERS[Math.min(1, state.tier)];
+    const picks = shuffle(palette).slice(0, [3, 3, 4][state.tier]);
+    if (!picks.includes(this.target)) { /* fresh target ok */ }
+    this.target = rand(picks);
+    setInstruction(`🍦 Add a ${this.target} scoop!`, `Add a ${this.target} scoop on top!`);
+    const wrap = $("scoopChoices"); wrap.innerHTML = "";
+    picks.forEach(c => {
+      const b = document.createElement("button");
+      b.className = "scoopbtn"; b.style.background = COLORS[c]; b.dataset.color = c;
+      if (c === "white") b.style.borderColor = "#9bb";
+      b.onclick = e => this.tap(c, e);
+      wrap.appendChild(b);
+    });
+  },
+  tap(c, e) {
+    if (state.busy) return;
+    if (c === this.target) {
+      const scoop = document.createElement("div");
+      scoop.className = "scoop"; scoop.style.background = COLORS[this.target];
+      $("scoops").appendChild(scoop);
+      sfx.tap(); miniStar(e.clientX, e.clientY);
+      this.on++;
+      if (this.on < this.need) { speak(`${this.target}! ${NUM_WORDS[this.on]} ${this.on === 1 ? "scoop" : "scoops"}!`); this.nextColor(); }
+      else { speak(`${this.target}! A yummy ${this.need}-scoop ice cream! ${praise()}`); roundComplete(); }
+    } else {
+      sfx.bad();
+      const b = [...document.querySelectorAll(".scoopbtn")].find(x => x.dataset.color === c);
+      if (b) wiggle(b);
+      speak(`That's ${c}! Find the ${this.target} scoop!`);
+    }
+  }
+};
+
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
-  rocket: rocketLevel, sort: sortLevel, pattern: patternLevel
+  rocket: rocketLevel, sort: sortLevel, pattern: patternLevel,
+  dragon: dragonLevel, dino: dinoLevel, icecream: icecreamLevel
 };
 
 /* ================= Paint Studio (free drawing) ================= */
@@ -1837,14 +1989,17 @@ const GAMES = {
   pizza:   { icon: "🍕", name: "Pizza" },     pasta:   { icon: "🍝", name: "Yum Count" },
   trace:   { icon: "✨", name: "Tracing" },   rocket:  { icon: "🚀", name: "Countdown" },
   sort:    { icon: "🪐", name: "Big & Small" }, pattern: { icon: "🔮", name: "Patterns" },
-  paint:   { icon: "🎨", name: "Paint" },     story:   { icon: "📖", name: "Story" }
+  paint:   { icon: "🎨", name: "Paint" },     story:   { icon: "📖", name: "Story" },
+  dragon:  { icon: "🐉", name: "Dragon Feed" }, dino:  { icon: "🦕", name: "Dino Eggs" },
+  icecream:{ icon: "🍦", name: "Ice Cream" }
 };
 const CATEGORIES = [
-  { id: "num",    icon: "🔢", name: "Numbers",        cls: "c-num",    games: ["snow", "bike", "pasta", "rocket"] },
-  { id: "shape",  icon: "🎨", name: "Colors & Shapes", cls: "c-shape",  games: ["ocean", "pizza", "trace"] },
+  { id: "num",    icon: "🔢", name: "Numbers",        cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
+  { id: "shape",  icon: "🎨", name: "Colors & Shapes", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
   { id: "brain",  icon: "🧩", name: "Brain Games",     cls: "c-brain",  games: ["memory", "pattern", "sort"] },
-  { id: "animal", icon: "🐾", name: "Animals",         cls: "c-animal", games: ["music", "whosays"] },
+  { id: "animal", icon: "🐾", name: "Animals",         cls: "c-animal", games: ["music", "whosays", "dino"] },
   { id: "space",  icon: "🚀", name: "Space",           cls: "c-space",  games: ["rocket", "sort", "pattern"] },
+  { id: "fantasy",icon: "🐉", name: "Make-Believe",    cls: "c-fantasy", games: ["dragon", "dino", "icecream"] },
   { id: "create", icon: "✏️", name: "Create",          cls: "c-create", games: ["paint", "story"] }
 ];
 function launchGame(id) { if (id === "paint") paint.show(); else if (id === "story") showStory(); else startLevel(id); }
@@ -1990,6 +2145,7 @@ function showStickerBook() {
 
 /* ================= Settings ================= */
 function openSettings() {
+  $("charscreen").classList.add("hidden"); $("namescreen").classList.add("hidden");
   $("settings").classList.remove("hidden");
   document.querySelectorAll("#segDiff button").forEach(b => b.classList.toggle("sel", b.dataset.d === settings.diff));
   document.querySelectorAll("#segVoice button").forEach(b => b.classList.toggle("sel", String(settings.voice) === b.dataset.v));
@@ -2008,6 +2164,8 @@ function showCharScreen(returnTo) {
       BUDDY = b.id; localStorage.setItem("fionaBuddy", BUDDY); localStorage.setItem("fionaBuddySet", "1");
       refreshBuddies(); sfx.tap(); speak(b.name + "!");
       grid.querySelectorAll(".char-btn").forEach(x => x.classList.remove("sel")); btn.classList.add("sel");
+      clearTimeout(charTimer);                       // tapping a buddy auto-advances (no need to find the button)
+      charTimer = setTimeout(() => { $("charDone").dataset.return === "settings" ? openSettings() : showHub(); }, 800);
     };
     grid.appendChild(btn);
   });
@@ -2019,7 +2177,7 @@ function showHub() {
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   setMascots("talking", false);
   document.body.className = "";
-  ["game", "celebrate", "stickerbook", "story", "settings", "paint", "games"].forEach(id => $(id).classList.add("hidden"));
+  ["game", "celebrate", "stickerbook", "story", "settings", "paint", "games", "charscreen", "namescreen"].forEach(id => $(id).classList.add("hidden"));
   $("hub").classList.remove("hidden");
   buildHub();
 }
@@ -2062,7 +2220,7 @@ document.querySelectorAll("#segMusic button").forEach(b => b.onclick = () => {
   openSettings();
 });
 $("setBuddy").onclick = () => { $("settings").classList.add("hidden"); showCharScreen("settings"); };
-$("charDone").onclick = () => { $("charDone").dataset.return === "settings" ? openSettings() : showHub(); };
+$("charDone").onclick = () => { clearTimeout(charTimer); $("charDone").dataset.return === "settings" ? openSettings() : showHub(); };
 $("storyHome").onclick = showHub;
 $("storyPrev").onclick = () => storyNav(-1);
 $("storyNext").onclick = () => storyNav(1);
