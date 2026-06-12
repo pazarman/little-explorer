@@ -1,0 +1,13 @@
+{
+  "name": "Fiona's World",
+  "short_name": "Fiona",
+  "description": "Educational games for Fiona: counting, colors, shapes, numbers, memory and music.",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#8fd5f7",
+  "theme_color": "#8fd5f7",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
