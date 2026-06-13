@@ -1599,6 +1599,7 @@ const pizzaLevel = {
         if (inside(centerOf(el), $("pizzaHolder")) || !info.moved) {
           if (shape === this.target) {
             el.classList.add("popped"); miniStar(ev.clientX || innerWidth/2, ev.clientY || innerHeight/2);
+            tone(660, 0, .18, "triangle", .16); floaters(["✨", "🌟"], ev.clientX || innerWidth/2, ev.clientY || innerHeight/2, 4);
             $("pizzaHolder").innerHTML = pizzaBase(`<g transform="translate(75,75) scale(1.5)" fill="${TOPPING_COLORS[this.target]}" class="landed">${SHAPES[this.target]}</g>`);
             speak(`Yummy! The ${shape} fits! ${praise()}`); roundComplete();
           } else { info.reset(); sfx.bad(); wiggle(el); speak(`That's the ${shape}! Look for the ${this.target}!`); }
@@ -1615,6 +1616,7 @@ const pizzaLevel = {
     const tplural = plural(tname, need);
     setInstruction(`🍕 Put ${need} ${tplural} on the pizza!`, `Put ${need} ${tplural} on the pizza!`);
     this.shell(pizzaBase());
+    document.querySelector(".pizza-wrap").insertAdjacentHTML("afterbegin", `<div class="count-badge" id="pizCount">0</div>`);
     for (let i = 0; i < need; i++) {
       const b = document.createElement("button");
       b.className = "choice tok"; b.textContent = temoji;
@@ -1624,13 +1626,17 @@ const pizzaLevel = {
         if (inside(centerOf(el), holder) || !info.moved) {
           el.classList.add("popped");
           const r = holder.getBoundingClientRect();
+          const i = this.placed, cx = r.width / 2, cy = r.height / 2, rad = Math.min(r.width, r.height) * 0.3;
+          const ang = (-90 + i * (360 / need)) * Math.PI / 180;            // tidy ring so the count reads clearly
           const t = document.createElement("div");
           t.className = "laid-topping"; t.textContent = temoji;
-          t.style.left = (randBetween(.3, .7) * r.width) + "px";
-          t.style.top = (randBetween(.3, .7) * r.height) + "px";
+          t.style.left = (cx + Math.cos(ang) * rad) + "px";
+          t.style.top = (cy + Math.sin(ang) * rad) + "px";
           holder.appendChild(t);
-          sfx.tap();
+          sfx.tap(); tone(440 + i * 60, 0, .14, "sine", .14);
+          floaters(["✨"], ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2, 3);
           this.placed++;
+          const badge = $("pizCount"); if (badge) { badge.textContent = this.placed; badge.classList.remove("bump"); void badge.offsetWidth; badge.classList.add("bump"); }
           if (this.placed < need) speak(NUM_WORDS[this.placed] + "!");
           else { speak(`${NUM_WORDS[this.placed]}! ${need} ${tplural}! ${praise()}`); roundComplete(); }
         } else info.reset();
@@ -1653,6 +1659,7 @@ const pizzaLevel = {
         if (inside(centerOf(el), $("pizzaHolder")) || !info.moved) {
           if (color === this.target) {
             el.classList.add("popped"); miniStar(ev.clientX || innerWidth/2, ev.clientY || innerHeight/2);
+            tone(660, 0, .18, "triangle", .16); floaters(["✨", "🌟"], ev.clientX || innerWidth/2, ev.clientY || innerHeight/2, 4);
             const holder = $("pizzaHolder"), r = holder.getBoundingClientRect();
             const t = document.createElement("div");
             t.innerHTML = `<svg width="60" height="60"><circle cx="30" cy="30" r="26" fill="${COLORS[color]}"/></svg>`;
