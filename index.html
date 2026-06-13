@@ -309,6 +309,25 @@
   .ice-spikes { position:absolute; bottom:0; left:0; width:100%; height:20%; z-index:0;
     background:rgba(255,255,255,.35); pointer-events:none;
     clip-path:polygon(0 100%,0 60%,6% 22%,12% 70%,18% 32%,24% 78%,30% 12%,36% 65%,44% 36%,50% 80%,56% 18%,62% 68%,70% 28%,76% 75%,82% 10%,88% 62%,94% 28%,100% 55%,100% 100%); }
+  /* drawn winter scene + counting tray (Counting Critters) */
+  .snow-scene { position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+  .snowfield { position:absolute; inset:0; z-index:2; }
+  .snowflake.critter.tapped { animation:critterPop .5s ease forwards !important; pointer-events:none; }
+  @keyframes critterPop { 0%{transform:scale(1) rotate(0);} 35%{transform:scale(1.3) translateY(-14px) rotate(18deg);}
+                          100%{transform:scale(0) rotate(45deg); opacity:0;} }
+  .count-tray { position:absolute; left:0; right:0; bottom:0; z-index:6; display:flex; align-items:center;
+    justify-content:center; gap:2.4vmin; padding:1vmin 2vmin; background:rgba(255,255,255,.32);
+    border-top:3px solid rgba(255,255,255,.6); }
+  .count-num { font-size:clamp(34px,9vmin,72px); font-weight:bold; color:#1d3f8f; min-width:1.3em; text-align:center;
+    text-shadow:0 2px 0 rgba(255,255,255,.6); }
+  .count-num.bump { animation:numBump .4s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes numBump { 0%{transform:scale(1);} 45%{transform:scale(1.45);} 100%{transform:scale(1);} }
+  .count-slots { display:flex; gap:1.2vmin; flex-wrap:wrap; justify-content:center; }
+  .count-slot { width:clamp(28px,6.4vmin,50px); height:clamp(28px,6.4vmin,50px); border-radius:50%;
+    border:2.5px dashed rgba(29,63,143,.4); display:flex; align-items:center; justify-content:center; font-size:clamp(17px,4vmin,30px); }
+  .count-slot.filled { border-style:solid; border-color:#1d3f8f; background:rgba(255,255,255,.72);
+    animation:slotPop .45s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes slotPop { 0%{transform:scale(0);} 60%{transform:scale(1.3);} 100%{transform:scale(1);} }
 
   /* ----- ocean ----- */
   .fish-btn { position:absolute; border:none; background:none; z-index:5;
@@ -1404,12 +1423,20 @@ const snowLevel = {
     const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
     const count = counts[state.round];
     if (state.round === 0) this.critter = rand(CRITTERS);   // one critter per playthrough
-    this.left = count; this.count = count;
+    this.count = count; this.done = 0;
     const [emoji, noun] = this.critter;
     const word = plural(noun, count);
     setInstruction(`${emoji} Tap ${count} ${word}!`, `Tap ${count} ${word}!`);
     const area = $("playArea");
-    area.innerHTML = `<div class="ice-spikes"></div>`;
+    area.innerHTML = `
+      <svg class="snow-scene" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="84" cy="15" r="11" fill="#fff7c0" opacity=".85"/>
+        <path d="M0 67 Q26 53 52 65 Q76 77 100 61 L100 100 L0 100 Z" fill="#dcecff" opacity=".7"/>
+        <path d="M0 83 Q30 70 58 81 Q82 90 100 79 L100 100 L0 100 Z" fill="#ffffff" opacity=".85"/>
+      </svg>
+      <div class="snowfield" id="snowfield"></div>
+      <div class="count-tray"><div class="count-num" id="countNum">0</div><div class="count-slots" id="countSlots"></div></div>`;
+    const field = $("snowfield");
     for (let i = 0; i < 16; i++) {
       const d = document.createElement("span");
       d.className = "snowdust"; d.textContent = "❄";
@@ -1418,24 +1445,32 @@ const snowLevel = {
       d.style.opacity = randBetween(.3, .8);
       d.style.animationDuration = randBetween(5, 11) + "s";
       d.style.animationDelay = -Math.random() * 10 + "s";
-      area.appendChild(d);
+      field.appendChild(d);
     }
+    const slots = $("countSlots");
+    for (let i = 0; i < count; i++) { const s = document.createElement("div"); s.className = "count-slot"; slots.appendChild(s); }
     scatter(count).forEach(pos => {
       const b = document.createElement("button");
-      b.className = "snowflake"; b.textContent = emoji;
-      b.style.left = pos.left; b.style.top = pos.top;
+      b.className = "snowflake critter"; b.textContent = emoji;
+      b.style.left = pos.left; b.style.top = Math.min(parseFloat(pos.top), 64) + "%";   // keep clear of the count tray
       b.style.animationDelay = Math.random() * 2 + "s";
       b.onclick = e => this.tap(b, e);
-      area.appendChild(b);
+      field.appendChild(b);
     });
   },
   tap(el, e) {
-    if (state.busy || el.classList.contains("popped")) return;
-    el.classList.add("popped");
+    if (state.busy || el.classList.contains("tapped")) return;
+    el.classList.add("tapped");
     sfx.tap(); miniStar(e.clientX, e.clientY);
-    const tapped = this.count - (--this.left);
-    if (this.left > 0) speak(NUM_WORDS[tapped] + "!");
-    else { speak(`${NUM_WORDS[tapped]}! You counted ${this.count}! ${praise()}`); roundComplete(); }
+    const n = ++this.done;
+    const slot = $("countSlots").children[n - 1];               // a critter hops into the tray...
+    if (slot) { slot.textContent = this.critter[0]; slot.classList.add("filled"); }
+    const num = $("countNum");                                  // ...and the numeral grows: quantity ↔ symbol
+    num.textContent = n; num.classList.remove("bump"); void num.offsetWidth; num.classList.add("bump");
+    tone(440 + n * 60, 0, .14, "sine", .14);
+    if (n < this.count) speak(NUM_WORDS[n] + "!");
+    else { speak(`${NUM_WORDS[n]}! You counted ${this.count}! ${praise()}`); roundComplete(); }
+    setTimeout(() => el.remove(), 480);
   }
 };
 
