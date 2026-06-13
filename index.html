@@ -406,6 +406,10 @@
   }
   .fooditem.ball { box-shadow:0 4px 0 rgba(0,0,0,.25); }
   .fooditem.on-plate { pointer-events:none; animation:land .4s ease; }
+  .yum-badge { position:absolute; top:7%; right:9%; z-index:8; min-width:1.5em; text-align:center;
+    font-size:clamp(28px,7.5vmin,56px); font-weight:bold; color:#fff; background:#e25b4a; border:3px solid #fff;
+    border-radius:50%; padding:.05em .22em; box-shadow:0 4px 0 rgba(0,0,0,.22); text-shadow:0 2px 0 rgba(0,0,0,.25); }
+  .yum-badge.bump { animation:numBump .4s cubic-bezier(0.34,1.56,0.64,1); }
 
   /* ----- trace ----- */
   #guideC, #inkC { position:absolute; inset:0; width:100%; height:100%; }
@@ -1773,6 +1777,7 @@ const pastaLevel = {
     setInstruction(`Put ${need} ${plural} on the ${base === "spaghetti" ? "spaghetti" : base}!`,
                    `Put ${need} ${plural} on the ${base === "spaghetti" ? "spaghetti" : base}!`);
     $("playArea").innerHTML = `<div class="pasta-wrap">
+        <div class="yum-badge" id="yumCount">0</div>
         <div class="food-row" id="foodRow"></div>
         <div id="plateHolder">${plateSVG(base)}</div></div>`;
     for (let i = 0; i < need; i++) {
@@ -1795,8 +1800,19 @@ const pastaLevel = {
     } else info.reset();
   },
   land(el) {
-    el.classList.add("on-plate"); sfx.tap();
+    // snap the food into a tidy arc on the plate so the quantity reads clearly
+    const plate = $("plateHolder").getBoundingClientRect();
+    const i = this.on, n = this.need, t = n === 1 ? 0.5 : i / (n - 1);
+    const px = plate.left + plate.width * (0.2 + 0.6 * t);
+    const py = plate.top + plate.height * 0.46 - Math.sin(t * Math.PI) * plate.height * 0.12;
+    const r = el.getBoundingClientRect();
+    el.classList.remove("on-plate"); void el.offsetWidth;
+    el.style.position = "fixed"; el.style.zIndex = 12;
+    el.style.left = (px - r.width / 2) + "px"; el.style.top = (py - r.height / 2) + "px";
+    el.classList.add("on-plate");
+    sfx.tap(); tone(440 + i * 60, 0, .14, "sine", .14); floaters(["✨"], px, py, 3);
     this.on++;
+    const badge = $("yumCount"); if (badge) { badge.textContent = this.on; badge.classList.remove("bump"); void badge.offsetWidth; badge.classList.add("bump"); }
     if (this.on < this.need) speak(NUM_WORDS[this.on] + "!");
     else { speak(`${NUM_WORDS[this.on]}! ${this.need} ${plural(this.food.noun, this.need)}! Yummy! ${praise()}`); roundComplete(); }
   }
