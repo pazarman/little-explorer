@@ -1,0 +1,14 @@
+{
+  "name": "little-explorer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Voice-guided educational PWA for ages 2-5. The app itself has no build step or runtime deps; this manifest exists only for the smoke-test tooling.",
+  "scripts": {
+    "serve": "python3 -m http.server 8765",
+    "test": "playwright test",
+    "test:install": "playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}

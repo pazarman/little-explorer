@@ -1,0 +1,15 @@
+# Normalize line endings so Git stops rewriting CRLF<->LF and diffs stay clean.
+* text=auto eol=lf
+
+*.html  text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.svg   text eol=lf
+*.yml   text eol=lf
+
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.ico   binary
+*.webp  binary

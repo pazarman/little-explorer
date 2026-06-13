@@ -32,6 +32,7 @@
   body.theme-icecream { background:linear-gradient(#ffd1e8, #ffe6c0 55%, #bfe8ff); }
   body.theme-pets   { background:linear-gradient(#ffe6a8, #ffd2e0 55%, #b8e6c0); }
   body.theme-dressup { background:linear-gradient(#ffe0f2, #e2e6ff 60%, #d8f0e0); }
+  body.theme-sort   { background:linear-gradient(#5aa9d6, #9fd0e8 55%, #dff0f8); }
 
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
             align-items:center; justify-content:center; padding:2vmin;
@@ -510,6 +511,26 @@
               filter:drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
   .sortitem.big   { font-size:clamp(52px,13vmin,104px); }
   .sortitem.small { font-size:clamp(26px,6vmin,46px); }
+  /* ----- Sort It (classify by color or kind) ----- */
+  .sk-stage { position:absolute; inset:0; z-index:5; }
+  /* bins + tray are absolutely placed so picking up an item never reflows/jumps the bins */
+  .sk-bins { position:absolute; top:4%; left:0; width:100%; display:flex; justify-content:space-around;
+             align-items:flex-start; gap:2vmin; padding:0 2vmin; }
+  .sk-bin { display:flex; flex-direction:column; align-items:center; gap:.6vmin; flex:1; max-width:34%;
+            background:rgba(255,255,255,.24); border-radius:20px; padding:1.4vmin 1vmin; border:3px solid rgba(255,255,255,.55); }
+  .sk-bin.hint { animation:skHint .6s ease-in-out 3; }
+  @keyframes skHint { 0%,100%{box-shadow:0 0 0 0 rgba(255,210,62,0);} 50%{box-shadow:0 0 0 8px rgba(255,210,62,.75);} }
+  .sk-badge { width:clamp(40px,9vmin,68px); height:clamp(40px,9vmin,68px); border-radius:50%; border:3px solid #fff;
+              display:flex; align-items:center; justify-content:center; font-size:clamp(24px,6vmin,44px); box-shadow:0 3px 0 rgba(0,0,0,.18); }
+  .sk-basket { width:100%; min-height:clamp(46px,12vmin,96px); display:flex; flex-wrap:wrap; align-content:flex-start;
+               align-items:center; justify-content:center; gap:.5vmin; }
+  .sk-binlbl { font-size:clamp(12px,2.8vmin,20px); font-weight:bold; color:#fff; text-shadow:0 2px 0 rgba(0,0,0,.4); }
+  .sk-tray { position:absolute; bottom:4%; left:2vmin; right:2vmin; display:flex; flex-wrap:wrap; gap:2vmin;
+             justify-content:center; align-items:center; background:rgba(255,255,255,.2); border-radius:20px;
+             padding:1.6vmin; min-height:clamp(60px,14vmin,110px); }
+  .sk-item { border:none; background:none; touch-action:none; line-height:1; font-size:clamp(36px,9vmin,64px);
+             filter:drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
+  .sk-item.on-plate { font-size:clamp(26px,6vmin,46px); pointer-events:none; animation:land .4s ease; }
   .pattern-row { position:absolute; top:14%; left:0; width:100%; display:flex; gap:1.4vmin; flex-wrap:wrap;
                  justify-content:center; align-items:center; z-index:3; padding:0 2vmin; }
   .patcell { width:clamp(40px,9vmin,76px); height:clamp(40px,9vmin,76px); border-radius:16px;
@@ -650,6 +671,14 @@
                      background:rgba(255,255,255,.92); border-radius:16px; overflow:hidden;
                      box-shadow:inset 0 0 0 3px rgba(255,255,255,.5); }
   #paintC { position:absolute; inset:0; width:100%; height:100%; touch-action:none; }
+  #paintInstruct {
+    position:absolute; top:13.5vmin; width:min(90%, 480px); left:50%; transform:translateX(-50%);
+    background:rgba(255,255,255,.94); border-radius:20px; padding:1.2vmin 2.4vmin;
+    font-size:clamp(15px,3.2vmin,24px); font-weight:bold; color:#444; text-align:center;
+    box-shadow:0 4px 12px rgba(0,0,0,.15); z-index:25; pointer-events:none;
+    opacity:0; transition:opacity .4s, transform .4s; transform:translateX(-50%) translateY(-10px);
+  }
+  #paintInstruct.on { opacity:1; transform:translateX(-50%) translateY(0); }
 
   /* ================= STORY ================= */
   #story { padding:0; }
@@ -952,31 +981,113 @@ function plural(noun, n) {
   return noun + "s";
 }
 
+/* ================= Lifecycle & Persistence Registry ================= */
+const core = {
+  timers: new Set(),
+  intervals: new Set(),
+  pendingSaves: new Map(),
+  saveTimer: null,
+  
+  // Register and return a timeout
+  wait(fn, ms) {
+    const id = setTimeout(() => { this.timers.delete(id); fn(); }, ms);
+    this.timers.add(id);
+    return id;
+  },
+  
+  // Register and return an interval
+  repeat(fn, ms) {
+    const id = setInterval(fn, ms);
+    this.intervals.add(id);
+    return id;
+  },
+  
+  // Clear all registered timers/intervals
+  cleanup() {
+    this.timers.forEach(clearTimeout);
+    this.intervals.forEach(clearInterval);
+    this.timers.clear();
+    this.intervals.clear();
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    state.busy = false; // Safety reset for stuck busy states
+  },
+  
+  // Throttled persistence to avoid localStorage jank
+  save(key, val) {
+    this.pendingSaves.set(key, JSON.stringify(val));
+    if (this.saveTimer) return;
+    this.saveTimer = setTimeout(() => {
+      this.pendingSaves.forEach((v, k) => localStorage.setItem(k, v));
+      this.pendingSaves.clear();
+      this.saveTimer = null;
+    }, 2000); // 2s debounce: perfect for "quiet" moments
+  },
+  
+  // Force immediate save (e.g. before page unload)
+  flush() {
+    if (!this.saveTimer) return;
+    this.pendingSaves.forEach((v, k) => localStorage.setItem(k, v));
+    this.pendingSaves.clear();
+    clearTimeout(this.saveTimer);
+    this.saveTimer = null;
+  }
+};
+window.addEventListener("beforeunload", () => core.flush());
+
 /* ================= Persistent state ================= */
-const completions = JSON.parse(localStorage.getItem("fionaStars") || "{}"); // per-level completion count
+const completions = JSON.parse(localStorage.getItem("fionaStars") || "{}");
 const stickers = JSON.parse(localStorage.getItem("fionaStickers") || "[]");
 let settings = Object.assign({ diff: "auto", voice: 1, music: "bouncy" },
   JSON.parse(localStorage.getItem("fionaSettings") || "{}"));
-const saveCompletions = () => localStorage.setItem("fionaStars", JSON.stringify(completions));
-const saveStickers = () => localStorage.setItem("fionaStickers", JSON.stringify(stickers));
-const saveSettings = () => localStorage.setItem("fionaSettings", JSON.stringify(settings));
+const perf = JSON.parse(localStorage.getItem("fionaPerf") || "{}");
+const saveCompletions = () => core.save("fionaStars", completions);
+const saveStickers = () => core.save("fionaStickers", stickers);
+const saveSettings = () => core.save("fionaSettings", settings);
+const savePerf = () => core.save("fionaPerf", perf);
 
-/* ===== Centralized quest: collect Star Sparks to power up the broken rocket ===== */
-const QUEST_GOAL = 6;                                    // sparks needed to launch the rocket
+/* ===== Centralized quest ===== */
 let sparks = +(localStorage.getItem("fionaSparks") || 0);
 let trips  = +(localStorage.getItem("fionaTrips")  || 0);
 let questShown = sparks, questGreeted = false;
-const saveQuest = () => { localStorage.setItem("fionaSparks", sparks); localStorage.setItem("fionaTrips", trips); };
+const saveQuest = () => { core.save("fionaSparks", sparks); core.save("fionaTrips", trips); };
 
 /* difficulty tier 0..2 for a level */
+function ensurePerf(level) {
+  if (!perf[level]) perf[level] = { roundsPlayed: 0, roundsNoMistake: 0, roundsWithManyMistakes: 0, emaScore: 0.6 };
+  return perf[level];
+}
+function roundScore(mistakes) {
+  if (mistakes <= 0) return 1.0;
+  if (mistakes === 1) return 0.75;
+  if (mistakes === 2) return 0.5;
+  return 0.2;
+}
+function recordRoundPerf(level, mistakes) {
+  const p = ensurePerf(level);
+  p.roundsPlayed++;
+  if (mistakes === 0) p.roundsNoMistake++;
+  if (mistakes >= 3) p.roundsWithManyMistakes++;
+  const score = roundScore(mistakes);
+  p.emaScore = clamp(p.emaScore * 0.7 + score * 0.3, 0, 1);
+  savePerf();
+}
+function autoTierFor(level) {
+  const p = ensurePerf(level);
+  // Early sessions: stay conservative and use completion progress gently.
+  if (p.roundsPlayed < 4) return clamp(Math.floor((completions[level] || 0) / 2), 0, 1);
+  if (p.emaScore >= 0.8) return 2;
+  if (p.emaScore >= 0.55) return 1;
+  return 0;
+}
 function tierFor(level) {
   if (settings.diff === "easy") return 0;
   if (settings.diff === "med") return 1;
   if (settings.diff === "hard") return 2;
-  return clamp(completions[level] || 0, 0, 2);   // auto: grows with completions
+  return autoTierFor(level);
 }
 
 const state = { level: null, round: 0, busy: false, tier: 0 };
+let roundMistakes = 0;
 
 /* ================= Mascot ================= */
 function mascotSVG() {
@@ -1027,7 +1138,7 @@ function refreshBuddies() {
 }
 
 /* ================= Speech & sound ================= */
-let talkTimer = null, speakResume = null, lastSpeakEnd = 0;
+let lastSpeakEnd = 0;
 function speak(text, opts = {}) {
   if (!settings.voice || !("speechSynthesis" in window)) { lastSpeakEnd = performance.now(); return; }
   if (!opts.queue) speechSynthesis.cancel();
@@ -1036,28 +1147,25 @@ function speak(text, opts = {}) {
   u.rate = opts.rate || 0.95;
   u.pitch = opts.pitch || 1.25;
   setMascots("talking", true);
-  clearTimeout(talkTimer);
+  
   const stopTalk = () => {
     if (!speechSynthesis.speaking && !speechSynthesis.pending) {
       setMascots("talking", false);
-      clearInterval(speakResume); speakResume = null;
     }
   };
   u.onend = stopTalk; u.onerror = stopTalk;
-  talkTimer = setTimeout(() => setMascots("talking", false), Math.min(11000, 700 + text.length * 95));
+  core.wait(() => setMascots("talking", false), Math.min(11000, 700 + text.length * 95));
   speechSynthesis.speak(u);
   // keep-alive: Chrome silently stops synthesis after ~15s unless nudged
-  clearInterval(speakResume);
-  speakResume = setInterval(() => {
+  core.repeat(() => {
     if (speechSynthesis.speaking) speechSynthesis.resume();
-    else { clearInterval(speakResume); speakResume = null; }
   }, 4000);
 }
 // wait roughly as long as the praise takes to speak (capped) before running cb — so it's never cut off
 function waitSpeech(cb, opts = {}) {
   const min = opts.min != null ? opts.min : 900, cap = opts.cap != null ? opts.cap : 4500;
   const wait = clamp(lastSpeakEnd - performance.now(), min, cap);
-  setTimeout(cb, wait);
+  core.wait(cb, wait);
 }
 
 let actx = null;
@@ -1110,6 +1218,11 @@ const sfx = {
              voice({ type:"triangle", f0:fr, dur:.38, start:i*.11, cut:2800, vol:.07 }); });
            voice({ type:"sine", f0:2093, dur:.6, start:.58, cut:7000, vol:.10 }); }
 };
+const baseBad = sfx.bad;
+sfx.bad = function (...args) {
+  roundMistakes++;
+  return baseBad.apply(this, args);
+};
 
 // selectable background music styles — each tune is [freq, beats]
 const MUSIC = {
@@ -1147,10 +1260,10 @@ function playStep(tune, i, st) {
   const atEnd = i % tune.length === tune.length - 1;
   if (atEnd && st.boing && Math.random() < .35) tone(rand([180, 200, 240]), st.beat * b * 0.0004, .18, "sawtooth", .05);
   const nextTune = atEnd && Math.random() < .4 ? rand(st.tunes) : tune;
-  musicTimer = setTimeout(() => playStep(nextTune, i + 1, st), st.beat * b);
+  musicTimer = core.wait(() => playStep(nextTune, i + 1, st), st.beat * b);
 }
 function startMusic() { audio(); musicOn = true; $("musicBtn").classList.add("on"); const st = curStyle(); playStep(rand(st.tunes), 0, st); }
-function stopMusic() { musicOn = false; clearTimeout(musicTimer); $("musicBtn").classList.remove("on"); }
+function stopMusic() { musicOn = false; if (musicTimer) { clearTimeout(musicTimer); core.timers.delete(musicTimer); } $("musicBtn").classList.remove("on"); }
 function toggleMusic() { if (musicOn) stopMusic(); else startMusic(); }
 
 /* ================= Fireworks + floaters ================= */
@@ -1353,18 +1466,24 @@ function scatter(n) {
 }
 
 /* ================= Round / level flow ================= */
-function cleanupLevel() { const l = LEVELS[state.level]; if (l && l.cleanup) l.cleanup(); }
+function cleanupLevel() { core.cleanup(); }
 function roundComplete() {
   state.busy = true;
+  const manyMistakes = roundMistakes >= 3;
+  recordRoundPerf(state.level, roundMistakes);
+  let nextTier = tierFor(state.level);
+  if (settings.diff === "auto" && manyMistakes) nextTier = Math.max(0, nextTier - 1);
+  roundMistakes = 0;
   sfx.good();
   waitSpeech(() => {                       // let the praise finish talking first
     state.round++;
+    state.tier = nextTier;
     drawProgress();
     if (state.round >= totalRounds()) levelComplete();
     else { state.busy = false; LEVELS[state.level].startRound(); }
   });
 }
-function levelComplete() { cleanupLevel(); celebrateWith(state.level); }
+function levelComplete() { core.cleanup(); celebrateWith(state.level); }
 function celebrateWith(levelId, opts = {}) {
   completions[levelId] = (completions[levelId] || 0) + 1;
   saveCompletions();
@@ -2038,7 +2157,7 @@ const memoryLevel = {
     const a = this.first, b = card; this.first = null;
     if (a.dataset.emoji === b.dataset.emoji) {
       this.locked = true;
-      setTimeout(() => {
+      core.wait(() => {
         a.classList.add("matched"); b.classList.add("matched");
         a.classList.remove("flipped"); b.classList.remove("flipped");
         sfx.good(); this.locked = false; this.remaining--;
@@ -2047,7 +2166,7 @@ const memoryLevel = {
       }, 550);
     } else {
       this.locked = true; sfx.bad();
-      setTimeout(() => { a.classList.remove("flipped"); b.classList.remove("flipped"); this.locked = false; }, 1000);
+      core.wait(() => { a.classList.remove("flipped"); b.classList.remove("flipped"); this.locked = false; }, 1000);
     }
   }
 };
@@ -2055,9 +2174,9 @@ const memoryLevel = {
 /* ================= LEVEL: Animal band ================= */
 const BAND_KEYS = ["frog", "cat", "dog", "duck", "sheep", "bird", "cow", "lion"];
 const musicLevel = {
-  theme: "theme-music", rounds: 5, timers: [],
+  theme: "theme-music", rounds: 5,
   startRound() {
-    this.cleanup();
+    core.cleanup();
     const nKeys = [3, 4, 5][state.tier];
     const len = [2, 3, 4][state.tier];
     this.keys = shuffle(BAND_KEYS).slice(0, nKeys);
@@ -2072,12 +2191,12 @@ const musicLevel = {
       b.onclick = e => this.press(b, i, e);
       $("musicKeys").appendChild(b);
     });
-    this.seq.forEach((ki, idx) => this.timers.push(setTimeout(() => this.demo(ki), 1100 + idx * 1150)));
-    this.timers.push(setTimeout(() => {
+    this.seq.forEach((ki, idx) => core.wait(() => this.demo(ki), 1100 + idx * 1150));
+    core.wait(() => {
       this.listening = true;
       this.keys.forEach((_, i) => { if (this.seq.includes(i)) this.keyEl(i).classList.add("glow"); });
       setInstruction(`🥁 Now you play! Press the glowing animals!`, `Your turn! Press the glowing animals!`);
-    }, 1100 + this.seq.length * 1150 + 400));
+    }, 1100 + this.seq.length * 1150 + 400);
   },
   keyEl(i) { return document.querySelector(`.mkey[data-i="${i}"]`); },
   demo(i) {
@@ -2089,12 +2208,12 @@ const musicLevel = {
   press(el, i, e) {
     if (state.busy) return;
     speakAnimal(this.keys[i]);
-    el.classList.add("lit"); setTimeout(() => el.classList.remove("lit"), 300);
+    el.classList.add("lit"); core.wait(() => el.classList.remove("lit"), 300);
     const note = document.createElement("div");
     note.className = "music-note"; note.textContent = rand(["🎵", "🎶", "🎼"]);
     const r = el.getBoundingClientRect();
     note.style.left = (r.left + r.width / 2 - 14) + "px"; note.style.top = (r.top - 10) + "px"; note.style.position = "fixed";
-    document.body.appendChild(note); setTimeout(() => note.remove(), 1600);
+    document.body.appendChild(note); core.wait(() => note.remove(), 1600);
     if (!this.listening) return;
     const idx = this.toPlay.indexOf(i);
     if (idx !== -1) {
@@ -2103,8 +2222,7 @@ const musicLevel = {
       miniStar(e.clientX, e.clientY);
       if (this.toPlay.length === 0) { speak(`Beautiful music! ${praise()}`); roundComplete(); }
     }
-  },
-  cleanup() { this.timers.forEach(clearTimeout); this.timers = []; }
+  }
 };
 
 /* ================= LEVEL: Who Says That? ================= */
@@ -2249,6 +2367,74 @@ const sortLevel = {
         if (this.remaining === 0) { speak(praise()); roundComplete(); }
       } else { info.reset(); sfx.bad(); wiggle(el); speak(sz === "big" ? "That one is big! Put it on the big planet!" : "That one is small! Put it on the small planet!"); }
     } else info.reset();
+  }
+};
+
+/* ================= LEVEL: Sort It (classification) =================
+   STEM: Sorting/Classification · classify by a single attribute (color or kind) · ages 2-4 ·
+   Success = child groups objects into the correct bin by color or category. */
+const SORT_KINDS = {
+  animal:  { label: "🐾", name: "animals",        items: ["🐶", "🐱", "🐰", "🦊", "🐻", "🐸", "🦁"] },
+  food:    { label: "🍎", name: "yummy food",     items: ["🍕", "🍎", "🍓", "🍌", "🥕", "🍪", "🧀"] },
+  vehicle: { label: "🚗", name: "things that go",  items: ["🚗", "✈️", "🚂", "🚲", "🚜", "🚀", "⛵"] }
+};
+const SORT_COLORS = {
+  red:    { color: "#e63946", name: "red",    items: ["🍎", "🍓", "🌹", "🍒", "🚒", "❤️"] },
+  blue:   { color: "#2f6fde", name: "blue",   items: ["🫐", "🐳", "🌊", "💙", "🧢", "🐬"] },
+  yellow: { color: "#f4c726", name: "yellow", items: ["🍋", "🌻", "⭐", "🍌", "🐥", "🌟"] },
+  green:  { color: "#3fa84f", name: "green",  items: ["🥦", "🐸", "🌳", "🍀", "🥝", "🦎"] }
+};
+const sortkindLevel = {
+  theme: "theme-sort", rounds: 4,
+  startRound() {
+    this.mode = rand(["color", "kind"]);
+    this.wrong = 0;
+    const nBins = [2, 2, 3][state.tier], perBin = 2;
+    const sets = this.mode === "color" ? SORT_COLORS : SORT_KINDS;
+    this.sets = sets;
+    const keys = shuffle(Object.keys(sets)).slice(0, nBins);
+    setInstruction(this.mode === "color" ? "🧺 Sort by color!" : "🧺 Sort them out!",
+      this.mode === "color" ? "Put each thing in the basket that matches its color!" : "Put each thing where it belongs!");
+    const binsHtml = keys.map(k => {
+      const s = sets[k];
+      const badge = this.mode === "color" ? `<div class="sk-badge" style="background:${s.color}"></div>` : `<div class="sk-badge">${s.label}</div>`;
+      return `<div class="sk-bin" data-bin="${k}">${badge}<div class="sk-basket sk-drop"></div><div class="sk-binlbl">${s.name}</div></div>`;
+    }).join("");
+    $("playArea").innerHTML = `<div class="sk-stage"><div class="sk-bins">${binsHtml}</div><div class="sk-tray" id="skTray"></div></div>`;
+    let items = [];
+    keys.forEach(k => shuffle(sets[k].items).slice(0, perBin).forEach(e => items.push({ e, bin: k })));
+    items = shuffle(items);
+    this.remaining = items.length;
+    items.forEach(it => {
+      const b = document.createElement("button");
+      b.className = "sk-item"; b.textContent = it.e; b.dataset.bin = it.bin;
+      makeDraggable(b, (el, ev, info) => this.release(el, ev, info));
+      $("skTray").appendChild(b);
+    });
+  },
+  release(el, ev, info) {
+    if (state.busy) { info.reset(); return; }
+    const c = centerOf(el);
+    const over = [...document.querySelectorAll(".sk-bin")].find(b => inside(c, b));
+    if (!over) { info.reset(); return; }
+    const want = el.dataset.bin, got = over.dataset.bin;
+    if (want === got) {
+      el.classList.add("on-plate"); el.style.position = "static"; el.style.left = el.style.top = el.style.zIndex = "";
+      over.querySelector(".sk-drop").appendChild(el);
+      sfx.tap(); tone(540, 0, .14, "sine", .15); miniStar(ev.clientX, ev.clientY);
+      const cc = centerOf(over); floaters(["✨"], cc.x, cc.y, 3);
+      this.remaining--;
+      speak(this.sets[got].name + "!");
+      if (this.remaining === 0) { speak(`All sorted! ${praise()}`); roundComplete(); }
+    } else {
+      info.reset(); sfx.bad(); this.wrong++;
+      const wantName = this.sets[want].name;
+      if (this.wrong >= 2) {                                 // hint ladder: highlight the right basket after the 2nd miss
+        const tb = document.querySelector(`.sk-bin[data-bin="${want}"]`);
+        if (tb) { tb.classList.remove("hint"); void tb.offsetWidth; tb.classList.add("hint"); }
+      }
+      speak(this.mode === "color" ? `That one is ${wantName}. Find the ${wantName} basket!` : `That goes with the ${wantName}!`);
+    }
   }
 };
 
@@ -2549,7 +2735,7 @@ const petfeedLevel = {
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
-  rocket: rocketLevel, sort: sortLevel, pattern: patternLevel,
+  rocket: rocketLevel, sort: sortLevel, pattern: patternLevel, sortkind: sortkindLevel,
   dragon: dragonLevel, dino: dinoLevel, icecream: icecreamLevel,
   petmatch: petmatchLevel, petcare: petcareLevel, petfeed: petfeedLevel
 };
@@ -2557,9 +2743,10 @@ const LEVELS = {
 /* ================= Paint Studio (free drawing) ================= */
 const paint = {
   colors: ["#e63946", "#f07f13", "#f4c726", "#3fa84f", "#2f6fde", "#8e4fd0", "#f06ba8", "#8a5a2b", "#2b2b2b"],
+  colorNames: ["red", "orange", "yellow", "green", "blue", "purple", "pink", "brown", "black"],
   stamps: ["⭐", "❤️", "🌸", "🦋", "❄️", "🐠", "🌈", "🍩"],
   outlines: ["snowman", "flower", "fish", "butterfly", "star", "heart"],
-  color: "#e63946", mode: "draw", stampIdx: 0, last: null, trailHue: 0,
+  color: "#e63946", mode: "draw", stampIdx: 0, last: null, trailHue: 0, challenge: null,
   show() {
     cleanupLevel();
     if ("speechSynthesis" in window) speechSynthesis.cancel();
@@ -2573,13 +2760,53 @@ const paint = {
     $("paintStamp").classList.remove("on"); $("paintErase").classList.remove("on");
     this.setup();
     speak(`Let's paint! Pick a color and draw with your finger, ${NAME}!`);
+    this.challenge = null;
+    $("paintInstruct").classList.remove("on");
+    core.wait(() => this.nextChallenge(), 4000);
+  },
+  nextChallenge() {
+    if (!$("paint") || $("paint").classList.contains("hidden")) return;
+    const type = rand(["color", "stamp", "outline"]);
+    if (type === "color") {
+      const idx = Math.floor(Math.random() * this.colors.length);
+      this.challenge = { type: "color", val: this.colors[idx], name: this.colorNames[idx] };
+      this.setInstruct(`Can you paint with ${this.challenge.name}?`);
+    } else if (type === "stamp") {
+      const idx = Math.floor(Math.random() * this.stamps.length);
+      this.challenge = { type: "stamp", val: this.stamps[idx] };
+      this.setInstruct(`Can you put a ${this.challenge.val} on your picture?`);
+    } else {
+      this.setInstruct(`Let's paint the ${this.outline}!`);
+      this.challenge = { type: "outline" };
+    }
+  },
+  setInstruct(txt) {
+    const el = $("paintInstruct"); el.textContent = txt; el.classList.add("on");
+    speak(txt);
+  },
+  checkChallenge(type, val) {
+    if (!this.challenge || this.challenge.type !== type) return;
+    if (type === "color" && val === this.challenge.val) this.winChallenge(`Yes! You found ${this.challenge.name}!`);
+    else if (type === "stamp" && val === this.challenge.val) this.winChallenge(`Great! A ${this.challenge.val}!`);
+    else if (type === "outline") this.winChallenge(`Beautiful painting!`);
+  },
+  winChallenge(txt) {
+    this.challenge = null;
+    $("paintInstruct").classList.remove("on");
+    speak(txt + " " + praise());
+    celebrate(false);
+    core.wait(() => this.nextChallenge(), 7000);
   },
   buildSwatches() {
     const w = $("swatches"); w.innerHTML = "";
     this.colors.forEach((c, i) => {
       const b = document.createElement("button");
       b.className = "swatch" + (i === 0 ? " sel" : ""); b.style.background = c;
-      b.onclick = () => { this.color = c; this.mode = "draw"; this.markSel(b); $("paintStamp").classList.remove("on"); $("paintErase").classList.remove("on"); };
+      b.onclick = () => { 
+        this.color = c; this.mode = "draw"; this.markSel(b); 
+        $("paintStamp").classList.remove("on"); $("paintErase").classList.remove("on");
+        this.checkChallenge("color", c);
+      };
       w.appendChild(b);
     });
     this.color = this.colors[0];
@@ -2597,7 +2824,13 @@ const paint = {
       e.preventDefault(); try { c.setPointerCapture(e.pointerId); } catch (_) {}
       const p = pos(e);
       if (this.mode === "stamp") this.stamp(p);
-      else { this.last = p; this.draw(p); if (this.mode !== "erase") trail.add(e.clientX, e.clientY, this.trailHue = (this.trailHue + 24) % 360, 4); }
+      else { 
+        this.last = p; this.draw(p); 
+        if (this.mode !== "erase") {
+          trail.add(e.clientX, e.clientY, this.trailHue = (this.trailHue + 24) % 360, 4);
+          this.checkChallenge("outline");
+        }
+      }
     };
     c.onpointermove = e => { if (this.last && this.mode !== "stamp") { const p = pos(e); this.draw(p); this.last = p; if (this.mode !== "erase") trail.add(e.clientX, e.clientY, this.trailHue = (this.trailHue + 12) % 360, 2); } };
     const stop = () => this.last = null;
@@ -2631,6 +2864,7 @@ const paint = {
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText(this.stamps[this.stampIdx], p.x, p.y);
     sfx.tick();
+    this.checkChallenge("stamp", this.stamps[this.stampIdx]);
   }
 };
 
@@ -2800,6 +3034,7 @@ const GAMES = {
   pizza:   { icon: "🍕", name: "Pizza" },     pasta:   { icon: "🍝", name: "Yum Count" },
   trace:   { icon: "✨", name: "Tracing" },   rocket:  { icon: "🚀", name: "Countdown" },
   sort:    { icon: "🪐", name: "Big & Small" }, pattern: { icon: "🔮", name: "Patterns" },
+  sortkind:{ icon: "🧺", name: "Sort It" },
   paint:   { icon: "🎨", name: "Paint" },     story:   { icon: "📖", name: "Story" },
   dragon:  { icon: "🐉", name: "Dragon Feed" }, dino:  { icon: "🦕", name: "Dino Eggs" },
   icecream:{ icon: "🍦", name: "Ice Cream" },  petfeed: { icon: "🦴", name: "Feed Pet" },
@@ -2809,7 +3044,7 @@ const GAMES = {
 const CATEGORIES = [
   { id: "num",    icon: "🔢", name: "Numbers",        cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
   { id: "shape",  icon: "🎨", name: "Colors & Shapes", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
-  { id: "brain",  icon: "🧩", name: "Brain Games",     cls: "c-brain",  games: ["memory", "pattern", "sort"] },
+  { id: "brain",  icon: "🧩", name: "Brain Games",     cls: "c-brain",  games: ["memory", "pattern", "sort", "sortkind"] },
   { id: "animal", icon: "🐾", name: "Animals",         cls: "c-animal", games: ["music", "whosays", "dino"] },
   { id: "pets",   icon: "🐶", name: "Pets",            cls: "c-pets",   games: ["petcare", "petmatch", "petfeed"] },
   { id: "space",  icon: "🚀", name: "Space",           cls: "c-space",  games: ["rocket", "sort", "pattern"] },
@@ -2857,15 +3092,15 @@ function openCategory(id) {
 
 /* ================= Story mode ================= */
 const STORY = [
-  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. “I'm going on an adventure!” she said, and rode into the magical park.", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle") },
-  { theme: "theme-snow",  art: "🏔️⛄❄️", text: "First she climbed a sparkly snow mountain. A friendly snowman waved hello. Together they counted the snowflakes: one, two, three!", tapEmoji: ["❄️", "✨", "⛄"], tapSound: () => tone(880, 0, .2, "sine") },
-  { theme: "theme-ocean", art: "🌊🐠🐬", text: "Next, {n} sailed across the bright blue ocean. Red, yellow, and green fish swam all around, and a dolphin did a happy flip!", tapEmoji: ["🐠", "💦", "🐬"], tapSound: () => tone(523, 0, .25, "sine") },
-  { theme: "theme-pizza", art: "🍕🍝🧆", text: "All that adventuring made {n} hungry! She stopped in Yummy Town for a slice of pizza and spaghetti with three little meatballs.", tapEmoji: ["🍕", "😋", "🍝"], tapSound: () => tone(440, 0, .2, "triangle") },
-  { theme: "theme-music", art: "🐸🐱🐮", text: "In the meadow, the animal band was playing! The frog went ribbit, the cat went meow, and the cow went moo. {n} danced and danced.", tapEmoji: ["🎵", "🎶", "💃"], tapSound: () => speakAnimal(rand(["frog", "cat", "cow", "duck"]), { queue: true }) },
-  { theme: "theme-space", art: "🚀🌙⭐", text: "Then {n} put on a shiny space helmet and zoomed to the moon in a rocket! Five, four, three, two, one... blast off! She counted the twinkly stars up high.", tapEmoji: ["⭐", "🚀", "🪐"], tapSound: () => tone(130, 0, .5, "sawtooth", .15) },
+  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. “I'm going on an adventure!” she said, and rode into the magical park.", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle"), task: "🚲" },
+  { theme: "theme-snow",  art: "🏔️⛄❄️", text: "First she climbed a sparkly snow mountain. A friendly snowman waved hello. Together they counted the snowflakes: one, two, three!", tapEmoji: ["❄️", "✨", "⛄"], tapSound: () => tone(880, 0, .2, "sine"), task: "⛄" },
+  { theme: "theme-ocean", art: "🌊🐠🐬", text: "Next, {n} sailed across the bright blue ocean. Red, yellow, and green fish swam all around, and a dolphin did a happy flip!", tapEmoji: ["🐠", "💦", "🐬"], tapSound: () => tone(523, 0, .25, "sine"), task: "🐬" },
+  { theme: "theme-pizza", art: "🍕🍝🧆", text: "All that adventuring made {n} hungry! She stopped in Yummy Town for a slice of pizza and spaghetti with three little meatballs.", tapEmoji: ["🍕", "😋", "🍝"], tapSound: () => tone(440, 0, .2, "triangle"), task: "🍕" },
+  { theme: "theme-music", art: "🐸🐱🐮", text: "In the meadow, the animal band was playing! The frog went ribbit, the cat went meow, and the cow went moo. {n} danced and danced.", tapEmoji: ["🎵", "🎶", "💃"], tapSound: () => speakAnimal(rand(["frog", "cat", "cow", "duck"]), { queue: true }), task: "🐱" },
+  { theme: "theme-space", art: "🚀🌙⭐", text: "Then {n} put on a shiny space helmet and zoomed to the moon in a rocket! Five, four, three, two, one... blast off! She counted the twinkly stars up high.", tapEmoji: ["⭐", "🚀", "🪐"], tapSound: () => tone(130, 0, .5, "sawtooth", .15), task: "🚀" },
   { theme: "theme-story", art: "🌈⭐💖", text: "As the sun set, {n} flew home, happy and sleepy. “What a wonderful day!” she yawned. Goodnight, {n}. The End. 💖", tapEmoji: ["⭐", "🌙", "💖"], tapSound: () => sfx.good(), last: true }
 ];
-let storyPage = 0;
+let storyPage = 0, storySolved = false;
 function showStory() {
   cleanupLevel();
   if ("speechSynthesis" in window) speechSynthesis.cancel();
@@ -2876,17 +3111,43 @@ function showStory() {
 }
 function renderStory() {
   const p = STORY[storyPage];
+  storySolved = !p.task;
   document.body.className = p.theme;
   const scene = $("storyScene");
   scene.className = "story-scene";
-  scene.innerHTML = `<div class="story-art">${p.art}</div>
-      <div class="story-textbox">${fillName(p.text)}</div>
+  
+  // split art into interactive emojis
+  const artHtml = [...p.art].map(e => `<span class="s-em" onclick="storyTap('${e}', event)">${e}</span>`).join("");
+  
+  scene.innerHTML = `<div class="story-art">${artHtml}</div>
+      <div class="story-textbox" id="storyText">${fillName(p.text)}</div>
       <div class="story-tap-hint">👆 Tap the picture!</div>`;
-  scene.onclick = e => { floaters(p.tapEmoji, e.clientX || innerWidth / 2, e.clientY || innerHeight / 2, 7); if (p.tapSound) p.tapSound(); };
+  
   $("storyDots").innerHTML = STORY.map((_, i) => `<div class="sdot ${i === storyPage ? "on" : ""}"></div>`).join("");
   $("storyPrev").style.visibility = storyPage === 0 ? "hidden" : "visible";
-  $("storyNext").textContent = p.last ? "🎉" : "▶️";
+  updateStoryNav();
   speak(fillName(p.text));
+  if (p.task) core.wait(() => speak(`Can you find the ${p.task}? Tap it!`), 6000);
+}
+function updateStoryNav() {
+  const p = STORY[storyPage];
+  const btn = $("storyNext");
+  btn.textContent = p.last ? "🎉" : "▶️";
+  btn.style.opacity = storySolved ? "1" : "0.3";
+  btn.style.pointerEvents = storySolved ? "auto" : "none";
+}
+function storyTap(e, ev) {
+  const p = STORY[storyPage];
+  floaters(p.tapEmoji, ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2, 5);
+  if (p.tapSound) p.tapSound();
+  
+  if (p.task && e === p.task && !storySolved) {
+    storySolved = true;
+    sfx.good();
+    celebrate(false);
+    speak(`Yes! You found the ${e}! ${praise()}`);
+    updateStoryNav();
+  }
 }
 function storyNav(dir) {
   const p = STORY[storyPage];
@@ -2953,6 +3214,11 @@ function renderScene() {
     const x = (e.clientX - r.left) / r.width * 100, y = (e.clientY - r.top) / r.height * 100;
     (decor[curScene] = decor[curScene] || []).push({ e: palSel, x, y });
     saveDecor(); sfx.tap();
+    const d = STICKER_DATA[palSel];
+    if (d && d.h === curScene) {
+      celebrate(false);
+      speak(`Perfect! The ${d.n} belongs in the ${curScene}!`);
+    }
     addPlaced({ e: palSel, x, y }, decor[curScene].length - 1);
   };
   (decor[curScene] || []).forEach((d, i) => addPlaced(d, i));
@@ -3028,11 +3294,12 @@ function showHub() {
   $("hub").classList.remove("hidden");
   animScreen("hub", "back");
   buildHub();
-  if (!questGreeted && settings.voice) { questGreeted = true; setTimeout(questIntro, 800); }
+  if (!questGreeted && settings.voice) { questGreeted = true; core.wait(questIntro, 800); }
 }
 function startLevel(name) {
   audio(); cleanupLevel();
   state.level = name; state.round = 0; state.busy = false; state.tier = tierFor(name);
+  roundMistakes = 0;
   document.body.className = LEVELS[name].theme;
   hideAllScreens();
   $("game").classList.remove("hidden");

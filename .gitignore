@@ -5,3 +5,12 @@ desktop.ini
 *.swp
 .idea/
 .vscode/
+
+# CI scratch (inline-JS syntax check)
+.ci/
+
+# Smoke-test tooling (the app itself has no deps/build)
+node_modules/
+test-results/
+playwright-report/
+playwright/.cache/

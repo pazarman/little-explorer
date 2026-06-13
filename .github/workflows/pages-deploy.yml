@@ -1,0 +1,59 @@
+name: Deploy Static Site to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Fast gate: never auto-deploy a broken build to the live site that children use.
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Required files present
+        run: |
+          for f in index.html manifest.json sw.js icon.svg; do
+            test -f "$f" || { echo "::error::missing required file $f"; exit 1; }
+          done
+
+      - name: manifest.json is valid JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('manifest.json','utf8'))"
+
+      - name: Inline JS parses (no syntax errors)
+        run: |
+          node -e "const fs=require('fs');const h=fs.readFileSync('index.html','utf8');const b=[...h.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);if(!b.length){console.error('no inline <script> found');process.exit(1);}fs.mkdirSync('.ci',{recursive:true});b.forEach((s,i)=>fs.writeFileSync('.ci/b'+i+'.js',s));"
+          for f in .ci/*.js; do node --check "$f"; done
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

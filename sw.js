@@ -1,5 +1,5 @@
 // Bump CACHE whenever you ship an update (forces old caches to clear).
-const CACHE = "little-explorer-v7";
+const CACHE = "little-explorer-v8";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", e => {
@@ -15,16 +15,22 @@ self.addEventListener("activate", e => {
   );
 });
 
-// Network-first: always try to fetch the freshest version, fall back to cache when offline.
+// Network-first with timeout: always try freshest version but fallback quickly if slow.
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
+  
+  // Create a timeout promise to race against the fetch
+  const timeout = new Promise(resolve => setTimeout(resolve, 3000));
+  
   e.respondWith(
-    fetch(e.request)
-      .then(res => {
+    Promise.race([
+      fetch(e.request).then(res => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
         return res;
-      })
-      .catch(() => caches.match(e.request).then(hit => hit || caches.match("./index.html")))
+      }),
+      timeout // if timeout wins, the catch() below will trigger the cache fallback
+    ])
+    .catch(() => caches.match(e.request).then(hit => hit || caches.match("./index.html")))
   );
 });
