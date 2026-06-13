@@ -378,12 +378,18 @@
   @keyframes ride { 0%,100%{ transform:scaleX(-1) translateY(0);} 50%{ transform:scaleX(-1) translateY(-1vmin);} }
   .balloon { position:absolute; border:none; background:none; z-index:8; }
   .b-body {
-    width:clamp(60px,13vmin,104px); height:clamp(72px,15.5vmin,124px); border-radius:50% 50% 50% 50% / 56% 56% 44% 44%;
+    position:relative; width:clamp(60px,13vmin,104px); height:clamp(72px,15.5vmin,124px);
+    border-radius:50% 50% 50% 50% / 56% 56% 44% 44%;
     display:flex; align-items:center; justify-content:center;
-    color:#fff; font-weight:bold; font-size:clamp(28px,6.6vmin,52px); text-shadow:0 2px 0 rgba(0,0,0,.3);
-    box-shadow:inset -6px -8px 0 rgba(0,0,0,.12), 0 3px 4px rgba(0,0,0,.25);
+    color:#fff; font-weight:bold; font-size:clamp(28px,6.6vmin,52px); text-shadow:0 2px 0 rgba(0,0,0,.35);
+    box-shadow:inset -7px -9px 0 rgba(0,0,0,.14), inset 8px 6px 10px rgba(255,255,255,.25), 0 3px 4px rgba(0,0,0,.25);
     animation:floaty 2.6s ease-in-out infinite;
   }
+  .b-num { position:relative; z-index:2; }
+  .b-shine { position:absolute; top:12%; left:17%; width:34%; height:30%; border-radius:50%; z-index:1;
+    background:radial-gradient(closest-side, rgba(255,255,255,.9), rgba(255,255,255,0)); }
+  .b-knot { width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent;
+    border-top:9px solid #888; margin:-3px auto 0; filter:brightness(.8); }
   .b-string { width:2px; height:clamp(26px,5.5vmin,44px); background:rgba(255,255,255,.85); margin:0 auto; }
 
   /* ----- pasta ----- */
@@ -1706,7 +1712,8 @@ const bikeLevel = {
   spawn(W, num) {
     const el = document.createElement("button");
     el.className = "balloon";
-    el.innerHTML = `<div class="b-body" style="background:${rand(BALLOON_COLORS)}; animation-delay:${Math.random() * 2}s;">${num}</div><div class="b-string"></div>`;
+    const color = rand(BALLOON_COLORS);
+    el.innerHTML = `<div class="b-body" style="background:${color}; animation-delay:${Math.random() * 2}s;"><span class="b-shine"></span><span class="b-num">${num}</span></div><div class="b-knot" style="border-top-color:${color}"></div><div class="b-string"></div>`;
     el.style.top = randBetween(3, 48) + "%";
     el.style.left = W + 20 + "px";
     const b = { el, num, x: W + 20, speed: randBetween(55, 95) * (W / 700) * this.speedMul };
@@ -1717,8 +1724,11 @@ const bikeLevel = {
   tap(b, e) {
     if (state.busy || b.el.classList.contains("popped")) return;
     if (b.num === this.target) {
-      b.el.classList.add("popped"); sfx.tap(); miniStar(e.clientX, e.clientY);
-      speak(`${NUM_WORDS[b.num]}! ${praise()}`); roundComplete();
+      b.el.classList.add("popped");
+      tone(1100, 0, .04, "square", .2); tone(180, .03, .14, "sawtooth", .12);   // snappy balloon pop
+      floaters(["🎈", "⭐", "✨"], e.clientX, e.clientY, b.num);                  // burst exactly b.num pieces = the quantity
+      miniStar(e.clientX, e.clientY);
+      speak(`${NUM_WORDS[b.num]}! That's ${b.num}! ${praise()}`); roundComplete();
     } else { sfx.bad(); wiggle(b.el); speak(`That's number ${b.num}. Find number ${this.target}!`); }
   },
   cleanup() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.balloons = []; }
