@@ -19,8 +19,8 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
   
-  // Create a timeout promise to race against the fetch
-  const timeout = new Promise(resolve => setTimeout(resolve, 3000));
+  // Create a timeout promise to race against the fetch — reject so the catch() triggers cache fallback
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
   
   e.respondWith(
     Promise.race([

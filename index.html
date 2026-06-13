@@ -34,6 +34,11 @@
   body.theme-dressup { background:linear-gradient(#ffe0f2, #e2e6ff 60%, #d8f0e0); }
   body.theme-sort   { background:linear-gradient(#5aa9d6, #9fd0e8 55%, #dff0f8); }
 
+  body.test *, body.test *::before, body.test *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
             align-items:center; justify-content:center; padding:2vmin;
             animation:screenIn .44s cubic-bezier(0.34,1.56,0.64,1) both; }
@@ -1046,6 +1051,7 @@ const saveSettings = () => core.save("fionaSettings", settings);
 const savePerf = () => core.save("fionaPerf", perf);
 
 /* ===== Centralized quest ===== */
+const QUEST_GOAL = 6;
 let sparks = +(localStorage.getItem("fionaSparks") || 0);
 let trips  = +(localStorage.getItem("fionaTrips")  || 0);
 let questShown = sparks, questGreeted = false;
@@ -2794,7 +2800,7 @@ const paint = {
     this.challenge = null;
     $("paintInstruct").classList.remove("on");
     speak(txt + " " + praise());
-    celebrate(false);
+    confetti();
     core.wait(() => this.nextChallenge(), 7000);
   },
   buildSwatches() {
@@ -3144,7 +3150,7 @@ function storyTap(e, ev) {
   if (p.task && e === p.task && !storySolved) {
     storySolved = true;
     sfx.good();
-    celebrate(false);
+    confetti();
     speak(`Yes! You found the ${e}! ${praise()}`);
     updateStoryNav();
   }
@@ -3216,7 +3222,7 @@ function renderScene() {
     saveDecor(); sfx.tap();
     const d = STICKER_DATA[palSel];
     if (d && d.h === curScene) {
-      celebrate(false);
+      confetti();
       speak(`Perfect! The ${d.n} belongs in the ${curScene}!`);
     }
     addPlaced({ e: palSel, x, y }, decor[curScene].length - 1);
