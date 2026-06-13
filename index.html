@@ -30,6 +30,8 @@
   body.theme-dragon { background:linear-gradient(#3a1c4a, #7a3b8a 50%, #e08a5a); }
   body.theme-dino   { background:linear-gradient(#5c9e57, #9ed07e 55%, #e6dba0); }
   body.theme-icecream { background:linear-gradient(#ffd1e8, #ffe6c0 55%, #bfe8ff); }
+  body.theme-pets   { background:linear-gradient(#ffe6a8, #ffd2e0 55%, #b8e6c0); }
+  body.theme-dressup { background:linear-gradient(#ffe0f2, #e2e6ff 60%, #d8f0e0); }
 
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
             align-items:center; justify-content:center; padding:2vmin; animation:fadeIn .35s ease; }
@@ -84,7 +86,12 @@
   .b-dragon { background:linear-gradient(#a05bc0,#6a2f8a); }
   .b-dino   { background:linear-gradient(#7fc96a,#3f8e35); }
   .b-icecream { background:linear-gradient(#ff9ec9,#e84393); }
+  .b-petfeed { background:linear-gradient(#ffc06a,#e0852e); }
+  .b-petmatch{ background:linear-gradient(#ffb38f,#e06a3a); }
+  .b-petcare { background:linear-gradient(#7fd0e0,#2f8ea0); }
+  .b-dressup { background:linear-gradient(#ff9ed6,#c84398); }
   .c-fantasy{ background:linear-gradient(#b57fe0,#6a3a9a); }
+  .c-pets   { background:linear-gradient(#ffba6a,#e07a2e); }
   .c-num    { background:linear-gradient(#7fb6f7,#3a6fd0); }
   .c-shape  { background:linear-gradient(#ff9f4f,#e0701e); }
   .c-brain  { background:linear-gradient(#5ad29a,#2f9e6e); }
@@ -123,6 +130,32 @@
   #nameStart:active { transform:scale(.95); }
   #nameSkip { border:none; background:none; color:#aaa; font-family:inherit; font-size:clamp(13px,2.8vmin,18px); text-decoration:underline; }
   #setName { background:#cdeafe; color:#1b4e7a; }
+  #setDash { background:#d8f0d0; color:#2b5e1f; }
+
+  /* dress-up */
+  #dressup { padding:0; }
+  #dressBar { display:flex; align-items:center; justify-content:center; gap:1.4vmin; width:100%; padding:1.2vmin; z-index:20; }
+  #dressStage { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+                width:100%; max-width:560px; border-radius:20px; transition:background .3s; margin:0 auto; }
+  .dp { border:none; background:none; line-height:.82; margin:-1.5vmin 0; font-size:clamp(52px,14vmin,120px); }
+  .dp:active { transform:scale(1.1); }
+  #dp-item { font-size:clamp(34px,8vmin,64px); margin-top:1vmin; }
+  #dressHint { color:#666; font-size:clamp(13px,3vmin,20px); padding:1.4vmin; text-align:center; }
+
+  /* dashboard */
+  #dashboard { justify-content:flex-start; padding-top:8vmin; overflow-y:auto; }
+  #dashHome { position:absolute; top:2vmin; left:2vmin; z-index:10; }
+  #dashboard h2 { font-size:clamp(20px,4.6vmin,34px); color:#fff; text-shadow:0 3px 0 rgba(0,0,0,.25); margin-bottom:2vmin; }
+  #dashStats { display:grid; grid-template-columns:repeat(4,1fr); gap:1.6vmin; width:100%; max-width:680px; margin-bottom:2.5vmin; padding:0 2vmin; }
+  @media (max-width:560px) { #dashStats { grid-template-columns:repeat(2,1fr); } }
+  .stat { background:rgba(255,255,255,.92); border-radius:18px; padding:2vmin 1vmin; text-align:center; box-shadow:0 4px 0 rgba(0,0,0,.15); }
+  .stat .sv { font-size:clamp(20px,4.6vmin,32px); font-weight:bold; color:#444; }
+  .stat .sl { font-size:clamp(11px,2.4vmin,16px); color:#888; }
+  #dashList { width:100%; max-width:680px; padding:0 2vmin 4vmin; }
+  .dash-cat { background:rgba(255,255,255,.92); border-radius:18px; padding:1.6vmin 2.4vmin; margin-bottom:1.6vmin; box-shadow:0 4px 0 rgba(0,0,0,.12); }
+  .dash-cat h3 { font-size:clamp(15px,3.2vmin,22px); color:#7444c4; margin-bottom:.8vmin; }
+  .dash-row { display:flex; justify-content:space-between; align-items:center; padding:.5vmin 0; font-size:clamp(13px,2.8vmin,19px); color:#555; border-top:1px solid #eee; }
+  .dash-row .dp { font-size:clamp(13px,2.8vmin,19px); margin:0; background:none; }
 
   /* buddy chooser */
   #charscreen { background:linear-gradient(#b8a0ee,#c9efb0 75%,#8fd06a); z-index:78; }
@@ -416,20 +449,49 @@
               border:3px solid #fff; box-shadow:0 5px 0 rgba(0,0,0,.22); }
   .scoopbtn:active { transform:scale(.92); }
 
+  /* ----- pets ----- */
+  .pet-choices { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+                 gap:4vmin; flex-wrap:wrap; padding:2vmin; z-index:5; }
+  .pet-choice { border:none; background:rgba(255,255,255,.92); border-radius:28px;
+                width:clamp(80px,18vmin,150px); height:clamp(80px,18vmin,150px);
+                font-size:clamp(44px,11vmin,90px); box-shadow:0 6px 0 rgba(0,0,0,.2); }
+  .pet-choice:active { transform:scale(.93); }
+  .petcare-wrap { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+                  justify-content:center; gap:3vmin; z-index:5; }
+  .care-pet { font-size:clamp(90px,24vmin,200px); line-height:1; filter:drop-shadow(0 5px 6px rgba(0,0,0,.3)); }
+  .care-pet.happy { animation:chomp .4s ease; }
+  .care-status { font-size:clamp(28px,7vmin,52px); letter-spacing:1.4vmin; min-height:1.2em; }
+  .care-tools { display:flex; gap:3vmin; }
+  .care-tool { border:none; background:#fff; border-radius:24px; width:clamp(64px,15vmin,110px);
+               height:clamp(64px,15vmin,110px); font-size:clamp(34px,8vmin,64px); box-shadow:0 6px 0 rgba(0,0,0,.2); }
+  .care-tool:active { transform:translateY(4px); }
+
   /* ================= STICKER BOOK ================= */
-  #stickerbook { overflow:hidden; }
-  #stickerbook h2 { font-size:clamp(22px,5.5vmin,44px); color:#fff; z-index:2;
-                    text-shadow:0 3px 0 rgba(0,0,0,.25); margin-bottom:1vmin; }
+  #stickerbook { overflow:hidden; padding:1vmin; gap:1vmin; }
+  #bookTop { display:flex; align-items:center; gap:1.4vmin; width:100%; max-width:980px; padding:.5vmin; z-index:3; }
+  #sceneBtns { flex:1; display:flex; gap:1vmin; overflow-x:auto; justify-content:center; flex-wrap:wrap; }
+  .scene-btn { border:none; border-radius:50px; padding:1vmin 2.4vmin; font-family:inherit; font-weight:bold;
+               font-size:clamp(13px,2.8vmin,19px); background:rgba(255,255,255,.85); color:#555; box-shadow:0 3px 0 rgba(0,0,0,.15); white-space:nowrap; }
+  .scene-btn.sel { background:#ffd23e; color:#5b3c00; }
   #stickerScene { position:relative; flex:1; width:100%; max-width:980px; z-index:2;
-                  border-radius:18px; background:rgba(255,255,255,.18); }
-  #stickerHint { color:#fff; font-size:clamp(14px,3vmin,22px); z-index:2; padding:1.5vmin;
-                 text-shadow:0 2px 0 rgba(0,0,0,.25); }
-  .sticker { position:absolute; transform:translate(-50%,-50%); font-size:clamp(40px,9vmin,78px);
-             touch-action:none; cursor:grab; filter:drop-shadow(0 3px 3px rgba(0,0,0,.3)); z-index:5; }
-  .slot { position:absolute; transform:translate(-50%,-50%); border:3px dashed rgba(255,255,255,.6);
-          border-radius:50%; width:clamp(48px,10.5vmin,86px); height:clamp(48px,10.5vmin,86px); z-index:3; }
-  .slot.hover { border-color:#ffd23e; background:rgba(255,210,62,.3); }
-  #bookHome { position:absolute; top:2vmin; left:2vmin; z-index:10; }
+                  border-radius:18px; overflow:hidden; box-shadow:inset 0 0 0 3px rgba(255,255,255,.4); }
+  #stickerScene.sc-park   { background:linear-gradient(#bfe9ff,#d8f7c8 70%,#9bd870); }
+  #stickerScene.sc-space  { background:linear-gradient(#0a0a2e,#241a55 60%,#3a2a66); }
+  #stickerScene.sc-ocean  { background:linear-gradient(#9fe4f5,#3aa9cc 55%,#0e6e96); }
+  #stickerScene.sc-castle { background:linear-gradient(#ffd6f0,#e0b3ff 55%,#b692e8); }
+  #stickerScene.sc-bed    { background:linear-gradient(#3a2a6e,#6a5aa8 60%,#caa0e0); }
+  .scene-deco { position:absolute; bottom:1vmin; width:100%; text-align:center;
+                font-size:clamp(26px,7vmin,52px); pointer-events:none; opacity:.95; letter-spacing:1vmin; }
+  #stickerHint { color:#fff; font-size:clamp(13px,2.8vmin,20px); z-index:2; padding:.4vmin;
+                 text-shadow:0 2px 0 rgba(0,0,0,.3); text-align:center; }
+  #stickerPalette { display:flex; gap:1.4vmin; width:100%; max-width:980px; overflow-x:auto; padding:1.2vmin;
+                    background:rgba(255,255,255,.25); border-radius:18px; z-index:3; align-items:center; min-height:11vmin; }
+  .pal-item { border:none; background:rgba(255,255,255,.8); border-radius:14px; flex-shrink:0;
+              width:clamp(46px,10vmin,74px); height:clamp(46px,10vmin,74px); font-size:clamp(28px,6.5vmin,48px); box-shadow:0 3px 0 rgba(0,0,0,.15); }
+  .pal-item.sel { background:#ffd23e; outline:4px solid #f0a813; transform:scale(1.08); }
+  .sticker { position:absolute; transform:translate(-50%,-50%); font-size:clamp(40px,9vmin,80px);
+             touch-action:none; cursor:grab; filter:drop-shadow(0 3px 3px rgba(0,0,0,.35)); z-index:5; animation:bounceIn .4s; }
+  #bookHome, #sceneClear { flex-shrink:0; }
 
   /* ================= PAINT ================= */
   #paint { padding:0; }
@@ -568,10 +630,14 @@
 </div>
 
 <div id="stickerbook" class="screen hidden">
-  <button class="round-btn" id="bookHome" aria-label="Home">🏠</button>
-  <h2>📒 {n}'s Sticker Book 📒</h2>
+  <div id="bookTop">
+    <button class="round-btn" id="bookHome" aria-label="Home">🏠</button>
+    <div id="sceneBtns"></div>
+    <button class="round-btn" id="sceneClear" aria-label="Clear">🗑️</button>
+  </div>
   <div id="stickerScene"></div>
-  <div id="stickerHint">Drag your stickers anywhere you like!</div>
+  <div id="stickerHint"></div>
+  <div id="stickerPalette"></div>
 </div>
 
 <div id="paint" class="screen hidden">
@@ -595,6 +661,29 @@
     <div id="storyDots"></div>
     <button class="round-btn" id="storyNext" aria-label="Next">▶️</button>
   </div>
+</div>
+
+<div id="dressup" class="screen hidden">
+  <div id="dressBar">
+    <button class="round-btn" id="dressHome" aria-label="Home">🏠</button>
+    <button class="round-btn" id="dressBg" aria-label="Background">🌈</button>
+    <button class="round-btn" id="dressShuffle" aria-label="Surprise">🎲</button>
+    <button class="round-btn" id="dressDone" aria-label="Done">✅</button>
+  </div>
+  <div id="dressStage">
+    <button class="dp" id="dp-hat"></button>
+    <button class="dp" id="dp-face"></button>
+    <button class="dp" id="dp-body"></button>
+    <button class="dp" id="dp-item"></button>
+  </div>
+  <div id="dressHint">Tap a piece to change it! 👆</div>
+</div>
+
+<div id="dashboard" class="screen hidden">
+  <button class="round-btn" id="dashHome" aria-label="Home">🏠</button>
+  <h2>📊 Grown-up Progress</h2>
+  <div id="dashStats"></div>
+  <div id="dashList"></div>
 </div>
 
 <div id="settings" class="screen hidden">
@@ -628,6 +717,7 @@
     <div class="closeRow">
       <button id="setBuddy">🧸 Buddy</button>
       <button id="setName">✏️ Name</button>
+      <button id="setDash">📊 Progress</button>
       <button id="setReset">Reset stars</button>
       <button id="setDone">Done</button>
     </div>
@@ -895,7 +985,8 @@ const COLOR_TIERS = [
   ["red", "blue", "yellow", "green", "orange", "purple", "pink", "brown", "gray", "black", "white"]
 ];
 const NUM_WORDS = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
-const STICKER_POOL = ["🦄", "👑", "🦋", "🌈", "⛄", "🐬", "🌺", "🍦", "🎈", "🐠", "🍕", "💎", "🚲", "🌟", "🐧", "🦁", "🌸", "🍩"];
+const STICKER_POOL = ["🦄", "👑", "🦋", "🌈", "⛄", "🐬", "🌺", "🍦", "🎈", "🐠", "🍕", "💎", "🚲", "🌟", "🐧", "🦁", "🌸", "🍩",
+  "🐉", "🦕", "🐶", "🐱", "🐰", "🦊", "🐻", "🐢", "🦩", "🐙", "🦜", "🌙", "⭐", "🍭", "🧁", "🎀", "🚀", "🪐", "🏰", "🦖", "🌷", "🍓"];
 
 const ANIMALS = {
   dog:   { e: "🐶", sound: "Woof woof", freq: 300 },
@@ -1385,10 +1476,33 @@ const GLYPHS = {
   "1": [[[.5, .06], [.5, .94]], [[.33, .22], [.5, .06]]],
   "2": [[[.26, .28], [.4, .12], [.62, .12], [.74, .3], [.58, .52], [.3, .8], [.26, .94], [.78, .94]]],
   "3": [[[.28, .16], [.62, .1], [.74, .3], [.5, .5], [.74, .7], [.6, .92], [.28, .86]]],
+  "4": [[[.66, .94], [.66, .06], [.22, .62], [.8, .62]]],
+  "5": [[[.74, .06], [.32, .06], [.3, .46], [.56, .42], [.76, .58], [.66, .9], [.32, .92], [.24, .8]]],
+  "A": [[[.2, .94], [.5, .06], [.8, .94]], [[.33, .62], [.67, .62]]],
+  "B": [[[.25, .06], [.25, .94]], [[.25, .06], [.6, .06], [.74, .22], [.6, .48], [.25, .48]], [[.25, .48], [.66, .48], [.8, .72], [.64, .94], [.25, .94]]],
+  "C": [[[.78, .2], [.5, .06], [.26, .2], [.18, .5], [.26, .8], [.5, .94], [.78, .8]]],
+  "D": [[[.25, .06], [.25, .94]], [[.25, .06], [.55, .08], [.78, .3], [.78, .7], [.55, .92], [.25, .94]]],
+  "E": [[[.76, .06], [.28, .06], [.28, .94], [.76, .94]], [[.28, .5], [.64, .5]]],
   "F": [[[.32, .06], [.32, .94]], [[.32, .06], [.84, .06]], [[.32, .48], [.74, .48]]],
+  "G": [[[.78, .2], [.5, .06], [.26, .2], [.18, .5], [.26, .8], [.5, .94], [.78, .82], [.78, .54], [.56, .54]]],
+  "H": [[[.25, .06], [.25, .94]], [[.75, .06], [.75, .94]], [[.25, .5], [.75, .5]]],
   "I": [[[.5, .06], [.5, .94]]],
+  "J": [[[.7, .06], [.7, .76], [.56, .92], [.36, .88], [.3, .72]]],
+  "K": [[[.28, .06], [.28, .94]], [[.74, .06], [.28, .5], [.76, .94]]],
+  "L": [[[.3, .06], [.3, .94], [.74, .94]]],
+  "M": [[[.2, .94], [.2, .06], [.5, .58], [.8, .06], [.8, .94]]],
   "N": [[[.26, .94], [.26, .06], [.74, .94], [.74, .06]]],
-  "A": [[[.2, .94], [.5, .06], [.8, .94]], [[.33, .62], [.67, .62]]]
+  "P": [[[.28, .94], [.28, .06], [.62, .06], [.78, .24], [.62, .46], [.28, .46]]],
+  "Q": [[[.7, .18], [.5, .06], [.3, .18], [.2, .5], [.3, .82], [.5, .94], [.7, .82], [.8, .5], [.7, .18]], [[.58, .68], [.84, .96]]],
+  "R": [[[.28, .94], [.28, .06], [.62, .06], [.78, .24], [.62, .46], [.28, .46]], [[.5, .46], [.78, .94]]],
+  "S": [[[.76, .2], [.5, .06], [.28, .18], [.3, .42], [.6, .54], [.74, .72], [.6, .92], [.3, .9], [.22, .78]]],
+  "T": [[[.14, .06], [.86, .06]], [[.5, .06], [.5, .94]]],
+  "U": [[[.25, .06], [.25, .68], [.4, .9], [.6, .9], [.75, .68], [.75, .06]]],
+  "V": [[[.2, .06], [.5, .94], [.8, .06]]],
+  "W": [[[.14, .06], [.32, .94], [.5, .4], [.68, .94], [.86, .06]]],
+  "X": [[[.24, .06], [.76, .94]], [[.76, .06], [.24, .94]]],
+  "Y": [[[.24, .06], [.5, .5], [.76, .06]], [[.5, .5], [.5, .94]]],
+  "Z": [[[.24, .06], [.76, .06], [.26, .94], [.78, .94]]]
 };
 function sampleStrokes(strokes, w, h) {
   const padX = w * 0.30, padY = h * 0.13;
@@ -1430,11 +1544,17 @@ const traceLevel = {
   theme: "theme-trace", rounds: 5,
   startRound() {
     if (state.round === 0) {
-      this.order = [
-        ["circle", "square", "triangle", "star", "heart"],
-        shuffle(["triangle", "star", "oval", "diamond", "1", "2", "3"]).slice(0, 5),
-        ["F", "I", "O", "N", "A"]                       // tier 2 spells her name!
-      ][state.tier];
+      if (state.tier === 2) {
+        const letters = NAME.toUpperCase().replace(/[^A-Z]/g, "").split("").slice(0, 8);
+        this.order = letters.length ? letters : ["S", "T", "A", "R"];   // tier 2 spells the child's name!
+      } else {
+        this.order = [
+          ["circle", "square", "triangle", "star", "heart"],
+          shuffle(["triangle", "star", "oval", "diamond", "1", "2", "3"]).slice(0, 5)
+        ][state.tier];
+      }
+      this.rounds = this.order.length;
+      drawProgress();
     }
     const item = this.order[state.round];
     this.item = item; this.done = false; this.hue = 0; this.last = null; this.hits = 0;
@@ -1894,11 +2014,110 @@ const icecreamLevel = {
   }
 };
 
+/* ================= PETS ================= */
+const PETS = [
+  { e: "🐶", name: "puppy" }, { e: "🐱", name: "kitty" }, { e: "🐰", name: "bunny" }, { e: "🐹", name: "hamster" },
+  { e: "🐦", name: "birdie" }, { e: "🐠", name: "fishy" }, { e: "🐢", name: "turtle" }, { e: "🐴", name: "pony" }
+];
+
+/* LEVEL: Find Pet (vocabulary / identification) */
+const petmatchLevel = {
+  theme: "theme-pets", rounds: 5,
+  startRound() {
+    const n = [2, 3, 4][state.tier];
+    const picks = shuffle(PETS).slice(0, n);
+    this.target = rand(picks);
+    setInstruction(`🐾 Tap the ${this.target.name}!`, `Tap the ${this.target.name}!`);
+    $("playArea").innerHTML = `<div class="pet-choices" id="petChoices"></div>`;
+    picks.forEach(p => {
+      const b = document.createElement("button");
+      b.className = "pet-choice"; b.textContent = p.e;
+      b.onclick = e => this.tap(p, b, e);
+      $("petChoices").appendChild(b);
+    });
+  },
+  tap(p, btn, e) {
+    if (state.busy) return;
+    if (p.name === this.target.name) {
+      btn.classList.add("popped"); miniStar(e.clientX, e.clientY);
+      speak(`Yes! The ${this.target.name}! ${praise()}`); roundComplete();
+    } else { sfx.bad(); wiggle(btn); speak(`Look for the ${this.target.name}!`); }
+  }
+};
+
+/* LEVEL: Pet Care (nurture / cause-effect) */
+const petcareLevel = {
+  theme: "theme-pets", rounds: 3,
+  startRound() {
+    this.pet = rand(PETS.slice(0, 6));
+    this.needs = new Set(["wash", "feed", "play"]);
+    setInstruction(`🛁 Take care of the ${this.pet.name}!`, `Take care of the ${this.pet.name}! Give it a bath, some food, and a toy!`);
+    $("playArea").innerHTML = `<div class="petcare-wrap">
+        <div class="care-pet" id="carePet">${this.pet.e}</div>
+        <div class="care-status" id="careStatus">🫧 🍖 🎾</div>
+        <div class="care-tools">
+          <button class="care-tool" data-act="wash">🧼</button>
+          <button class="care-tool" data-act="feed">🍖</button>
+          <button class="care-tool" data-act="play">🎾</button>
+        </div></div>`;
+    document.querySelectorAll(".care-tool").forEach(t => t.onclick = e => this.use(t.dataset.act, e));
+  },
+  use(act, e) {
+    if (state.busy || !this.needs.has(act)) return;
+    this.needs.delete(act);
+    const pet = $("carePet"); pet.classList.remove("happy"); void pet.offsetWidth; pet.classList.add("happy");
+    const c = centerOf(pet);
+    if (act === "wash") { floaters(["🫧", "✨", "💧"], c.x, c.y, 9); tone(700, 0, .2, "sine"); speak("All clean!"); }
+    else if (act === "feed") { floaters(["😋", "❤️", "🍖"], c.x, c.y, 6); tone(400, 0, .2, "square"); speak("Yum yum!"); }
+    else { floaters(["🎾", "⭐", "🐾"], c.x, c.y, 7); tone(600, 0, .2, "triangle"); speak("Wheee!"); }
+    const icons = { wash: "🫧", feed: "🍖", play: "🎾" };
+    $("careStatus").textContent = [...this.needs].map(n => icons[n]).join(" ") || "💖";
+    if (this.needs.size === 0) { floaters(["💖", "⭐", "🐾", "✨"], c.x, c.y, 12); speak(`The ${this.pet.name} is so happy! ${praise()}`); roundComplete(); }
+  }
+};
+
+/* LEVEL: Feed Pet (counting) */
+const PET_FOODS = [
+  { e: "🐶", treat: "🦴", name: "puppy" }, { e: "🐱", treat: "🐟", name: "kitty" },
+  { e: "🐰", treat: "🥕", name: "bunny" }, { e: "🐹", treat: "🌰", name: "hamster" }
+];
+const petfeedLevel = {
+  theme: "theme-pets", rounds: 5,
+  startRound() {
+    if (state.round === 0) this.pet = rand(PET_FOODS);
+    const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
+    const need = counts[state.round];
+    this.need = need; this.fed = 0;
+    setInstruction(`Give the ${this.pet.name} ${need} ${plural("treat", need)}!`, `Give the ${this.pet.name} ${need} ${need === 1 ? "treat" : "treats"}!`);
+    $("playArea").innerHTML = `<div class="dragon-wrap"><div class="dragon" id="petEl">${this.pet.e}</div><div class="treat-row" id="treatRow"></div></div>`;
+    for (let i = 0; i < need; i++) {
+      const t = document.createElement("button");
+      t.className = "treat"; t.textContent = this.pet.treat;
+      makeDraggable(t, (el, ev, info) => this.release(el, ev, info));
+      $("treatRow").appendChild(t);
+    }
+  },
+  release(el, ev, info) {
+    if (state.busy) { info.reset(); return; }
+    if (inside(centerOf(el), $("petEl")) || !info.moved) this.feed(el, ev);
+    else info.reset();
+  },
+  feed(el, ev) {
+    el.style.visibility = "hidden"; el.classList.add("on-plate");
+    const d = $("petEl"); d.classList.remove("chomp"); void d.offsetWidth; d.classList.add("chomp");
+    sfx.tap(); tone(300, 0, .15, "square", .14); miniStar(ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2);
+    this.fed++;
+    if (this.fed < this.need) speak(NUM_WORDS[this.fed] + "!");
+    else { floaters(["❤️", "✨", "🐾"], innerWidth / 2, innerHeight / 2.5, 8); speak(`${this.need} ${plural("treat", this.need)}! ${praise()}`); roundComplete(); }
+  }
+};
+
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
   rocket: rocketLevel, sort: sortLevel, pattern: patternLevel,
-  dragon: dragonLevel, dino: dinoLevel, icecream: icecreamLevel
+  dragon: dragonLevel, dino: dinoLevel, icecream: icecreamLevel,
+  petmatch: petmatchLevel, petcare: petcareLevel, petfeed: petfeedLevel
 };
 
 /* ================= Paint Studio (free drawing) ================= */
@@ -1910,7 +2129,7 @@ const paint = {
   show() {
     cleanupLevel();
     if ("speechSynthesis" in window) speechSynthesis.cancel();
-    ["hub", "game", "celebrate", "stickerbook", "story", "settings", "games"].forEach(id => $(id).classList.add("hidden"));
+    hideAllScreens();
     $("paint").classList.remove("hidden");
     document.body.className = "theme-trace";
     this.mode = "draw";
@@ -1981,6 +2200,41 @@ const paint = {
   }
 };
 
+/* ================= Dress-Up Studio (creative) ================= */
+const dressup = {
+  parts: {
+    hat:  ["✨", "🎩", "👑", "🧢", "🎀", "🎓", "👒", "🪖", "🐣"],
+    face: ["🐶", "🐱", "🐰", "🦊", "🐻", "🦄", "🐯", "🧒", "👧", "👦", "🐵", "🐸"],
+    body: ["👕", "👗", "🦺", "🧥", "🩱", "👚", "🥋", "🦸", "🎽"],
+    item: ["✨", "🎈", "🌸", "🍦", "🪀", "🧸", "⭐", "🍭", "🌈", "🎁"]
+  },
+  idx: { hat: 0, face: 0, body: 0, item: 0 },
+  bgs: ["#bfe9ff", "#ffd6f0", "#d8f7c8", "#fff0b8", "#e0d0ff", "#ffd9c0"],
+  bg: 0,
+  show() {
+    cleanupLevel();
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    hideAllScreens();
+    $("dressup").classList.remove("hidden");
+    document.body.className = "theme-dressup";
+    this.render();
+    speak(`Let's dress up! Tap the pieces to change them, ${NAME}!`);
+  },
+  render() {
+    $("dressStage").style.background = this.bgs[this.bg];
+    ["hat", "face", "body", "item"].forEach(p => { $("dp-" + p).textContent = this.parts[p][this.idx[p]]; });
+  },
+  cycle(p) { this.idx[p] = (this.idx[p] + 1) % this.parts[p].length; sfx.tick(); $("dp-" + p).style.animation = "none"; void $("dp-" + p).offsetWidth; $("dp-" + p).style.animation = "bounceIn .3s"; this.render(); },
+  cycleBg() { this.bg = (this.bg + 1) % this.bgs.length; sfx.tick(); this.render(); },
+  shuffle() {
+    for (const p in this.parts) this.idx[p] = Math.floor(Math.random() * this.parts[p].length);
+    this.bg = Math.floor(Math.random() * this.bgs.length);
+    sfx.good(); this.render();
+    floaters(["✨", "🌟", "💫"], innerWidth / 2, innerHeight / 2.5, 9);
+  },
+  done() { speak(`What a cool look! ${praise()}`); celebrateWith("dressup", { noLevelUp: true }); }
+};
+
 /* ================= Categories & games ================= */
 const GAMES = {
   snow:    { icon: "❄️", name: "Count" },     ocean:   { icon: "🐠", name: "Colors" },
@@ -1991,18 +2245,26 @@ const GAMES = {
   sort:    { icon: "🪐", name: "Big & Small" }, pattern: { icon: "🔮", name: "Patterns" },
   paint:   { icon: "🎨", name: "Paint" },     story:   { icon: "📖", name: "Story" },
   dragon:  { icon: "🐉", name: "Dragon Feed" }, dino:  { icon: "🦕", name: "Dino Eggs" },
-  icecream:{ icon: "🍦", name: "Ice Cream" }
+  icecream:{ icon: "🍦", name: "Ice Cream" },  petfeed: { icon: "🦴", name: "Feed Pet" },
+  petmatch:{ icon: "🐶", name: "Find Pet" },   petcare: { icon: "🛁", name: "Pet Care" },
+  dressup: { icon: "👗", name: "Dress Up" }
 };
 const CATEGORIES = [
   { id: "num",    icon: "🔢", name: "Numbers",        cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
   { id: "shape",  icon: "🎨", name: "Colors & Shapes", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
   { id: "brain",  icon: "🧩", name: "Brain Games",     cls: "c-brain",  games: ["memory", "pattern", "sort"] },
   { id: "animal", icon: "🐾", name: "Animals",         cls: "c-animal", games: ["music", "whosays", "dino"] },
+  { id: "pets",   icon: "🐶", name: "Pets",            cls: "c-pets",   games: ["petcare", "petmatch", "petfeed"] },
   { id: "space",  icon: "🚀", name: "Space",           cls: "c-space",  games: ["rocket", "sort", "pattern"] },
   { id: "fantasy",icon: "🐉", name: "Make-Believe",    cls: "c-fantasy", games: ["dragon", "dino", "icecream"] },
-  { id: "create", icon: "✏️", name: "Create",          cls: "c-create", games: ["paint", "story"] }
+  { id: "create", icon: "✏️", name: "Create",          cls: "c-create", games: ["paint", "story", "dressup"] }
 ];
-function launchGame(id) { if (id === "paint") paint.show(); else if (id === "story") showStory(); else startLevel(id); }
+function launchGame(id) {
+  if (id === "paint") paint.show();
+  else if (id === "story") showStory();
+  else if (id === "dressup") dressup.show();
+  else startLevel(id);
+}
 function buildHub() {
   $("mapPath").setAttribute("points", "");
   const wrap = $("mapNodes"); wrap.className = "cats"; wrap.innerHTML = "";
@@ -2017,7 +2279,7 @@ function buildHub() {
 function openCategory(id) {
   audio();
   const cat = CATEGORIES.find(c => c.id === id);
-  ["hub", "game", "celebrate", "stickerbook", "story", "settings", "paint"].forEach(x => $(x).classList.add("hidden"));
+  hideAllScreens();
   $("games").classList.remove("hidden");
   document.body.className = "";
   $("gamesTitle").textContent = `${cat.icon} ${cat.name}`;
@@ -2047,7 +2309,7 @@ let storyPage = 0;
 function showStory() {
   cleanupLevel();
   if ("speechSynthesis" in window) speechSynthesis.cancel();
-  ["game", "celebrate", "stickerbook", "hub", "settings", "paint", "games"].forEach(id => $(id).classList.add("hidden"));
+  hideAllScreens();
   $("story").classList.remove("hidden");
   storyPage = 0;
   renderStory();
@@ -2074,73 +2336,90 @@ function storyNav(dir) {
 }
 
 /* ================= Sticker book ================= */
-function slotPositions(n) {
-  const cols = n <= 2 ? 2 : n <= 6 ? 3 : 4;
-  const rows = Math.ceil(n / cols);
-  const pos = [];
-  for (let i = 0; i < n; i++) {
-    const c = i % cols, r = Math.floor(i / cols);
-    pos.push({ x: 10 + (c + 0.5) * (80 / cols), y: 9 + (r + 0.5) * (70 / rows) });
-  }
-  return pos;
-}
-function nearestSlot(slots, x, y) {
-  let best = 0, bd = Infinity;
-  slots.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = i; } });
-  return best;
-}
+const SCENES = [
+  { id: "park",   name: "Park 🌳",   cls: "sc-park",   deco: "🌳 🛝 🌷 🌳 ⛲" },
+  { id: "space",  name: "Space 🚀",  cls: "sc-space",  deco: "🌑 🪐 ⭐ 🌙 ⭐" },
+  { id: "ocean",  name: "Ocean 🌊",  cls: "sc-ocean",  deco: "🐚 🪸 🌊 🐚 🌊" },
+  { id: "castle", name: "Castle 🏰", cls: "sc-castle", deco: "🌸 🏰 🌳 🌸" },
+  { id: "bed",    name: "Cozy 🌙",   cls: "sc-bed",    deco: "🛏️ 🧸 🪟 🌙" }
+];
+let decor = JSON.parse(localStorage.getItem("fionaDecor") || "{}");
+let curScene = localStorage.getItem("fionaScene") || "park";
+let palSel = null;
+const saveDecor = () => localStorage.setItem("fionaDecor", JSON.stringify(decor));
+
 function showStickerBook() {
   cleanupLevel();
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   document.body.className = "";
-  ["hub", "game", "celebrate", "story", "settings", "paint", "games"].forEach(id => $(id).classList.add("hidden"));
+  hideAllScreens();
   $("stickerbook").classList.remove("hidden");
+  // scene buttons
+  const sb = $("sceneBtns"); sb.innerHTML = "";
+  SCENES.forEach(sc => {
+    const b = document.createElement("button");
+    b.className = "scene-btn" + (sc.id === curScene ? " sel" : "");
+    b.textContent = sc.name;
+    b.onclick = () => { curScene = sc.id; localStorage.setItem("fionaScene", curScene); palSel = null; showStickerBook(); };
+    sb.appendChild(b);
+  });
+  renderScene();
+  // palette of earned sticker types
+  const earned = [...new Set(stickers.map(s => s.e))];
+  const pal = $("stickerPalette"); pal.innerHTML = "";
+  if (!earned.length) {
+    $("stickerHint").textContent = "Play games to earn stickers to decorate with!";
+    speak("Play games to earn stickers!");
+    return;
+  }
+  $("stickerHint").textContent = "Tap a sticker, then tap the picture to place it! 🎨";
+  speak(`Here is your sticker book, ${NAME}! Tap a sticker, then tap the picture to place it!`);
+  earned.forEach(e => {
+    const b = document.createElement("button");
+    b.className = "pal-item" + (e === palSel ? " sel" : "");
+    b.textContent = e;
+    b.onclick = () => { palSel = (palSel === e ? null : e); sfx.tick(); document.querySelectorAll(".pal-item").forEach(x => x.classList.toggle("sel", x.textContent === palSel)); };
+    pal.appendChild(b);
+  });
+}
+function renderScene() {
+  const sc = SCENES.find(s => s.id === curScene) || SCENES[0];
   const scene = $("stickerScene");
-  scene.innerHTML = `<div style="position:absolute; bottom:1vmin; width:100%; text-align:center; font-size:clamp(24px,6vmin,46px); pointer-events:none;">🌳 🛝 ⛲ 🌷 🌳</div>`;
-  if (!stickers.length) { $("stickerHint").textContent = "Play the games to earn stickers!"; speak("Play the games to earn stickers!"); return; }
-  $("stickerHint").textContent = "Drag each sticker onto a spot!";
-  speak(`Here is your sticker book, ${NAME}! Drag your stickers onto the spots!`);
-
-  const n = stickers.length;
-  const slots = slotPositions(n);
-  // make sure every sticker has a unique slot index
-  const used = new Set(stickers.filter(s => s.slot != null && s.slot < n).map(s => s.slot));
-  let free = 0;
-  stickers.forEach(s => { if (s.slot == null || s.slot >= n || [...used].filter(u => u === s.slot).length > 1) { while (used.has(free)) free++; s.slot = free; used.add(free); } });
-  saveStickers();
-
-  slots.forEach((p, i) => {
-    const o = document.createElement("div");
-    o.className = "slot"; o.dataset.slot = i;
-    o.style.left = p.x + "%"; o.style.top = p.y + "%";
-    scene.appendChild(o);
+  scene.className = sc.cls;
+  scene.innerHTML = `<div class="scene-deco">${sc.deco}</div>`;
+  scene.onpointerdown = e => {
+    if (!palSel || e.target !== scene && e.target.className !== "scene-deco") return;
+    const r = scene.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width * 100, y = (e.clientY - r.top) / r.height * 100;
+    (decor[curScene] = decor[curScene] || []).push({ e: palSel, x, y });
+    saveDecor(); sfx.tap();
+    addPlaced({ e: palSel, x, y }, decor[curScene].length - 1);
+  };
+  (decor[curScene] || []).forEach((d, i) => addPlaced(d, i));
+}
+function addPlaced(d, idx) {
+  const scene = $("stickerScene");
+  const el = document.createElement("div");
+  el.className = "sticker"; el.textContent = d.e;
+  el.style.left = d.x + "%"; el.style.top = d.y + "%";
+  el.addEventListener("pointerdown", e => {
+    e.preventDefault(); e.stopPropagation();
+    try { el.setPointerCapture(e.pointerId); } catch (_) {}
+    el.style.zIndex = 20;
+    let moved = false; const sx = e.clientX, sy = e.clientY;
+    const pct = ev => { const r = scene.getBoundingClientRect(); return { x: clamp((ev.clientX - r.left) / r.width * 100, 1, 99), y: clamp((ev.clientY - r.top) / r.height * 100, 1, 99) }; };
+    const move = ev => {
+      if (Math.hypot(ev.clientX - sx, ev.clientY - sy) > 6) moved = true;
+      const q = pct(ev); el.style.left = q.x + "%"; el.style.top = q.y + "%";
+      d.x = q.x; d.y = q.y;
+    };
+    const up = () => {
+      el.removeEventListener("pointermove", move); el.removeEventListener("pointerup", up);
+      el.style.zIndex = ""; saveDecor();
+    };
+    el.addEventListener("pointermove", move); el.addEventListener("pointerup", up);
   });
-  stickers.forEach(st => {
-    const p = slots[st.slot];
-    const el = document.createElement("div");
-    el.className = "sticker"; el.textContent = st.e;
-    el.style.left = p.x + "%"; el.style.top = p.y + "%";
-    el.addEventListener("pointerdown", e => {
-      e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch (_) {}
-      el.style.zIndex = 20;
-      const pct = ev => { const r = scene.getBoundingClientRect(); return { x: clamp((ev.clientX - r.left) / r.width * 100, 2, 98), y: clamp((ev.clientY - r.top) / r.height * 100, 2, 97) }; };
-      const move = ev => {
-        const q = pct(ev); el.style.left = q.x + "%"; el.style.top = q.y + "%";
-        const ni = nearestSlot(slots, q.x, q.y);
-        document.querySelectorAll(".slot").forEach(o => o.classList.toggle("hover", +o.dataset.slot === ni));
-      };
-      const up = ev => {
-        el.removeEventListener("pointermove", move); el.removeEventListener("pointerup", up);
-        const q = pct(ev), ni = nearestSlot(slots, q.x, q.y);
-        const occ = stickers.find(s => s !== st && s.slot === ni);
-        if (occ) occ.slot = st.slot;          // swap into the spot it left
-        st.slot = ni; saveStickers(); sfx.tick();
-        showStickerBook();                      // re-render snapped into place
-      };
-      el.addEventListener("pointermove", move); el.addEventListener("pointerup", up);
-    });
-    scene.appendChild(el);
-  });
+  scene.appendChild(el);
 }
 
 /* ================= Settings ================= */
@@ -2152,7 +2431,7 @@ function openSettings() {
   document.querySelectorAll("#segMusic button").forEach(b => b.classList.toggle("sel", b.dataset.m === settings.music));
 }
 function showCharScreen(returnTo) {
-  ["hub", "game", "celebrate", "stickerbook", "story", "settings", "paint", "games", "namescreen"].forEach(id => $(id).classList.add("hidden"));
+  hideAllScreens();
   $("charscreen").classList.remove("hidden");
   $("charDone").dataset.return = returnTo || "hub";
   const grid = $("charGrid"); grid.innerHTML = "";
@@ -2172,12 +2451,14 @@ function showCharScreen(returnTo) {
 }
 
 /* ================= Navigation ================= */
+const ALL_SCREENS = ["hub", "games", "game", "stickerbook", "story", "paint", "dressup", "dashboard", "namescreen", "charscreen", "settings", "celebrate"];
+function hideAllScreens() { ALL_SCREENS.forEach(id => { const e = $(id); if (e) e.classList.add("hidden"); }); }
 function showHub() {
   cleanupLevel();
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   setMascots("talking", false);
   document.body.className = "";
-  ["game", "celebrate", "stickerbook", "story", "settings", "paint", "games", "charscreen", "namescreen"].forEach(id => $(id).classList.add("hidden"));
+  hideAllScreens();
   $("hub").classList.remove("hidden");
   buildHub();
 }
@@ -2185,10 +2466,35 @@ function startLevel(name) {
   audio(); cleanupLevel();
   state.level = name; state.round = 0; state.busy = false; state.tier = tierFor(name);
   document.body.className = LEVELS[name].theme;
-  ["hub", "celebrate", "stickerbook", "story", "settings", "paint", "games"].forEach(id => $(id).classList.add("hidden"));
+  hideAllScreens();
   $("game").classList.remove("hidden");
   drawProgress();
   LEVELS[name].startRound();
+}
+function showDashboard() {
+  cleanupLevel();
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  document.body.className = "";
+  hideAllScreens();
+  $("dashboard").classList.remove("hidden");
+  const plays = id => completions[id] || 0;
+  const totalPlays = Object.values(completions).reduce((a, b) => a + b, 0);
+  const totalStars = Object.keys(completions).reduce((a, k) => a + Math.min(3, completions[k]), 0);
+  const gamesTried = Object.keys(completions).filter(k => completions[k] > 0).length;
+  $("dashStats").innerHTML =
+    `<div class="stat"><div class="sv">⭐ ${totalStars}</div><div class="sl">Stars</div></div>
+     <div class="stat"><div class="sv">🎮 ${totalPlays}</div><div class="sl">Games played</div></div>
+     <div class="stat"><div class="sv">📒 ${stickers.length}</div><div class="sl">Stickers</div></div>
+     <div class="stat"><div class="sv">🗂️ ${gamesTried}/${Object.keys(GAMES).length}</div><div class="sl">Activities tried</div></div>`;
+  const list = $("dashList"); list.innerHTML = "";
+  CATEGORIES.forEach(cat => {
+    const rows = cat.games.map(gid => {
+      const g = GAMES[gid], p = plays(gid);
+      return `<div class="dash-row"><span class="dg">${g.icon} ${g.name}</span>
+              <span class="dp">${p ? "⭐".repeat(Math.min(3, p)) + (p > 3 ? ` ×${p}` : "") : "—"}</span></div>`;
+    }).join("");
+    list.innerHTML += `<div class="dash-cat"><h3>${cat.icon} ${cat.name}</h3>${rows}</div>`;
+  });
 }
 
 /* ================= Boot ================= */
@@ -2236,11 +2542,25 @@ $("paintErase").onclick = () => { paint.mode = "erase"; $("paintErase").classLis
 $("paintClear").onclick = () => paint.redraw();
 $("paintDone").onclick = () => { celebrateWith("paint", { noLevelUp: true }); };
 
+/* ---- dress-up ---- */
+$("dressHome").onclick = showHub;
+$("dressBg").onclick = () => dressup.cycleBg();
+$("dressShuffle").onclick = () => dressup.shuffle();
+$("dressDone").onclick = () => dressup.done();
+["hat", "face", "body", "item"].forEach(p => $("dp-" + p).onclick = () => dressup.cycle(p));
+
+/* ---- dashboard ---- */
+$("dashHome").onclick = showHub;
+$("setDash").onclick = () => { $("settings").classList.add("hidden"); showDashboard(); };
+
+/* ---- sticker book clear ---- */
+$("sceneClear").onclick = () => { if (decor[curScene] && decor[curScene].length) { decor[curScene] = []; saveDecor(); sfx.tick(); renderScene(); } };
+
 /* ---- name entry ---- */
 function showNameScreen(prefill) {
-  $("nameMascot").innerHTML = mascotSVG();
+  $("nameMascot").innerHTML = buddyMarkup();
   $("nameInput").value = prefill || "";
-  ["hub", "game", "celebrate", "stickerbook", "story", "settings", "paint", "games"].forEach(id => $(id).classList.add("hidden"));
+  hideAllScreens();
   $("namescreen").classList.remove("hidden");
   setTimeout(() => { try { $("nameInput").focus(); } catch (_) {} }, 250);
 }
