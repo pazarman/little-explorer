@@ -171,7 +171,7 @@
   #dashboard { justify-content:flex-start; padding-top:8vmin; overflow-y:auto; }
   #dashHome { position:absolute; top:2vmin; left:2vmin; z-index:10; }
   #dashboard h2 { font-size:clamp(20px,4.6vmin,34px); color:#fff; text-shadow:0 3px 0 rgba(0,0,0,.25); margin-bottom:2vmin; }
-  #dashStats { display:grid; grid-template-columns:repeat(4,1fr); gap:1.6vmin; width:100%; max-width:680px; margin-bottom:2.5vmin; padding:0 2vmin; }
+  #dashStats { display:grid; grid-template-columns:repeat(3,1fr); gap:1.6vmin; width:100%; max-width:680px; margin-bottom:2.5vmin; padding:0 2vmin; }
   @media (max-width:560px) { #dashStats { grid-template-columns:repeat(2,1fr); } }
   .stat { background:rgba(255,255,255,.92); border-radius:18px; padding:2vmin 1vmin; text-align:center; box-shadow:0 4px 0 rgba(0,0,0,.15); }
   .stat .sv { font-size:clamp(20px,4.6vmin,32px); font-weight:bold; color:#444; }
@@ -609,6 +609,47 @@
 
   #musicBtn { position:fixed; bottom:2vmin; right:2vmin; z-index:70; opacity:.55; }
   #musicBtn.on { opacity:1; background:#ffd23e; }
+
+  /* ================= ROCKET QUEST ================= */
+  #questBar { position:absolute; left:50%; bottom:1.4vmin; transform:translateX(-50%); z-index:6;
+    display:flex; align-items:center; gap:1.1vmin; border:none;
+    background:rgba(255,255,255,.24); border-radius:99px; padding:.7vmin 1.8vmin;
+    box-shadow:0 4px 0 rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.4); max-width:88vw; }
+  #questBar:active { transform:translateX(-50%) scale(.95); }
+  .q-rocket { font-size:clamp(22px,5vmin,40px); line-height:1; filter:drop-shadow(0 2px 2px rgba(0,0,0,.3));
+    animation:qrock 3s ease-in-out infinite; }
+  @keyframes qrock { 50% { transform:translateY(-.5vmin) rotate(-5deg); } }
+  .q-slots { display:flex; gap:.6vmin; }
+  .q-slot { width:clamp(16px,3.4vmin,26px); height:clamp(16px,3.4vmin,26px); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:clamp(10px,2.3vmin,17px);
+    background:rgba(0,0,0,.16); border:2px solid rgba(255,255,255,.6); }
+  .q-slot.filled { background:radial-gradient(circle at 50% 38%, #fff6b0, #ffd23e); border-color:#fff;
+    box-shadow:0 0 8px #ffd23e; }
+  .q-slot.pop { animation:qpop .55s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes qpop { 0%{transform:scale(0) rotate(-40deg);} 60%{transform:scale(1.45);} 100%{transform:scale(1) rotate(0);} }
+
+  #rocketLaunch { position:fixed; inset:0; z-index:110; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:3vmin; overflow:hidden;
+    background:radial-gradient(circle at 50% 120%, #34215c, #0a0a26 70%); }
+  #rocketLaunch::before { content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(2px 2px at 20% 30%, #fff, transparent),
+               radial-gradient(2px 2px at 70% 20%, #fff, transparent),
+               radial-gradient(2px 2px at 40% 60%, #fff, transparent),
+               radial-gradient(2px 2px at 85% 70%, #fff, transparent),
+               radial-gradient(2px 2px at 55% 85%, #fff, transparent),
+               radial-gradient(2px 2px at 10% 80%, #fff, transparent);
+    opacity:.8; animation:twinkle 2.4s ease-in-out infinite; }
+  @keyframes twinkle { 50% { opacity:.35; } }
+  .rl-text { color:#fff; font-weight:bold; text-align:center; padding:0 4vmin; z-index:2;
+    font-size:clamp(20px,5vmin,40px); text-shadow:0 3px 0 rgba(0,0,0,.4); }
+  .rl-rocket { font-size:clamp(80px,22vmin,180px); line-height:1; z-index:2;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,.5)); }
+  .rl-rocket.shake { animation:rlShake .12s linear infinite; }
+  @keyframes rlShake { 0%,100%{transform:translate(0,0) rotate(0);} 25%{transform:translate(-1.5vmin,0) rotate(-2deg);} 75%{transform:translate(1.5vmin,0) rotate(2deg);} }
+  .rl-rocket.blast { animation:rlBlast 2.6s cubic-bezier(.45,0,.9,.35) forwards; }
+  @keyframes rlBlast { 0%{transform:translateY(0) scale(1);} 30%{transform:translateY(-6vh) scale(1.05);} 100%{transform:translateY(-130vh) scale(.4);} }
+  .rl-count { color:#ffd23e; font-weight:bold; font-size:clamp(40px,12vmin,110px); z-index:2;
+    text-shadow:0 3px 0 rgba(0,0,0,.4); min-height:1.1em; }
 </style>
 </head>
 <body>
@@ -631,6 +672,10 @@
     <h1>🌈 {n}'s World 🌈</h1>
     <div id="mapNodes"></div>
     <div id="hubMascot" class="mascot"></div>
+    <button id="questBar" aria-label="Rocket quest">
+      <span class="q-rocket">🚀</span>
+      <span class="q-slots" id="questSlots"></span>
+    </button>
     <button class="corner-btn" id="bookBtn" aria-label="Sticker book">📒</button>
     <button class="corner-btn" id="settingsBtn" aria-label="Grown-up settings">⚙️</button>
   </div>
@@ -772,9 +817,16 @@
   <div class="sticker-reveal" id="celebSticker"></div>
   <div class="sub" id="celebSub"></div>
   <div class="btns">
+    <button id="celebLaunch" class="hidden">🚀 Blast off!</button>
     <button id="celebBook">📒 Sticker book</button>
     <button id="celebHome">🏠 World map</button>
   </div>
+</div>
+
+<div id="rocketLaunch" class="hidden">
+  <div class="rl-text" id="rlText"></div>
+  <div class="rl-rocket" id="rlRocket">🚀</div>
+  <div class="rl-count" id="rlCount"></div>
 </div>
 
 <canvas id="fxC"></canvas>
@@ -807,6 +859,13 @@ let settings = Object.assign({ diff: "auto", voice: 1, music: "bouncy" },
 const saveCompletions = () => localStorage.setItem("fionaStars", JSON.stringify(completions));
 const saveStickers = () => localStorage.setItem("fionaStickers", JSON.stringify(stickers));
 const saveSettings = () => localStorage.setItem("fionaSettings", JSON.stringify(settings));
+
+/* ===== Centralized quest: collect Star Sparks to power up the broken rocket ===== */
+const QUEST_GOAL = 6;                                    // sparks needed to launch the rocket
+let sparks = +(localStorage.getItem("fionaSparks") || 0);
+let trips  = +(localStorage.getItem("fionaTrips")  || 0);
+let questShown = sparks, questGreeted = false;
+const saveQuest = () => { localStorage.setItem("fionaSparks", sparks); localStorage.setItem("fionaTrips", trips); };
 
 /* difficulty tier 0..2 for a level */
 function tierFor(level) {
@@ -1211,14 +1270,76 @@ function celebrateWith(levelId, opts = {}) {
   const sticker = rand(STICKER_POOL);
   stickers.push({ e: sticker });           // position assigned by the sticker book's grid
   saveStickers();
+  sparks = Math.min(QUEST_GOAL, sparks + 1); saveQuest();   // every win powers up the rocket
+  const questDone = sparks >= QUEST_GOAL, left = QUEST_GOAL - sparks;
   sfx.win(); confetti(); fireworks();
-  const leveledUp = !opts.noLevelUp && settings.diff === "auto" && completions[levelId] <= 2;
   $("celebText").textContent = `You did it, ${NAME}!`;
   $("celebSticker").textContent = sticker;
-  $("celebSub").textContent = leveledUp ? "You earned a sticker — and a harder level next time! ⬆️"
-                                        : "You earned a new sticker!";
+  $("celebSub").textContent = questDone
+    ? "⚡ You found the LAST Star Spark! The rocket is ready! 🚀"
+    : `⚡ Star Spark collected! ${left} more to fix the rocket 🚀`;
+  // when the rocket is full, swap the normal buttons for a big Blast off!
+  $("celebLaunch").classList.toggle("hidden", !questDone);
+  $("celebBook").classList.toggle("hidden", questDone);
+  $("celebHome").classList.toggle("hidden", questDone);
   $("celebrate").classList.remove("hidden");
-  speak(`Hooray! You did it, ${NAME}! You earned a new sticker!`);
+  speak(questDone
+    ? `Hooray ${NAME}! You found the last Star Spark! The rocket is all fixed! Let's blast off!`
+    : `Hooray! You earned a Star Spark, ${NAME}! ${left} more to fix the rocket!`);
+}
+
+/* ================= Rocket Quest ================= */
+function renderQuest() {
+  const slots = $("questSlots"); if (!slots) return;
+  slots.innerHTML = "";
+  for (let i = 0; i < QUEST_GOAL; i++) {
+    const s = document.createElement("span");
+    s.className = "q-slot" + (i < sparks ? " filled" : "");
+    s.textContent = i < sparks ? "✨" : "";
+    slots.appendChild(s);
+  }
+  // pop the slot(s) earned since we were last on the hub
+  if (sparks > questShown) {
+    for (let i = questShown; i < sparks; i++) { const el = slots.children[i]; if (el) el.classList.add("pop"); }
+    miniStar(innerWidth / 2, innerHeight - 60);
+  }
+  questShown = sparks;
+}
+function questSpeak() {
+  const left = QUEST_GOAL - sparks;
+  speak(left <= 0
+    ? "The rocket is all fixed! Play one more game to blast off!"
+    : `We're collecting Star Sparks to fix the rocket! ${left} more to go. Tap a world to play!`);
+}
+function questIntro() {
+  speak(`Hi ${NAME}! Let's find shiny Star Sparks to fix the rocket ship! Tap a world to play!`);
+}
+function rocketLaunch() {
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  $("celebrate").classList.add("hidden");
+  document.body.className = "theme-space";
+  const ov = $("rocketLaunch"); ov.classList.remove("hidden");
+  const rocket = $("rlRocket"), count = $("rlCount"), txt = $("rlText");
+  rocket.className = "rl-rocket shake"; count.textContent = ""; txt.textContent = "🚀 Rocket ready!";
+  speak("The rocket is all fixed! Get ready to blast off!");
+  let n = 3;
+  const tick = () => {
+    if (n > 0) { count.textContent = n; speak(String(n)); tone(440, 0, .18, "triangle"); n--; setTimeout(tick, 900); }
+    else {
+      count.textContent = "🚀"; speak("Blast off!");
+      rocket.className = "rl-rocket blast";
+      sfx.win(); fireworks(); confetti(50);
+      trips++; sparks = 0; saveQuest();                       // reset the journey for endless replay
+      const badge = rand(["🏅", "🌟", "🚀", "👑", "🎖️"]); stickers.push({ e: badge }); saveStickers();
+      txt.textContent = `Trip #${trips} complete — you're a Star Explorer! ${badge}`;
+      setTimeout(() => {
+        ov.classList.add("hidden");
+        showHub();
+        setTimeout(() => speak(`Amazing job ${NAME}! The rocket zoomed to the stars! Let's find more Star Sparks!`), 700);
+      }, 3200);
+    }
+  };
+  setTimeout(tick, 1100);
 }
 
 /* ================= LEVEL: Counting Critters (snow) ================= */
@@ -2386,6 +2507,7 @@ function buildHub() {
     b.onclick = () => { sfx.tap(); speak(cat.name); openCategory(cat.id); };
     wrap.appendChild(b);
   });
+  renderQuest();
 }
 function openCategory(id) {
   audio();
@@ -2581,6 +2703,7 @@ function showHub() {
   $("hub").classList.remove("hidden");
   animScreen("hub", "back");
   buildHub();
+  if (!questGreeted && settings.voice) { questGreeted = true; setTimeout(questIntro, 800); }
 }
 function startLevel(name) {
   audio(); cleanupLevel();
@@ -2606,7 +2729,9 @@ function showDashboard() {
     `<div class="stat"><div class="sv">⭐ ${totalStars}</div><div class="sl">Stars</div></div>
      <div class="stat"><div class="sv">🎮 ${totalPlays}</div><div class="sl">Games played</div></div>
      <div class="stat"><div class="sv">📒 ${stickers.length}</div><div class="sl">Stickers</div></div>
-     <div class="stat"><div class="sv">🗂️ ${gamesTried}/${Object.keys(GAMES).length}</div><div class="sl">Activities tried</div></div>`;
+     <div class="stat"><div class="sv">🗂️ ${gamesTried}/${Object.keys(GAMES).length}</div><div class="sl">Activities tried</div></div>
+     <div class="stat"><div class="sv">🚀 ${trips}</div><div class="sl">Rocket trips</div></div>
+     <div class="stat"><div class="sv">⚡ ${sparks}/${QUEST_GOAL}</div><div class="sl">Star Sparks</div></div>`;
   const list = $("dashList"); list.innerHTML = "";
   CATEGORIES.forEach(cat => {
     const rows = cat.games.map(gid => {
@@ -2626,6 +2751,8 @@ $("homeBtn").onclick = showHub;
 $("gamesHome").onclick = showHub;
 $("celebHome").onclick = showHub;
 $("celebBook").onclick = showStickerBook;
+$("celebLaunch").onclick = rocketLaunch;
+$("questBar").onclick = () => { sfx.tap(); questSpeak(); };
 $("bookBtn").onclick = () => { audio(); showStickerBook(); };
 $("bookHome").onclick = showHub;
 $("musicBtn").onclick = toggleMusic;
@@ -2635,7 +2762,8 @@ $("setDone").onclick = () => { $("settings").classList.add("hidden"); };
 $("setReset").onclick = () => {
   if (confirm("Reset all of " + NAME + "'s stars and stickers?")) {
     for (const k in completions) delete completions[k];
-    stickers.length = 0; saveCompletions(); saveStickers(); buildHub();
+    stickers.length = 0; sparks = 0; trips = 0; questShown = 0;
+    saveCompletions(); saveStickers(); saveQuest(); buildHub();
   }
 };
 $("setName").onclick = () => { $("settings").classList.add("hidden"); showNameScreen(NAME); };
