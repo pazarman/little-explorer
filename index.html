@@ -417,6 +417,12 @@
   #guideC, #inkC { position:absolute; inset:0; width:100%; height:100%; }
   #inkC { z-index:6; touch-action:none; }
   #guideC { z-index:5; }
+  /* pulsing "start here" marker for tracing */
+  .trace-start { position:absolute; transform:translate(-50%,-50%); z-index:7; pointer-events:none;
+    width:clamp(24px,5.6vmin,42px); height:clamp(24px,5.6vmin,42px); border-radius:50%;
+    background:#48d168; border:3px solid #fff; box-shadow:0 0 0 0 rgba(72,209,104,.55);
+    animation:traceStartPulse 1.1s ease-out infinite; }
+  @keyframes traceStartPulse { 0%{box-shadow:0 0 0 0 rgba(72,209,104,.55);} 100%{box-shadow:0 0 0 18px rgba(72,209,104,0);} }
 
   /* ----- memory ----- */
   .mem-grid { position:absolute; inset:0; display:flex; flex-wrap:wrap; gap:1.8vmin;
@@ -1927,15 +1933,16 @@ const traceLevel = {
     const lab = traceLabel(item);
     setInstruction(lab.show, lab.say + " Follow the dots!");
     const area = $("playArea");
-    area.innerHTML = `<canvas id="guideC"></canvas><canvas id="inkC"></canvas>`;
+    area.innerHTML = `<canvas id="guideC"></canvas><canvas id="inkC"></canvas><div class="trace-start" id="traceStart"></div>`;
     const rect = area.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
     for (const id of ["guideC", "inkC"]) { const c = $(id); c.width = rect.width * dpr; c.height = rect.height * dpr; c.getContext("2d").scale(dpr, dpr); }
     this.pts = glyphPoints(item, rect.width, rect.height);
     this.drawGuide();
+    const start = $("traceStart"); start.style.left = this.pts[0].x + "px"; start.style.top = this.pts[0].y + "px";   // "start here"
     const ink = $("inkC");
     const pos = e => { const r = ink.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
-    ink.addEventListener("pointerdown", e => { e.preventDefault(); try { ink.setPointerCapture(e.pointerId); } catch (_) {} this.last = pos(e); this.paint(this.last); trail.add(e.clientX, e.clientY, this.hue, 4); });
+    ink.addEventListener("pointerdown", e => { e.preventDefault(); try { ink.setPointerCapture(e.pointerId); } catch (_) {} const ts = $("traceStart"); if (ts) ts.style.display = "none"; this.last = pos(e); this.paint(this.last); trail.add(e.clientX, e.clientY, this.hue, 4); });
     ink.addEventListener("pointermove", e => { if (this.last) { const p = pos(e); this.paint(p); this.last = p; trail.add(e.clientX, e.clientY, this.hue, this.done ? 0 : 2); } });
     const stop = () => this.last = null;
     ink.addEventListener("pointerup", stop); ink.addEventListener("pointercancel", stop);
@@ -1943,6 +1950,12 @@ const traceLevel = {
   drawGuide() {
     const c = $("guideC"), ctx = c.getContext("2d");
     ctx.clearRect(0, 0, c.width, c.height);
+    // faint ghost "road" through the points so the child sees the shape; gaps between strokes are skipped
+    ctx.strokeStyle = "rgba(255,255,255,.32)"; ctx.lineWidth = 12; ctx.lineCap = ctx.lineJoin = "round";
+    for (let i = 0; i < this.pts.length - 1; i++) {
+      const a = this.pts[i], b = this.pts[i + 1];
+      if (Math.hypot(a.x - b.x, a.y - b.y) < 46) { ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+    }
     for (const p of this.pts) {
       ctx.beginPath(); ctx.arc(p.x, p.y, p.hit ? 9 : 6, 0, Math.PI * 2);
       ctx.fillStyle = p.hit ? "#ffd23e" : "rgba(255,255,255,.85)";
@@ -1965,7 +1978,8 @@ const traceLevel = {
       this.drawGuide();
       if (this.hits / this.pts.length >= 0.82) {
         this.done = true; this.pts.forEach(pt => pt.hit = true); this.drawGuide(); confetti(14);
-        const lab = traceLabel(this.item);
+        sfx.good();
+        const ir = $("inkC").getBoundingClientRect(); floaters(["✨", "🌟", "💫"], ir.left + p.x, ir.top + p.y, 7);
         speak(`You traced it! ${praise()}`); roundComplete();
       }
     }
