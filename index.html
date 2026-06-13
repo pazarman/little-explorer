@@ -34,8 +34,19 @@
   body.theme-dressup { background:linear-gradient(#ffe0f2, #e2e6ff 60%, #d8f0e0); }
 
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
-            align-items:center; justify-content:center; padding:2vmin; animation:fadeIn .35s ease; }
-  @keyframes fadeIn { from { opacity:0; transform:scale(.985);} to { opacity:1; transform:scale(1);} }
+            align-items:center; justify-content:center; padding:2vmin;
+            animation:screenIn .44s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes screenIn { 0%{opacity:0; transform:scale(.86);} 100%{opacity:1; transform:scale(1);} }
+  /* contextual transitions: drilling forward slides in from the right, going home from the left */
+  .screen.fwd  { animation:enterFwd  .44s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .screen.back { animation:enterBack .44s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes enterFwd  { 0%{opacity:0; transform:translateX(30vw) scale(.9);}  100%{opacity:1; transform:translateX(0) scale(1);} }
+  @keyframes enterBack { 0%{opacity:0; transform:translateX(-24vw) scale(.9);} 100%{opacity:1; transform:translateX(0) scale(1);} }
+  /* quick child-friendly "wipe" flash when scenery changes */
+  #wipe { position:fixed; inset:0; z-index:120; pointer-events:none; opacity:0;
+          background:radial-gradient(circle at 50% 45%, rgba(255,255,255,.92), rgba(255,255,255,.55) 45%, rgba(255,255,255,0) 72%); }
+  #wipe.run { animation:wipeFlash .46s ease-out; }
+  @keyframes wipeFlash { 0%{opacity:0; transform:scale(.4);} 35%{opacity:.7;} 100%{opacity:0; transform:scale(1.6);} }
   .hidden { display:none !important; }
   button { font-family:inherit; cursor:pointer; }
 
@@ -55,20 +66,28 @@
            left:-15vw; animation:drift linear infinite; pointer-events:none; }
   @keyframes drift { to { transform:translateX(130vw); } }
 
-  .map-node { position:absolute; transform:translate(-50%,-50%); z-index:4;
-              display:flex; flex-direction:column; align-items:center; gap:.3vmin;
-              border:none; background:none; }
-  .map-node .bubble {
-    width:clamp(50px,11vmin,90px); height:clamp(50px,11vmin,90px); border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    font-size:clamp(23px,5.4vmin,46px); border:4px solid #fff;
-    box-shadow:0 5px 0 rgba(0,0,0,.22), inset 0 -6px 0 rgba(0,0,0,.14);
-    transition:transform .12s;
+  /* ---- Self-contained world node: flex column, no absolute/grid conflict ---- */
+  .node { display:flex; flex-direction:column; align-items:center; gap:.7vmin;
+          border:none; background:none; padding:0; }
+  .node-disc {
+    position:relative; width:clamp(58px,15vmin,118px); height:clamp(58px,15vmin,118px);
+    border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden;
+    font-size:clamp(28px,8vmin,58px); border:5px solid #fff;
+    /* layered depth: drop + ambient cast, inner core shade, inner top sheen */
+    box-shadow:0 6px 0 rgba(0,0,0,.16), 0 12px 22px rgba(0,0,0,.24),
+               inset 0 -8px 11px rgba(0,0,0,.18), inset 0 7px 11px rgba(255,255,255,.42);
+    transition:transform .5s cubic-bezier(0.175,0.885,0.32,1.275);   /* bouncy spring release */
   }
-  .map-node:active .bubble { transform:scale(.9); }
-  .map-node .nname { font-size:clamp(10px,2vmin,16px); font-weight:bold; color:#fff;
-    text-shadow:0 1px 0 rgba(0,0,0,.4); background:rgba(0,0,0,.22); padding:.1em .7em; border-radius:99px; white-space:nowrap; }
-  .map-node .nstars { font-size:clamp(9px,1.8vmin,14px); min-height:1.1em; letter-spacing:-1px; }
+  /* glossy highlight sweep across the top of every disc */
+  .node-disc::after { content:""; position:absolute; top:5%; left:13%; width:74%; height:44%;
+    border-radius:50%; pointer-events:none;
+    background:radial-gradient(closest-side, rgba(255,255,255,.72), rgba(255,255,255,0)); }
+  .node-disc>span { position:relative; z-index:1; line-height:1; filter:drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+  .node:active .node-disc { transform:scale(.82); transition:transform .09s ease-out; }   /* fast squish-in */
+  .node-label { font-size:clamp(11px,2.1vmin,17px); font-weight:bold; color:#fff; max-width:26vmin;
+    text-shadow:0 1px 0 rgba(0,0,0,.4); background:rgba(0,0,0,.2); padding:.12em .8em; border-radius:99px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .node-stars { font-size:clamp(10px,1.9vmin,15px); min-height:1.1em; letter-spacing:-1px; }
   .b-snow   { background:linear-gradient(#7fb6f7,#3a6fd0); }
   .b-ocean  { background:linear-gradient(#4fc4e0,#1583ad); }
   .b-memory { background:linear-gradient(#ffd166,#e8913a); }
@@ -99,22 +118,28 @@
   .c-space  { background:linear-gradient(#5a6bd8,#26265a); }
   .c-create { background:linear-gradient(#ff8fb1,#e84393); }
 
-  /* category + game grids */
-  #mapNodes.cats { position:absolute; inset:0; display:grid; grid-template-columns:repeat(3,1fr);
-                   align-content:center; justify-items:center; gap:2.5vmin 1vmin; padding:11vmin 3vmin 9vmin; z-index:4; }
-  @media (max-width:560px) { #mapNodes.cats { grid-template-columns:repeat(2,1fr); } }
-  .cat-node { position:static; transform:none; animation:nodePop .4s ease backwards; }
-  .cat-node:active .bubble { transform:scale(.9); }
-  .cat-node .bubble { width:clamp(62px,15vmin,116px); height:clamp(62px,15vmin,116px); font-size:clamp(30px,8vmin,58px); }
-  @keyframes nodePop { 0%{opacity:0; transform:scale(.4);} 100%{opacity:1; transform:scale(1);} }
+  /* ---- World hub grid: auto-fit, centered, scroll-safe (never clips title/mascot) ---- */
+  #mapNodes.cats { position:absolute; inset:0; display:grid;
+                   grid-template-columns:repeat(auto-fit, minmax(clamp(96px,26vmin,150px), 1fr));
+                   align-content:center; justify-items:center; gap:3vmin 1.5vmin;
+                   padding:13vmin 4vmin 12vmin; z-index:4; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  @media (max-width:520px) { #mapNodes.cats { grid-template-columns:repeat(2,1fr); } }
+  .node { animation:nodePop .55s cubic-bezier(0.34,1.56,0.64,1) backwards, catFloat 4.6s ease-in-out infinite;
+          animation-delay:0s, .55s; }
+  /* staggered idle bob so the grid breathes instead of sitting static */
+  .node:nth-child(4n+1) { animation-delay:0s, .7s; }   .node:nth-child(4n+2) { animation-delay:0s, 1.6s; }
+  .node:nth-child(4n+3) { animation-delay:0s, 2.5s; }   .node:nth-child(4n)   { animation-delay:0s, 3.4s; }
+  @keyframes catFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-1vmin);} }
+  @keyframes nodePop  { 0%{opacity:0; transform:scale(.3);} 100%{opacity:1; transform:scale(1);} }
   #games { padding-top:9vmin; }
   #games #gamesHome { position:absolute; top:2vmin; left:2vmin; z-index:10; }
   #gamesTitle { position:absolute; top:2.5vmin; width:100%; text-align:center; color:#fff;
-                font-size:clamp(22px,5vmin,40px); text-shadow:0 3px 0 rgba(0,0,0,.25); pointer-events:none; }
-  #gameNodes { display:grid; grid-template-columns:repeat(2,1fr); gap:3vmin 4vmin;
-               align-content:center; justify-items:center; padding:2vmin; max-width:640px; }
-  @media (min-width:680px) { #gameNodes { grid-template-columns:repeat(3,1fr); } }
-  #gameNodes .cat-node .bubble { width:clamp(70px,17vmin,120px); height:clamp(70px,17vmin,120px); font-size:clamp(34px,9vmin,62px); }
+                font-size:clamp(22px,5vmin,40px); text-shadow:0 3px 0 rgba(0,0,0,.25); pointer-events:none; padding:0 2vmin; }
+  #gameNodes { display:grid; grid-template-columns:repeat(auto-fit, minmax(clamp(104px,28vmin,160px), 1fr));
+               gap:3.4vmin 2vmin; align-content:center; justify-items:center; padding:2vmin; width:100%;
+               max-width:680px; max-height:100%; overflow-y:auto; }
+  @media (max-width:520px) { #gameNodes { grid-template-columns:repeat(2,1fr); } }
+  #gameNodes .node-disc { width:clamp(72px,18vmin,124px); height:clamp(72px,18vmin,124px); font-size:clamp(34px,9.5vmin,64px); }
 
   /* name entry */
   #namescreen { background:linear-gradient(#8fd5f7,#c9efb0 70%,#8fd06a); z-index:78; }
@@ -198,7 +223,15 @@
   #hubMascot   { position:absolute; left:1%; bottom:3%; width:clamp(74px,15vmin,140px); font-size:clamp(64px,13vmin,124px); z-index:4; }
   #gameMascot  { position:fixed; left:1vmin; bottom:1vmin; width:clamp(58px,11.5vmin,100px); font-size:clamp(50px,10vmin,90px); z-index:30; }
   #celebMascot { width:clamp(95px,21vmin,180px); font-size:clamp(84px,19vmin,164px); }
-  .mascot .buddy { display:block; line-height:1; text-align:center; filter:drop-shadow(0 4px 4px rgba(0,0,0,.25)); }
+  .mascot .buddy { display:block; line-height:1; text-align:center; filter:drop-shadow(0 4px 4px rgba(0,0,0,.25));
+                   transform-origin:center bottom; animation:buddyIdle 5.5s ease-in-out infinite; }
+  /* occasional happy wiggle/ear-flick when the buddy is just hanging out */
+  @keyframes buddyIdle { 0%,80%,100%{transform:rotate(0) scale(1);}
+                         86%{transform:rotate(-8deg) scale(1.06);}
+                         92%{transform:rotate(6deg) scale(1.05);}
+                         97%{transform:rotate(-2deg) scale(1.02);} }
+  .mascot.talking .buddy   { animation:buddyTalk .4s ease-in-out infinite; }
+  @keyframes buddyTalk { 50%{transform:scale(1.08) rotate(-3deg);} }
 
   /* ================= GAME ================= */
   #game header {
@@ -235,6 +268,7 @@
               animation:fall linear forwards; pointer-events:none; }
   @keyframes fall { to { transform:translateY(115vh) rotate(540deg); } }
   #fxC { position:fixed; inset:0; width:100vw; height:100vh; z-index:85; pointer-events:none; }
+  #trailC { position:fixed; inset:0; width:100vw; height:100vh; z-index:84; pointer-events:none; }
   .floater { position:fixed; z-index:88; font-size:clamp(26px,6vmin,48px); pointer-events:none;
              animation:floatUp 1.4s ease-out forwards; }
   @keyframes floatUp { to { transform:translateY(-26vh) rotate(18deg); opacity:0; } }
@@ -490,7 +524,15 @@
               width:clamp(46px,10vmin,74px); height:clamp(46px,10vmin,74px); font-size:clamp(28px,6.5vmin,48px); box-shadow:0 3px 0 rgba(0,0,0,.15); }
   .pal-item.sel { background:#ffd23e; outline:4px solid #f0a813; transform:scale(1.08); }
   .sticker { position:absolute; transform:translate(-50%,-50%); font-size:clamp(40px,9vmin,80px);
-             touch-action:none; cursor:grab; filter:drop-shadow(0 3px 3px rgba(0,0,0,.35)); z-index:5; animation:bounceIn .4s; }
+             touch-action:none; cursor:grab; filter:drop-shadow(0 3px 3px rgba(0,0,0,.35)); z-index:5; animation:bounceIn .4s;
+             transition:transform .18s cubic-bezier(0.34,1.56,0.64,1), filter .18s ease; }
+  /* lifted off the page while dragging — bigger, tilted, fuzzy shadow cast below */
+  .sticker.lifted { transform:translate(-50%,-50%) scale(1.28) rotate(4deg); cursor:grabbing;
+                    filter:drop-shadow(0 14px 12px rgba(0,0,0,.4)); z-index:30; transition:none; }
+  .sticker.settle { animation:stickSettle .42s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes stickSettle { 0%{transform:translate(-50%,-50%) scale(1.28) rotate(4deg);}
+                           55%{transform:translate(-50%,-50%) scale(.9) rotate(-2deg);}
+                           100%{transform:translate(-50%,-50%) scale(1) rotate(0);} }
   #bookHome, #sceneClear { flex-shrink:0; }
 
   /* ================= PAINT ================= */
@@ -736,6 +778,8 @@
 </div>
 
 <canvas id="fxC"></canvas>
+<canvas id="trailC"></canvas>
+<div id="wipe"></div>
 <button class="round-btn" id="musicBtn" aria-label="Music">🎵</button>
 
 <script>
@@ -870,12 +914,41 @@ function tone(freq, start, dur, type = "sine", vol = 0.22) {
   o.connect(g).connect(ctx.destination);
   o.start(ctx.currentTime + start); o.stop(ctx.currentTime + start + dur);
 }
+// "Plump" voice — one filtered oscillator with a glide + soft attack/decay so taps
+// sound round & organic instead of beepy. Pitch and lowpass cutoff both swoop.
+function voice(o) {
+  const ctx = audio(), t0 = ctx.currentTime + (o.start || 0), dur = o.dur;
+  const osc = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+  osc.type = o.type || "sine";
+  osc.frequency.setValueAtTime(o.f0, t0);
+  if (o.f1) osc.frequency.exponentialRampToValueAtTime(o.f1, t0 + dur);
+  f.type = "lowpass";
+  f.frequency.setValueAtTime(o.cut || 2600, t0);
+  if (o.cut1) f.frequency.exponentialRampToValueAtTime(o.cut1, t0 + dur);
+  const v = o.vol == null ? 0.2 : o.vol, atk = o.atk || 0.012;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(v, t0 + atk);            // soft attack (no click)
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);       // smooth decay
+  osc.connect(f).connect(g).connect(ctx.destination);
+  osc.start(t0); osc.stop(t0 + dur + 0.03);
+}
 const sfx = {
-  tap()  { tone(880, 0, .12, "triangle"); },
-  tick() { tone(1320, 0, .07, "triangle", .08); },
-  good() { [523, 659, 784].forEach((f, i) => tone(f, i * .09, .25, "triangle")); },
-  bad()  { tone(220, 0, .25, "sine", .15); },
-  win()  { [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * .12, .35, "triangle")); }
+  // soft organic bubble "pop" — body + a quieter sub-octave for roundness
+  tap()  { voice({ type:"sine", f0:430, f1:760, dur:.13, cut:1700, cut1:3200, vol:.22, atk:.006 });
+           voice({ type:"triangle", f0:215, f1:380, dur:.13, cut:1300, vol:.09, atk:.006 }); },
+  tick() { voice({ type:"sine", f0:900, f1:1160, dur:.07, cut:3000, vol:.09 }); },
+  // rich ascending magical chime: stacked sine+triangle, then a high sparkle
+  good() { [523.25, 659.25, 784, 1046.5].forEach((fr, i) => {
+             voice({ type:"sine", f0:fr, dur:.34, start:i*.085, cut:4200, vol:.16, atk:.01 });
+             voice({ type:"triangle", f0:fr, dur:.30, start:i*.085, cut:2600, vol:.07 }); });
+           voice({ type:"sine", f0:1568, f1:2093, dur:.5, start:.34, cut:6000, vol:.10 }); },
+  // soft wooden-block "tock" for invalid taps — gentle, never harsh
+  bad()  { voice({ type:"triangle", f0:300, f1:150, dur:.16, cut:1100, cut1:480, vol:.16, atk:.004 });
+           voice({ type:"sine", f0:150, f1:90, dur:.16, cut:700, vol:.09, atk:.004 }); },
+  win()  { [523.25, 659.25, 784, 1046.5, 1318.5].forEach((fr, i) => {
+             voice({ type:"sine", f0:fr, dur:.42, start:i*.11, cut:5000, vol:.16, atk:.01 });
+             voice({ type:"triangle", f0:fr, dur:.38, start:i*.11, cut:2800, vol:.07 }); });
+           voice({ type:"sine", f0:2093, dur:.6, start:.58, cut:7000, vol:.10 }); }
 };
 
 // selectable background music styles — each tune is [freq, beats]
@@ -964,6 +1037,44 @@ function floaters(emojis, x, y, n = 8) {
     setTimeout(() => f.remove(), 1500);
   }
 }
+
+/* ===== Pointer sparkle trail — self-fading glitter behind fingers (paint + tracing) ===== */
+const trail = {
+  parts: [], raf: null, ctx: null, w: 0, h: 0,
+  ensure() {
+    const c = $("trailC");
+    if (this.w !== innerWidth || this.h !== innerHeight) { this.w = c.width = innerWidth; this.h = c.height = innerHeight; this.ctx = c.getContext("2d"); }
+    else if (!this.ctx) this.ctx = c.getContext("2d");
+  },
+  add(x, y, hue, n = 3) {
+    this.ensure();
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, sp = randBetween(.3, 2.1);
+      this.parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - .55,
+        life: 1, decay: randBetween(.018, .04), r: randBetween(2.5, 6),
+        hue: hue + randBetween(-18, 18), star: Math.random() < .45, spin: randBetween(-.22, .22), ang: Math.random() * 7 });
+    }
+    if (this.parts.length > 260) this.parts.splice(0, this.parts.length - 260);   // cap for low-end phones
+    if (!this.raf) this.raf = requestAnimationFrame(() => this.frame());
+  },
+  frame() {
+    const ctx = this.ctx; ctx.clearRect(0, 0, this.w, this.h);
+    for (const p of this.parts) { p.x += p.vx; p.y += p.vy; p.vy += .04; p.vx *= .97; p.life -= p.decay; p.ang += p.spin; }
+    this.parts = this.parts.filter(p => p.life > 0);
+    for (const p of this.parts) {
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = `hsl(${p.hue}, 95%, 65%)`;
+      if (p.star) {
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.ang); ctx.beginPath();
+        for (let i = 0; i < 10; i++) { const rr = i % 2 ? p.r * .45 : p.r * 1.25, aa = i / 10 * Math.PI * 2, X = Math.cos(aa) * rr, Y = Math.sin(aa) * rr; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); }
+        ctx.closePath(); ctx.fill(); ctx.restore();
+      } else { ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (.6 + p.life * .6), 0, 7); ctx.fill(); }
+    }
+    ctx.globalAlpha = 1;
+    if (this.parts.length) this.raf = requestAnimationFrame(() => this.frame());
+    else { ctx.clearRect(0, 0, this.w, this.h); this.raf = null; }
+  }
+};
 
 /* ================= Shared data ================= */
 const PRAISE = ["Great job, {n}!", "Wonderful!", "Amazing!", "Hooray!", "You did it, {n}!", "Super!", "Fantastic!", "Woohoo!"];
@@ -1569,8 +1680,8 @@ const traceLevel = {
     this.drawGuide();
     const ink = $("inkC");
     const pos = e => { const r = ink.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
-    ink.addEventListener("pointerdown", e => { e.preventDefault(); try { ink.setPointerCapture(e.pointerId); } catch (_) {} this.last = pos(e); this.paint(this.last); });
-    ink.addEventListener("pointermove", e => { if (this.last) { const p = pos(e); this.paint(p); this.last = p; } });
+    ink.addEventListener("pointerdown", e => { e.preventDefault(); try { ink.setPointerCapture(e.pointerId); } catch (_) {} this.last = pos(e); this.paint(this.last); trail.add(e.clientX, e.clientY, this.hue, 4); });
+    ink.addEventListener("pointermove", e => { if (this.last) { const p = pos(e); this.paint(p); this.last = p; trail.add(e.clientX, e.clientY, this.hue, this.done ? 0 : 2); } });
     const stop = () => this.last = null;
     ink.addEventListener("pointerup", stop); ink.addEventListener("pointercancel", stop);
   },
@@ -2125,7 +2236,7 @@ const paint = {
   colors: ["#e63946", "#f07f13", "#f4c726", "#3fa84f", "#2f6fde", "#8e4fd0", "#f06ba8", "#8a5a2b", "#2b2b2b"],
   stamps: ["⭐", "❤️", "🌸", "🦋", "❄️", "🐠", "🌈", "🍩"],
   outlines: ["snowman", "flower", "fish", "butterfly", "star", "heart"],
-  color: "#e63946", mode: "draw", stampIdx: 0, last: null,
+  color: "#e63946", mode: "draw", stampIdx: 0, last: null, trailHue: 0,
   show() {
     cleanupLevel();
     if ("speechSynthesis" in window) speechSynthesis.cancel();
@@ -2163,9 +2274,9 @@ const paint = {
       e.preventDefault(); try { c.setPointerCapture(e.pointerId); } catch (_) {}
       const p = pos(e);
       if (this.mode === "stamp") this.stamp(p);
-      else { this.last = p; this.draw(p); }
+      else { this.last = p; this.draw(p); if (this.mode !== "erase") trail.add(e.clientX, e.clientY, this.trailHue = (this.trailHue + 24) % 360, 4); }
     };
-    c.onpointermove = e => { if (this.last && this.mode !== "stamp") { const p = pos(e); this.draw(p); this.last = p; } };
+    c.onpointermove = e => { if (this.last && this.mode !== "stamp") { const p = pos(e); this.draw(p); this.last = p; if (this.mode !== "erase") trail.add(e.clientX, e.clientY, this.trailHue = (this.trailHue + 12) % 360, 2); } };
     const stop = () => this.last = null;
     c.onpointerup = stop; c.onpointercancel = stop;
   },
@@ -2270,9 +2381,9 @@ function buildHub() {
   const wrap = $("mapNodes"); wrap.className = "cats"; wrap.innerHTML = "";
   CATEGORIES.forEach(cat => {
     const b = document.createElement("button");
-    b.className = "map-node cat-node";
-    b.innerHTML = `<div class="bubble ${cat.cls}">${cat.icon}</div><div class="nname">${cat.name}</div>`;
-    b.onclick = () => openCategory(cat.id);
+    b.className = "node";
+    b.innerHTML = `<div class="node-disc ${cat.cls}"><span>${cat.icon}</span></div><div class="node-label">${cat.name}</div>`;
+    b.onclick = () => { sfx.tap(); speak(cat.name); openCategory(cat.id); };
     wrap.appendChild(b);
   });
 }
@@ -2281,16 +2392,18 @@ function openCategory(id) {
   const cat = CATEGORIES.find(c => c.id === id);
   hideAllScreens();
   $("games").classList.remove("hidden");
+  animScreen("games", "fwd");
   document.body.className = "";
   $("gamesTitle").textContent = `${cat.icon} ${cat.name}`;
   const wrap = $("gameNodes"); wrap.innerHTML = "";
   cat.games.forEach(gid => {
     const g = GAMES[gid];
     const b = document.createElement("button");
-    b.className = "map-node cat-node";
-    b.innerHTML = `<div class="bubble b-${gid}">${g.icon}</div><div class="nname">${g.name}</div>
-                   <div class="nstars">${"⭐".repeat(Math.min(3, completions[gid] || 0))}</div>`;
-    b.onclick = () => launchGame(gid);
+    b.className = "node";
+    b.innerHTML = `<div class="node-disc b-${gid}"><span>${g.icon}</span></div>
+                   <div class="node-label">${g.name}</div>
+                   <div class="node-stars">${"⭐".repeat(Math.min(3, completions[gid] || 0))}</div>`;
+    b.onclick = () => { sfx.tap(); launchGame(gid); };
     wrap.appendChild(b);
   });
 }
@@ -2405,7 +2518,8 @@ function addPlaced(d, idx) {
   el.addEventListener("pointerdown", e => {
     e.preventDefault(); e.stopPropagation();
     try { el.setPointerCapture(e.pointerId); } catch (_) {}
-    el.style.zIndex = 20;
+    el.classList.remove("settle"); el.classList.add("lifted");   // pick it up: enlarge, tilt, cast shadow
+    sfx.tick();
     let moved = false; const sx = e.clientX, sy = e.clientY;
     const pct = ev => { const r = scene.getBoundingClientRect(); return { x: clamp((ev.clientX - r.left) / r.width * 100, 1, 99), y: clamp((ev.clientY - r.top) / r.height * 100, 1, 99) }; };
     const move = ev => {
@@ -2415,7 +2529,9 @@ function addPlaced(d, idx) {
     };
     const up = () => {
       el.removeEventListener("pointermove", move); el.removeEventListener("pointerup", up);
-      el.style.zIndex = ""; saveDecor();
+      el.classList.remove("lifted"); el.classList.add("settle");   // drop it: physical settlement bounce
+      el.addEventListener("animationend", () => el.classList.remove("settle"), { once: true });
+      sfx.tap(); saveDecor();
     };
     el.addEventListener("pointermove", move); el.addEventListener("pointerup", up);
   });
@@ -2452,7 +2568,10 @@ function showCharScreen(returnTo) {
 
 /* ================= Navigation ================= */
 const ALL_SCREENS = ["hub", "games", "game", "stickerbook", "story", "paint", "dressup", "dashboard", "namescreen", "charscreen", "settings", "celebrate"];
-function hideAllScreens() { ALL_SCREENS.forEach(id => { const e = $(id); if (e) e.classList.add("hidden"); }); }
+function hideAllScreens() { ALL_SCREENS.forEach(id => { const e = $(id); if (e) e.classList.add("hidden"); }); playWipe(); }
+function playWipe() { const w = $("wipe"); if (!w) return; w.classList.remove("run"); void w.offsetWidth; w.classList.add("run"); }
+// contextual screen entrance: "fwd" (drill in) or "back" (go home); falls back to default screenIn
+function animScreen(id, cls) { const el = $(id); if (!el) return; el.classList.remove("fwd", "back"); void el.offsetWidth; el.classList.add(cls); }
 function showHub() {
   cleanupLevel();
   if ("speechSynthesis" in window) speechSynthesis.cancel();
@@ -2460,6 +2579,7 @@ function showHub() {
   document.body.className = "";
   hideAllScreens();
   $("hub").classList.remove("hidden");
+  animScreen("hub", "back");
   buildHub();
 }
 function startLevel(name) {
@@ -2468,6 +2588,7 @@ function startLevel(name) {
   document.body.className = LEVELS[name].theme;
   hideAllScreens();
   $("game").classList.remove("hidden");
+  animScreen("game", "fwd");
   drawProgress();
   LEVELS[name].startRound();
 }
