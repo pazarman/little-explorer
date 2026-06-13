@@ -1,7 +1,7 @@
-# CLAUDE.md — Fiona's World
+# CLAUDE.md — Little Explorer's World
 
 ## Project Overview
-**Fiona's World** is a colorful, voice-guided educational game for toddlers (2–4 years old). It's a **Progressive Web App (PWA)** that runs entirely in the browser as static files — no build process, no dependencies, no backend needed.
+**Little Explorer's World** is a colorful, voice-guided educational game for toddlers (2–5 years old). It's a **Progressive Web App (PWA)** that runs entirely in the browser as static files — no build process, no dependencies, no backend needed.
 
 ### Key Features
 - 12 mini-games across 6 themed worlds (Numbers, Colors & Shapes, Brain Games, Animals, Space, Create)

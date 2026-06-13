@@ -1,7 +1,7 @@
 {
-  "name": "Fiona's World",
-  "short_name": "Fiona",
-  "description": "Educational games for Fiona: counting, colors, shapes, numbers, memory and music.",
+  "name": "Little Explorer's World",
+  "short_name": "Explorer",
+  "description": "Voice-guided educational games for ages 2-5: counting, colors, shapes, numbers, memory and music.",
   "start_url": "./index.html",
   "display": "fullscreen",
   "orientation": "any",

@@ -1,4 +1,4 @@
-# 🌈 Fiona's World
+# 🌈 Little Explorer's World
 
 A colorful, voice-guided educational game for **2–4 year olds**. No reading required — every instruction is spoken aloud. Big tap targets, no fail states, no time pressure.
 
