@@ -157,50 +157,38 @@
   #setName { background:#cdeafe; color:#1b4e7a; }
   #setDash { background:#d8f0d0; color:#2b5e1f; }
 
-  /* dress-up (paper doll stage + closet tray) */
+  /* dress-up (drawn, composable SVG character + closet) */
   #dressup { padding:0; }
   #dressBar { display:flex; align-items:center; justify-content:center; gap:1.4vmin; width:100%; padding:1.2vmin; z-index:20; }
   #dressStage { flex:1; width:100%; display:flex; align-items:center; justify-content:center;
                 transition:background .3s; min-height:0; padding:1vmin; }
-  /* paper-doll base: neutral head + body silhouette, accessories layered by absolute % */
-  #doll { position:relative; width:clamp(150px,38vmin,290px); aspect-ratio:3 / 4; }
-  .doll-shadow { position:absolute; left:50%; bottom:.5%; transform:translateX(-50%);
-    width:52%; height:4.5%; background:rgba(0,0,0,.18); border-radius:50%; filter:blur(2px); }
-  .doll-body { position:absolute; left:50%; top:60%; transform:translate(-50%,-50%); width:54%; height:46%;
-    border-radius:44% 44% 32% 32% / 34% 34% 22% 22%;
-    background:linear-gradient(#ffe2c6,#f2c096); box-shadow:inset -8px -10px 14px rgba(0,0,0,.1); }
-  .doll-head { position:absolute; left:50%; top:18%; transform:translate(-50%,-50%); width:42%; aspect-ratio:1;
-    border-radius:50%; background:radial-gradient(circle at 40% 35%, #fff3e4, #f2c096);
-    box-shadow:inset -6px -6px 10px rgba(0,0,0,.09); }
-  .dlayer { position:absolute; transform:translate(-50%,-50%); line-height:1; pointer-events:none;
-    display:flex; align-items:center; justify-content:center; }
-  #lyr-outfit  { left:50%; top:62%; font-size:clamp(50px,15vmin,112px); z-index:3; }
-  #lyr-face    { left:50%; top:18%; font-size:clamp(38px,11vmin,80px);  z-index:4; }
-  #lyr-glasses { left:50%; top:18.5%; font-size:clamp(24px,7vmin,52px); z-index:5; }
-  #lyr-hat     { left:50%; top:2.5%; font-size:clamp(40px,11.5vmin,86px); z-index:6; }
-  #lyr-item    { left:83%; top:74%; font-size:clamp(28px,8vmin,58px);  z-index:7; }
-  .dlayer.snap { animation:lyrSnap .42s cubic-bezier(0.34,1.56,0.64,1); }
-  @keyframes lyrSnap { 0%{transform:translate(-50%,-50%) scale(1.45);} 55%{transform:translate(-50%,-50%) scale(.86);} 100%{transform:translate(-50%,-50%) scale(1);} }
+  #dollWrap { width:clamp(150px,40vmin,300px); max-height:100%; display:flex; }
+  .dollsvg { width:100%; height:auto; max-height:100%; overflow:visible; filter:drop-shadow(0 6px 8px rgba(0,0,0,.18)); }
+  .dollsvg g { transform-box:fill-box; transform-origin:center; }
+  /* the layer that just changed pops in; the whole doll gives a happy wiggle */
+  .dollsvg g.pop { animation:partPop .45s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes partPop { 0%{transform:scale(.25);} 60%{transform:scale(1.2);} 100%{transform:scale(1);} }
+  #dollWrap.snap { animation:dollSnap .4s ease-in-out; }
+  @keyframes dollSnap { 0%,100%{transform:scale(1) rotate(0);} 40%{transform:scale(1.05) rotate(-1.5deg);} 70%{transform:scale(1.02) rotate(1deg);} }
   /* the closet drawer at the bottom */
   #closet { width:100%; background:linear-gradient(#ffffffee,#f1e6ff); border-top:3px solid #fff;
     border-radius:26px 26px 0 0; box-shadow:0 -4px 16px rgba(0,0,0,.13); padding:1.4vmin 1vmin 1.8vmin; z-index:20; }
-  #closetTabs { display:flex; justify-content:center; gap:1.4vmin; margin-bottom:1.2vmin; }
-  .ctab { border:none; border-radius:50%; width:clamp(42px,9vmin,62px); height:clamp(42px,9vmin,62px);
-    font-size:clamp(20px,5vmin,34px); background:#ececf2; box-shadow:0 3px 0 rgba(0,0,0,.15);
+  #closetTabs { display:flex; justify-content:center; gap:1.2vmin; margin-bottom:1.2vmin; flex-wrap:wrap; }
+  .ctab { border:none; border-radius:50%; width:clamp(40px,8.5vmin,58px); height:clamp(40px,8.5vmin,58px);
+    font-size:clamp(19px,4.6vmin,30px); background:#ececf2; box-shadow:0 3px 0 rgba(0,0,0,.15);
     transition:transform .09s ease-out; }
   .ctab:active { transform:scale(.9); }
   .ctab.sel { background:#ffd23e; box-shadow:0 3px 0 #d9a400; }
   #closetTray { display:flex; gap:1.6vmin; overflow-x:auto; padding:1vmin .6vmin .4vmin;
     -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; }
-  .cslot { flex:0 0 auto; border:3px solid #fff; border-radius:50%; scroll-snap-align:center;
-    width:clamp(54px,12vmin,84px); height:clamp(54px,12vmin,84px); font-size:clamp(28px,7vmin,50px);
-    background:radial-gradient(circle at 40% 35%, #fff, #e7ecf5); box-shadow:0 4px 0 rgba(0,0,0,.16);
-    display:flex; align-items:center; justify-content:center; transition:transform .09s ease-out; }
+  .cslot { flex:0 0 auto; border:3px solid #fff; border-radius:18px; scroll-snap-align:center; overflow:hidden;
+    width:clamp(56px,13vmin,88px); height:clamp(56px,13vmin,88px); font-size:clamp(28px,7vmin,50px);
+    background:radial-gradient(circle at 40% 32%, #fff, #e7ecf5); box-shadow:0 4px 0 rgba(0,0,0,.16);
+    display:flex; align-items:center; justify-content:center; transition:transform .09s ease-out; padding:0; }
+  .cslot svg { width:100%; height:100%; display:block; }
+  .cslot.none-slot { color:#b6b9c4; font-weight:bold; font-size:clamp(13px,3vmin,18px); }
   .cslot:active { transform:scale(.86); }
   .cslot.sel { border-color:#ffd23e; box-shadow:0 0 0 3px #ffd23e, 0 4px 0 rgba(0,0,0,.16); }
-  /* item flying from the closet onto the doll */
-  .fly-item { position:fixed; z-index:130; pointer-events:none; transform:translate(-50%,-50%);
-    font-size:clamp(34px,9vmin,64px); transition:transform .4s cubic-bezier(.5,0,.4,1), opacity .4s; }
 
   /* dashboard */
   #dashboard { justify-content:flex-start; padding-top:8vmin; overflow-y:auto; }
@@ -824,16 +812,7 @@
     <button class="round-btn" id="dressDone" aria-label="Done">✅</button>
   </div>
   <div id="dressStage">
-    <div id="doll">
-      <div class="doll-shadow"></div>
-      <div class="doll-body"></div>
-      <div class="dlayer" id="lyr-outfit"></div>
-      <div class="doll-head"></div>
-      <div class="dlayer" id="lyr-face"></div>
-      <div class="dlayer" id="lyr-glasses"></div>
-      <div class="dlayer" id="lyr-hat"></div>
-      <div class="dlayer" id="lyr-item"></div>
-    </div>
+    <div id="dollWrap"></div>
   </div>
   <div id="closet">
     <div id="closetTabs"></div>
@@ -2533,31 +2512,100 @@ const paint = {
 
 /* ================= Dress-Up Studio (creative) ================= */
 // fly an emoji from a closet slot onto its layer position on the doll, then snap
-function flyTo(fromEl, toEl, emoji, done) {
-  const fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
-  const fx = fr.left + fr.width / 2, fy = fr.top + fr.height / 2;
-  const tx = tr.left + tr.width / 2, ty = tr.top + tr.height / 2;
-  const fly = document.createElement("div");
-  fly.className = "fly-item"; fly.textContent = emoji;
-  fly.style.left = fx + "px"; fly.style.top = fy + "px";
-  document.body.appendChild(fly);
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    fly.style.transform = `translate(-50%,-50%) translate(${tx - fx}px,${ty - fy}px) scale(1.2)`;
-    fly.style.opacity = ".2";
-  }));
-  setTimeout(() => { fly.remove(); done && done(); }, 420);   // timer-driven so it lands even if rAF is throttled
+/* ---- Drawn character: every part is real SVG art designed to align & compose ---- */
+function dStarPath(cx, cy, r) {
+  let p = "";
+  for (let i = 0; i < 10; i++) { const rr = i % 2 ? r * 0.45 : r, a = i / 10 * Math.PI * 2 - Math.PI / 2; p += (i ? "L" : "M") + (cx + Math.cos(a) * rr).toFixed(1) + " " + (cy + Math.sin(a) * rr).toFixed(1); }
+  return p + "Z";
+}
+function dHeartPath(cx, cy, s) {
+  return `M${cx} ${cy + 0.55 * s} C ${cx - 1.1 * s} ${cy - 0.35 * s}, ${cx - 0.5 * s} ${cy - 1.05 * s}, ${cx} ${cy - 0.35 * s} C ${cx + 0.5 * s} ${cy - 1.05 * s}, ${cx + 1.1 * s} ${cy - 0.35 * s}, ${cx} ${cy + 0.55 * s} Z`;
+}
+function dEye(cx, kind) {
+  if (kind === "happy") return `<path d="M${cx - 9} 101 Q${cx} 90 ${cx + 9} 101" stroke="#3a2e2e" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  if (kind === "sleepy") return `<path d="M${cx - 9} 97 Q${cx} 106 ${cx + 9} 97" stroke="#3a2e2e" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  if (kind === "big") return `<circle cx="${cx}" cy="98" r="11" fill="#fff" stroke="#3a2e2e" stroke-width="2"/><circle cx="${cx}" cy="99" r="6.5" fill="#3a2e2e"/><circle cx="${cx + 2}" cy="96" r="2.1" fill="#fff"/>`;
+  if (kind === "star") return `<path d="${dStarPath(cx, 98, 11)}" fill="#ffd23e" stroke="#e0a400" stroke-width="1.5"/>`;
+  if (kind === "heart") return `<path d="${dHeartPath(cx, 99, 11)}" fill="#ff5d7a"/>`;
+  return `<circle cx="${cx}" cy="98" r="8" fill="#3a2e2e"/><circle cx="${cx + 2.5}" cy="95" r="2.6" fill="#fff"/>`;   // round
+}
+const dMouth = {
+  smile: `<path d="M84 119 Q100 137 116 119" stroke="#9c3b2a" stroke-width="5" fill="none" stroke-linecap="round"/>`,
+  small: `<path d="M90 122 Q100 130 110 122" stroke="#9c3b2a" stroke-width="4.5" fill="none" stroke-linecap="round"/>`,
+  big: `<path d="M84 117 Q100 121 116 117 Q113 140 100 140 Q87 140 84 117 Z" fill="#9c3b2a"/><path d="M91 133 Q100 143 109 133 Z" fill="#ff7d8a"/>`,
+  o: `<ellipse cx="100" cy="125" rx="7" ry="9" fill="#9c3b2a"/>`,
+  tongue: `<path d="M84 119 Q100 133 116 119" stroke="#9c3b2a" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M96 125 Q100 138 104 125 Z" fill="#ff7d8a"/>`
+};
+const dCheeks = `<circle cx="64" cy="116" r="9" fill="#ff9bb0" opacity=".7"/><circle cx="136" cy="116" r="9" fill="#ff9bb0" opacity=".7"/>`;
+function dFaceSVG(style) {
+  const F = { happy: ["round", "smile", 1], big: ["round", "big", 1], wink: ["wink", "smile", 0], sleepy: ["sleepy", "small", 0],
+    surprised: ["big", "o", 0], silly: ["happy", "tongue", 0], love: ["heart", "smile", 1], starry: ["star", "smile", 1] }[style] || ["round", "smile", 1];
+  const eyes = F[0] === "wink" ? dEye(80, "happy") + dEye(120, "round") : dEye(80, F[0]) + dEye(120, F[0]);
+  return (F[2] ? dCheeks : "") + eyes + dMouth[F[1]];
+}
+function dHairSVG(style) {
+  return {
+    none: "",
+    tuft: `<path d="M66 52 Q72 26 100 26 Q128 26 134 52 Q122 40 100 40 Q78 40 66 52 Z" fill="#7a4a24"/><path d="M95 28 Q104 16 113 30 Q104 27 95 28 Z" fill="#7a4a24"/>`,
+    bob: `<path d="M40 100 Q36 38 100 34 Q164 38 160 100 Q158 72 138 60 Q120 52 100 52 Q80 52 62 60 Q42 72 40 100 Z" fill="#2b2b33"/>`,
+    curls: `<g fill="#5a3318"><circle cx="74" cy="44" r="14"/><circle cx="100" cy="36" r="16"/><circle cx="126" cy="44" r="14"/><circle cx="58" cy="58" r="11"/><circle cx="142" cy="58" r="11"/></g>`,
+    spiky: `<g fill="#d94f3a"><path d="M60 56 L70 22 L84 52 Z"/><path d="M84 52 L100 16 L116 52 Z"/><path d="M116 52 L130 22 L140 56 Z"/></g>`,
+    pig: `<circle cx="42" cy="98" r="20" fill="#e8c45a"/><circle cx="158" cy="98" r="20" fill="#e8c45a"/><path d="M60 50 Q100 28 140 50 Q120 40 100 40 Q80 40 60 50 Z" fill="#e8c45a"/>`,
+    mohawk: `<path d="M80 52 L88 22 L96 50 Z" fill="#4dabf7"/><path d="M92 50 L100 12 L108 50 Z" fill="#ff5d8f"/><path d="M104 50 L112 22 L120 52 Z" fill="#69db7c"/>`
+  }[style] || "";
+}
+function dHatSVG(style) {
+  return {
+    none: "",
+    party: `<path d="M100 6 L80 50 L120 50 Z" fill="#ff5d8f"/><circle cx="100" cy="7" r="6" fill="#ffd23e"/><circle cx="94" cy="33" r="3" fill="#fff"/><circle cx="106" cy="42" r="3" fill="#fff"/>`,
+    crown: `<path d="M68 50 L72 24 L86 40 L100 18 L114 40 L128 24 L132 50 Z" fill="#ffd23e" stroke="#e0a400" stroke-width="2.5" stroke-linejoin="round"/><circle cx="100" cy="34" r="3.5" fill="#ff5d8f"/>`,
+    bow: `<path d="M100 42 L76 28 Q72 42 76 56 Z" fill="#ff5d8f"/><path d="M100 42 L124 28 Q128 42 124 56 Z" fill="#ff5d8f"/><circle cx="100" cy="42" r="8" fill="#e63b6f"/>`,
+    beanie: `<path d="M46 62 Q100 14 154 62 Z" fill="#4dabf7"/><rect x="44" y="55" width="112" height="13" rx="6.5" fill="#2f8fe0"/><circle cx="100" cy="14" r="7" fill="#dff0ff"/>`,
+    cap: `<path d="M50 60 Q100 18 150 60 Z" fill="#69db7c"/><path d="M98 60 Q152 58 158 72 Q120 72 98 66 Z" fill="#46b85e"/><circle cx="100" cy="22" r="4" fill="#2f8f44"/>`,
+    flower: `<g transform="translate(140,46)"><g fill="#ff7eb0"><circle cx="0" cy="-9" r="7"/><circle cx="9" cy="0" r="7"/><circle cx="0" cy="9" r="7"/><circle cx="-9" cy="0" r="7"/></g><circle r="6" fill="#ffd23e"/></g>`
+  }[style] || "";
+}
+function dGlassesSVG(style) {
+  if (style === "round") return `<g fill="none" stroke="#333" stroke-width="3.5"><circle cx="80" cy="98" r="14"/><circle cx="120" cy="98" r="14"/><path d="M94 98 H106"/><path d="M66 95 L48 91"/><path d="M134 95 L152 91"/></g>`;
+  if (style === "sun") return `<g><rect x="64" y="88" width="30" height="20" rx="9" fill="#222"/><rect x="106" y="88" width="30" height="20" rx="9" fill="#222"/><path d="M94 95 H106" stroke="#222" stroke-width="4"/><path d="M64 91 L48 87" stroke="#222" stroke-width="3.5"/><path d="M136 91 L152 87" stroke="#222" stroke-width="3.5"/><path d="M70 92 L78 92" stroke="#fff" stroke-width="2" opacity=".5"/></g>`;
+  if (style === "star") return `<path d="${dStarPath(80, 98, 14)}" fill="#ffd23e" stroke="#e0a400" stroke-width="2"/><path d="${dStarPath(120, 98, 14)}" fill="#ffd23e" stroke="#e0a400" stroke-width="2"/>`;
+  if (style === "heart") return `<path d="${dHeartPath(80, 99, 15)}" fill="none" stroke="#ff3b6f" stroke-width="3.5"/><path d="${dHeartPath(120, 99, 15)}" fill="none" stroke="#ff3b6f" stroke-width="3.5"/><path d="M95 98 H105" stroke="#ff3b6f" stroke-width="3"/>`;
+  return "";
+}
+function dFriendSVG(emoji) {
+  return emoji === "none" ? "" : `<text x="166" y="216" font-size="38" text-anchor="middle" dominant-baseline="middle">${emoji}</text>`;
+}
+const DRESS = {
+  skin:    { tab: "🎨", word: "New color!", type: "color",  opts: ["#ffdcb1", "#f1c084", "#e0a062", "#c6824a", "#9b5e2e", "#7ad3a0", "#b9c6ff", "#f3a6c9"] },
+  face:    { tab: "😊", word: "Funny face!", type: "face",   opts: ["happy", "big", "wink", "sleepy", "surprised", "silly", "love", "starry"] },
+  hair:    { tab: "💇", word: "New hair!",  type: "hair",   opts: ["none", "tuft", "bob", "curls", "spiky", "pig", "mohawk"] },
+  hat:     { tab: "🎩", word: "Nice hat!",  type: "hat",    opts: ["none", "party", "crown", "bow", "beanie", "cap", "flower"] },
+  glasses: { tab: "👓", word: "Cool glasses!", type: "glasses", opts: ["none", "round", "sun", "star", "heart"] },
+  outfit:  { tab: "👕", word: "New shirt!", type: "color",  opts: ["#ff6b6b", "#ffa94d", "#ffd43b", "#69db7c", "#4dabf7", "#9775fa", "#f783ac", "#ffffff"] },
+  friend:  { tab: "🧸", word: "A friend!",  type: "friend", opts: ["none", "🧸", "🎈", "🌸", "🍦", "⭐", "🎁", "🐶", "🍭", "🎸"] }
+};
+const dressOrder = ["skin", "face", "hair", "hat", "glasses", "outfit", "friend"];
+function dDollSVG(idx, popCat) {
+  const P = c => (popCat === c ? " pop" : "");
+  const skin = DRESS.skin.opts[idx.skin], outfit = DRESS.outfit.opts[idx.outfit];
+  return `<svg class="dollsvg" viewBox="0 0 200 298" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="290" rx="48" ry="7" fill="rgba(0,0,0,.14)"/>
+    <g class="L-outfit${P("outfit")}"><path d="M56 292 Q52 182 100 176 Q148 182 144 292 Z" fill="${outfit}" stroke="rgba(0,0,0,.14)" stroke-width="2"/><path d="M84 178 Q100 191 116 178" fill="none" stroke="rgba(0,0,0,.13)" stroke-width="3"/></g>
+    <g class="L-skin${P("skin")}"><rect x="91" y="150" width="18" height="26" rx="9" fill="${skin}"/><circle cx="46" cy="98" r="12" fill="${skin}"/><circle cx="154" cy="98" r="12" fill="${skin}"/><ellipse cx="100" cy="96" rx="58" ry="60" fill="${skin}"/></g>
+    <g class="L-hair${P("hair")}">${dHairSVG(DRESS.hair.opts[idx.hair])}</g>
+    <g class="L-face${P("face")}">${dFaceSVG(DRESS.face.opts[idx.face])}</g>
+    <g class="L-glasses${P("glasses")}">${dGlassesSVG(DRESS.glasses.opts[idx.glasses])}</g>
+    <g class="L-hat${P("hat")}">${dHatSVG(DRESS.hat.opts[idx.hat])}</g>
+    <g class="L-friend${P("friend")}">${dFriendSVG(DRESS.friend.opts[idx.friend])}</g>
+  </svg>`;
+}
+function dSlotSVG(cat, opt, skin) {
+  const part = cat === "face" ? dFaceSVG(opt) : cat === "hair" ? dHairSVG(opt) : cat === "hat" ? dHatSVG(opt) : cat === "glasses" ? dGlassesSVG(opt) : "";
+  return `<svg viewBox="22 0 156 168" xmlns="http://www.w3.org/2000/svg"><circle cx="46" cy="98" r="12" fill="${skin}"/><circle cx="154" cy="98" r="12" fill="${skin}"/><ellipse cx="100" cy="96" rx="58" ry="60" fill="${skin}"/>${part}</svg>`;
 }
 const dressup = {
-  cats: {
-    face:    { tab: "🙂", word: "Face!",    items: ["🧒", "👧", "👦", "🐶", "🐱", "🐰", "🦊", "🐻", "🦄", "🐯", "🐵", "🐸", "🐼", "🦁"] },
-    hat:     { tab: "🎩", word: "Hat!",     items: ["🎩", "👑", "🧢", "🎀", "🎓", "👒", "🪖", "🐣", "🌺", "🍓", "⭐", "🎈"] },
-    glasses: { tab: "👓", word: "Glasses!", items: ["👓", "🕶️", "🥽", "🤓", "🧐", "🌈"] },
-    outfit:  { tab: "👕", word: "Outfit!",  items: ["👕", "👗", "🦺", "🧥", "🩱", "👚", "🥋", "🎽", "🦸"] },
-    item:    { tab: "🧸", word: "Friend!",  items: ["🧸", "🎈", "🌸", "🍦", "🪀", "⭐", "🎁", "🐶", "🍭", "🎸"] }
-  },
-  order: ["face", "hat", "glasses", "outfit", "item"],
-  idx: { face: 0, hat: 0, glasses: 0, outfit: 0, item: 0 },
-  cur: "face",
+  idx: { skin: 0, face: 0, hair: 1, hat: 0, glasses: 0, outfit: 3, friend: 0 },
+  cur: "skin",
   bgs: ["#bfe9ff", "#ffd6f0", "#d8f7c8", "#fff0b8", "#e0d0ff", "#ffd9c0"],
   bg: 0,
   show() {
@@ -2569,52 +2617,52 @@ const dressup = {
     this.buildTabs();
     this.renderDoll();
     this.openTab(this.cur);
-    speak(`Let's dress up! Tap a closet picture to put it on, ${NAME}!`);
+    speak(`Let's dress up! Pick a part at the bottom to put it on, ${NAME}!`);
   },
-  renderDoll() {
+  renderDoll(popCat) {
     $("dressStage").style.background = this.bgs[this.bg];
-    this.order.forEach(cat => { $("lyr-" + cat).textContent = this.cats[cat].items[this.idx[cat]]; });
+    $("dollWrap").innerHTML = dDollSVG(this.idx, popCat);
   },
   buildTabs() {
     const tabs = $("closetTabs"); tabs.innerHTML = "";
-    this.order.forEach(cat => {
+    dressOrder.forEach(cat => {
       const b = document.createElement("button");
       b.className = "ctab" + (cat === this.cur ? " sel" : "");
-      b.textContent = this.cats[cat].tab;
+      b.textContent = DRESS[cat].tab;
       b.onclick = () => { sfx.tap(); this.openTab(cat); };
       tabs.appendChild(b);
     });
   },
   openTab(cat) {
     this.cur = cat;
-    document.querySelectorAll("#closetTabs .ctab").forEach((b, i) => b.classList.toggle("sel", this.order[i] === cat));
-    const tray = $("closetTray"); tray.innerHTML = "";
-    this.cats[cat].items.forEach((emoji, i) => {
+    document.querySelectorAll("#closetTabs .ctab").forEach((b, i) => b.classList.toggle("sel", dressOrder[i] === cat));
+    const def = DRESS[cat], tray = $("closetTray"); tray.innerHTML = "";
+    def.opts.forEach((opt, i) => {
       const s = document.createElement("button");
       s.className = "cslot" + (i === this.idx[cat] ? " sel" : "");
-      s.textContent = emoji;
-      s.onclick = () => this.pick(cat, i, s);
+      if (def.type === "color") { s.style.background = opt; if (opt === "#ffffff") s.style.boxShadow = "inset 0 0 0 2px #cfd4df, 0 4px 0 rgba(0,0,0,.16)"; }
+      else if (def.type === "friend") { if (opt === "none") { s.classList.add("none-slot"); s.textContent = "Off"; } else s.textContent = opt; }
+      else if (opt === "none") { s.classList.add("none-slot"); s.textContent = "Off"; }       // hair/hat/glasses removable
+      else s.innerHTML = dSlotSVG(cat, opt, DRESS.skin.opts[this.idx.skin]);
+      s.onclick = () => this.pick(cat, i);
       tray.appendChild(s);
     });
   },
-  pick(cat, i, slot) {
+  pick(cat, i) {
     this.idx[cat] = i;
     document.querySelectorAll("#closetTray .cslot").forEach((x, j) => x.classList.toggle("sel", j === i));
     sfx.tap();
-    const emoji = this.cats[cat].items[i], layer = $("lyr-" + cat);
-    flyTo(slot, layer, emoji, () => {
-      layer.textContent = emoji;
-      layer.classList.remove("snap"); void layer.offsetWidth; layer.classList.add("snap");   // scale-bounce splash
-      sfx.tick(); const c = centerOf(layer); floaters(["✨", "💫"], c.x, c.y, 4);
-      speak(this.cats[cat].word);
-    });
+    this.renderDoll(cat);
+    const w = $("dollWrap"); w.classList.remove("snap"); void w.offsetWidth; w.classList.add("snap");   // happy wiggle
+    const c = centerOf(w); floaters(["✨", "💫"], c.x, c.y, 4);
+    speak(DRESS[cat].word);
   },
   cycleBg() { this.bg = (this.bg + 1) % this.bgs.length; sfx.tick(); $("dressStage").style.background = this.bgs[this.bg]; },
   shuffle() {
-    this.order.forEach(cat => this.idx[cat] = Math.floor(Math.random() * this.cats[cat].items.length));
+    dressOrder.forEach(cat => this.idx[cat] = Math.floor(Math.random() * DRESS[cat].opts.length));
     this.bg = Math.floor(Math.random() * this.bgs.length);
     sfx.good(); this.renderDoll(); this.openTab(this.cur);
-    this.order.forEach(cat => { const l = $("lyr-" + cat); l.classList.remove("snap"); void l.offsetWidth; l.classList.add("snap"); });
+    const w = $("dollWrap"); w.classList.remove("snap"); void w.offsetWidth; w.classList.add("snap");
     floaters(["✨", "🌟", "💫"], innerWidth / 2, innerHeight / 2.5, 9);
   },
   done() { speak(`What a cool look! ${praise()}`); celebrateWith("dressup", { noLevelUp: true }); }
