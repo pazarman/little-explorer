@@ -19,7 +19,7 @@ function watchErrors(page) {
 test("boots to the hub with all worlds and no console errors", async ({ page }) => {
   const errors = watchErrors(page);
   await page.addInitScript(SKIP_INTRO);
-  await page.goto("/index.html");
+  await page.goto("/index.html?test=1");
 
   await expect(page.locator("#hub")).toBeVisible();
   await expect(page.locator("#mapNodes .node")).toHaveCount(8);
@@ -29,7 +29,7 @@ test("boots to the hub with all worlds and no console errors", async ({ page }) 
 test("can drill into a world and launch a game", async ({ page }) => {
   const errors = watchErrors(page);
   await page.addInitScript(SKIP_INTRO);
-  await page.goto("/index.html");
+  await page.goto("/index.html?test=1");
 
   // hub -> world grid
   await page.locator("#mapNodes .node").first().click();
@@ -38,14 +38,16 @@ test("can drill into a world and launch a game", async ({ page }) => {
 
   // world -> a game (or creative special) screen
   await page.locator("#gameNodes .node").first().click();
-  await expect(page.locator("#game, #paint, #story, #dressup")).toBeVisible();
+  // Filter for the one that IS actually visible to avoid strict mode violation on the multiple screen divs
+  const visibleGameScreen = page.locator("#game, #paint, #story, #dressup").filter({ visible: true });
+  await expect(visibleGameScreen).toBeVisible();
 
   expect(errors, "console/page errors while playing:\n" + errors.join("\n")).toEqual([]);
 });
 
 test("exactly one full-screen surface is visible at a time", async ({ page }) => {
   await page.addInitScript(SKIP_INTRO);
-  await page.goto("/index.html");
+  await page.goto("/index.html?test=1");
   await expect(page.locator("#hub")).toBeVisible();
 
   const visibleScreens = await page.evaluate(() =>

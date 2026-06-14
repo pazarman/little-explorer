@@ -7,7 +7,18 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>{n}'s World</title>
+<script>if (location.search.includes("test")) document.documentElement.dataset.test = "1";</script>
 <style>
+  /* Nuclear bypass for automated tests: disable ALL motion immediately if ?test is in URL */
+  html[data-test] *, 
+  html[data-test] *::before, 
+  html[data-test] *::after {
+    animation: none !important;
+    transition: none !important;
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent;
       user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
   html, body { height:100%; overflow:hidden; }
@@ -33,11 +44,6 @@
   body.theme-pets   { background:linear-gradient(#ffe6a8, #ffd2e0 55%, #b8e6c0); }
   body.theme-dressup { background:linear-gradient(#ffe0f2, #e2e6ff 60%, #d8f0e0); }
   body.theme-sort   { background:linear-gradient(#5aa9d6, #9fd0e8 55%, #dff0f8); }
-
-  body.test *, body.test *::before, body.test *::after {
-    animation: none !important;
-    transition: none !important;
-  }
 
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
             align-items:center; justify-content:center; padding:2vmin;
