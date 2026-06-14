@@ -833,18 +833,18 @@
 <div id="namescreen" class="screen hidden">
   <div class="name-card">
     <div class="mascot" id="nameMascot"></div>
-    <h2>Hi there! What's your name?</h2>
-    <input id="nameInput" type="text" maxlength="12" placeholder="Type a name…" autocomplete="off" autocorrect="off" spellcheck="false">
-    <button id="nameStart">Let's play! 🎉</button>
-    <button id="nameSkip">Skip for now</button>
+    <h2 data-i18n="name_title">Hi there! What's your name?</h2>
+    <input id="nameInput" type="text" maxlength="12" placeholder="Type a name…" data-i18n-ph="name_ph" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button id="nameStart" data-i18n="name_start">Let's play! 🎉</button>
+    <button id="nameSkip" data-i18n="name_skip">Skip for now</button>
   </div>
 </div>
 
 <div id="charscreen" class="screen hidden">
   <div class="char-card">
-    <h2>Pick your buddy!</h2>
+    <h2 data-i18n="char_title">Pick your buddy!</h2>
     <div class="char-grid" id="charGrid"></div>
-    <button id="charDone">Let's go! 🎉</button>
+    <button id="charDone" data-i18n="char_done">Let's go! 🎉</button>
   </div>
 </div>
 
@@ -911,45 +911,52 @@
 
 <div id="dashboard" class="screen hidden">
   <button class="round-btn" id="dashHome" aria-label="Home">🏠</button>
-  <h2>📊 Grown-up Progress</h2>
+  <h2 data-i18n="dash_title">📊 Grown-up Progress</h2>
   <div id="dashStats"></div>
   <div id="dashList"></div>
 </div>
 
 <div id="settings" class="screen hidden">
   <div class="settings-card">
-    <h2>⚙️ Grown-up Settings</h2>
+    <h2 data-i18n="settings_title">⚙️ Grown-up Settings</h2>
     <div class="row">
-      <span>Difficulty</span>
+      <span data-i18n="settings_lang">Language</span>
+      <div class="seg" id="segLang">
+        <button data-l="en" data-i18n="lang_en">English</button>
+        <button data-l="es" data-i18n="lang_es">Español</button>
+      </div>
+    </div>
+    <div class="row">
+      <span data-i18n="settings_diff">Difficulty</span>
       <div class="seg" id="segDiff">
-        <button data-d="auto">Auto ⬆️</button>
-        <button data-d="easy">Easy</button>
-        <button data-d="med">Medium</button>
-        <button data-d="hard">Hard</button>
+        <button data-d="auto" data-i18n="diff_auto">Auto ⬆️</button>
+        <button data-d="easy" data-i18n="diff_easy">Easy</button>
+        <button data-d="med" data-i18n="diff_med">Medium</button>
+        <button data-d="hard" data-i18n="diff_hard">Hard</button>
       </div>
     </div>
     <div class="row">
-      <span>Talking voice</span>
+      <span data-i18n="settings_voice">Talking voice</span>
       <div class="seg" id="segVoice">
-        <button data-v="1">On</button>
-        <button data-v="0">Off</button>
+        <button data-v="1" data-i18n="voice_on">On</button>
+        <button data-v="0" data-i18n="voice_off">Off</button>
       </div>
     </div>
     <div class="row">
-      <span>Music</span>
+      <span data-i18n="settings_music">Music</span>
       <div class="seg" id="segMusic">
-        <button data-m="bouncy">Bouncy</button>
-        <button data-m="calm">Calm</button>
-        <button data-m="march">March</button>
-        <button data-m="off">Off</button>
+        <button data-m="bouncy" data-i18n="music_bouncy">Bouncy</button>
+        <button data-m="calm" data-i18n="music_calm">Calm</button>
+        <button data-m="march" data-i18n="music_march">March</button>
+        <button data-m="off" data-i18n="music_off">Off</button>
       </div>
     </div>
     <div class="closeRow">
-      <button id="setBuddy">🧸 Buddy</button>
-      <button id="setName">✏️ Name</button>
-      <button id="setDash">📊 Progress</button>
-      <button id="setReset">Reset stars</button>
-      <button id="setDone">Done</button>
+      <button id="setBuddy" data-i18n="settings_buddy">🧸 Buddy</button>
+      <button id="setName" data-i18n="settings_name">✏️ Name</button>
+      <button id="setDash" data-i18n="settings_progress">📊 Progress</button>
+      <button id="setReset" data-i18n="settings_reset">Reset stars</button>
+      <button id="setDone" data-i18n="settings_done">Done</button>
     </div>
   </div>
 </div>
@@ -1090,7 +1097,7 @@ const DICT = {
     small: "Small!",
     try_again: "Try again!",
     look_at_pattern: "Look at the pattern!",
-    yes_it: "Yes! The {animal} says {sound}!",
+    yes_it: "Yes! {animal} says {sound}!",
     found_it: "Yes! You found {item}!",
     all_sorted: "All sorted!",
     found_all: "You found them all!",
@@ -1104,7 +1111,110 @@ const DICT = {
     pet_clean: "All clean!",
     pet_yum: "Yum yum!",
     pet_whee: "Wheee!",
-    pet_happy: "The {animal} is so happy!"
+    pet_happy: "{animal} is so happy!",
+    settings_title: "⚙️ Grown-up Settings",
+    lang_en: "English", lang_es: "Español",
+    diff_auto: "Auto ⬆️", diff_easy: "Easy", diff_med: "Medium", diff_hard: "Hard",
+    voice_on: "On", voice_off: "Off",
+    music_bouncy: "Bouncy", music_calm: "Calm", music_march: "March", music_off: "Off",
+    rocket_ready: "🚀 Rocket ready!",
+    rocket_zoomed: "Amazing job {n}! The rocket zoomed to the stars! Let's find more Star Sparks!",
+    tap_count: "Tap {count} {x}!",
+    you_counted: "{num}! You counted {count}!",
+    tap_fish: "Tap the {x} fish!",
+    goodtry_fish: "Good try! Look for the {x} fish!",
+    drag_pizza_show: "Drag {x} onto the pizza!",
+    drag_pizza_say: "Find {x}, and drag it onto the pizza!",
+    shape_fits: "Yummy! {x} fits!",
+    thats_look: "That's {x}! Look for {y}!",
+    put_pizza: "Put {count} {x} on the pizza!",
+    placed_pizza: "{num}! {count} {x}!",
+    drag_topping: "Drag the {color} topping onto the pizza!",
+    color_excl: "{color}!",
+    thats_find_one: "That's {color}! Find the {color2} one!",
+    pop_balloon_show: "Pop balloon number {target}!",
+    pop_balloon_say: "Pop the balloon with the number {target}!",
+    thats_that_num: "{num}! That's {target}!",
+    thats_find_num: "That's number {num}. Find number {target}!",
+    put_base: "Put {count} {x} on {base}!",
+    fed_count: "{num}! {count} {x}! Yummy!",
+    new_shapes: "New shapes! Let's trace!",
+    matching_show: "Find the matching pairs!",
+    matching_say: "Find the matching {x}! Tap a card to flip it!",
+    listen_show: "Listen to the animals!",
+    listen_say: "Listen to the animal band!",
+    yourturn_show: "Now you play! Press the glowing animals!",
+    yourturn_say: "Your turn! Press the glowing animals!",
+    who_show: "Who makes this sound?",
+    who_say: "Listen! Who makes this sound?",
+    countdown_show: "Count down! Tap {next}!",
+    countdown_say: "Let's count down to blast off! Tap number {next}!",
+    blastoff_screen: "🚀 BLAST OFF! 🌟",
+    find_num: "Find number {next}!",
+    sortsize_show: "Sort by size!",
+    sortsize_say: "Drag the big ones to the big planet, and the small ones to the small planet!",
+    that_big: "That one is big! Put it on the big planet!",
+    that_small: "That one is small! Put it on the small planet!",
+    sortcolor_show: "Sort by color!",
+    sortkind_show: "Sort them out!",
+    sorted_one: "{x}!",
+    that_basket: "That one is {x}. Find the {x} basket!",
+    goes_with: "That goes with {x}!",
+    next_show: "What comes next?",
+    next_say: "Look at the pattern! What comes next?",
+    try_pattern: "Try again! Look at the pattern!",
+    feed_dragon_show: "Feed the dragon {count} {x}!",
+    eggs_show: "Tap {count} {x} to hatch the dinos!",
+    eggs_say: "Tap {count} {x} to hatch the baby dinosaurs!",
+    scoop_show: "Add a {x} scoop!",
+    scoop_say: "Add a {x} scoop on top!",
+    thats_find_scoop: "That's {color}! Find the {color2} scoop!",
+    scoop_count: "{color}! {num} {x}!",
+    cherry_show: "Tap the cherry on top!",
+    cherry_say: "Now tap the cherry to finish your ice cream!",
+    yummy_cherry: "Yummy! Now pop a cherry on top!",
+    tap_pet: "Tap {x}!",
+    yes_pet: "Yes! {x}!",
+    lookfor_pet: "Look for {x}!",
+    takecare_show: "Take care of {x}!",
+    takecare_say: "Take care of {x}! Give it a bath, some food, and a toy!",
+    give_pet_show: "Give {animal} {count} {x}!",
+    count_x: "{count} {x}!",
+    paint_intro: "Let's paint! Pick a color and draw with your finger, {n}!",
+    paint_color_q: "Can you paint with {color}?",
+    paint_stamp_q: "Can you put a {x} on your picture?",
+    paint_outline_q: "Let's paint {x}!",
+    paint_finish: "Beautiful painting!",
+    paint_stamp_win: "Great! A {x}!",
+    dash_title: "📊 Grown-up Progress",
+    dash_stars: "Stars", dash_played: "Games played", dash_stickers: "Stickers",
+    dash_tried: "Activities tried", dash_trips: "Rocket trips", dash_sparks: "Star Sparks",
+    dressup_intro: "Let's dress up! Pick a part at the bottom to put it on, {n}!",
+    cool_look: "What a cool look!",
+    story_find: "Can you find the {x}? Tap it!",
+    story_tap: "👆 Tap the picture!",
+    story_end: "The end! Goodnight, {n}!",
+    name_title: "Hi there! What's your name?", name_ph: "Type a name…",
+    name_start: "Let's play! 🎉", name_skip: "Skip for now",
+    char_title: "Pick your buddy!", char_done: "Let's go! 🎉",
+    hub_title: "🌈 {n}'s World 🌈", book_title: "📒 {n}'s Sticker Book 📒",
+    sticker_empty_hint: "Play games to earn stickers to decorate with!",
+    sticker_empty_say: "Play games to earn stickers!",
+    sticker_hint: "Tap a sticker, then tap the picture to place it! 🎨",
+    sticker_intro: "Here is your sticker book, {n}! Tap a sticker, then tap the picture to place it!",
+    sticker_belongs: "Perfect! The {x} belongs in the {scene}!",
+    off_slot: "Off",
+    theme_animals: "animals", theme_food: "food", theme_frozen: "frozen things", theme_ocean: "sea things",
+    kind_animal: "the animals", kind_food: "the yummy food", kind_vehicle: "the things that go",
+    celeb_done_sub: "⚡ You found the LAST Star Spark! The rocket is ready! 🚀",
+    celeb_more_sub: "⚡ Star Spark collected! {left} more to fix the rocket 🚀",
+    quest_onemore: "The rocket is all fixed! Play one more game to blast off!",
+    trip_complete: "Trip #{trips} complete — you're a Star Explorer! {badge}",
+    trace_number: "Trace the number {x}!", trace_letter: "Trace the letter {x}!", trace_shape: "Trace {x}!",
+    follow_dots: "Follow the dots!",
+    tap_next: "🚀 Tap {next}!", lbl_big: "BIG", lbl_small: "small",
+    sortcolor_say: "Put each thing in the basket that matches its color!",
+    sortkind_say: "Put each thing where it belongs!"
   },
   es: {
     num: ["", "Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"],
@@ -1136,7 +1246,7 @@ const DICT = {
     small: "¡Pequeño!",
     try_again: "¡Inténtalo de nuevo!",
     look_at_pattern: "¡Mira el patrón!",
-    yes_it: "¡Sí! ¡El {animal} dice {sound}!",
+    yes_it: "¡Sí! ¡{animal} dice {sound}!",
     found_it: "¡Sí! ¡Encontraste {item}!",
     all_sorted: "¡Todo ordenado!",
     found_all: "¡Los encontraste todos!",
@@ -1150,7 +1260,110 @@ const DICT = {
     pet_clean: "¡Muy limpio!",
     pet_yum: "¡Ñam ñam!",
     pet_whee: "¡Siiii!",
-    pet_happy: "¡El {animal} está muy feliz!"
+    pet_happy: "¡{animal} está muy feliz!",
+    settings_title: "⚙️ Ajustes para adultos",
+    lang_en: "English", lang_es: "Español",
+    diff_auto: "Auto ⬆️", diff_easy: "Fácil", diff_med: "Medio", diff_hard: "Difícil",
+    voice_on: "Sí", voice_off: "No",
+    music_bouncy: "Alegre", music_calm: "Tranquila", music_march: "Marcha", music_off: "No",
+    rocket_ready: "🚀 ¡Cohete listo!",
+    rocket_zoomed: "¡Increíble {n}! ¡El cohete voló hasta las estrellas! ¡Busquemos más Chispas de Estrella!",
+    tap_count: "¡Toca {count} {x}!",
+    you_counted: "¡{num}! ¡Contaste {count}!",
+    tap_fish: "¡Toca el pez {x}!",
+    goodtry_fish: "¡Buen intento! ¡Busca el pez {x}!",
+    drag_pizza_show: "¡Arrastra {x} a la pizza!",
+    drag_pizza_say: "¡Encuentra {x} y arrástralo a la pizza!",
+    shape_fits: "¡Qué rico! ¡{x} encaja!",
+    thats_look: "¡Ese es {x}! ¡Busca {y}!",
+    put_pizza: "¡Pon {count} {x} en la pizza!",
+    placed_pizza: "¡{num}! ¡{count} {x}!",
+    drag_topping: "¡Arrastra el ingrediente {color} a la pizza!",
+    color_excl: "¡{color}!",
+    thats_find_one: "¡Eso es {color}! ¡Busca el {color2}!",
+    pop_balloon_show: "¡Explota el globo número {target}!",
+    pop_balloon_say: "¡Explota el globo con el número {target}!",
+    thats_that_num: "¡{num}! ¡Es el {target}!",
+    thats_find_num: "Ese es el número {num}. ¡Busca el número {target}!",
+    put_base: "¡Pon {count} {x} en {base}!",
+    fed_count: "¡{num}! ¡{count} {x}! ¡Qué rico!",
+    new_shapes: "¡Nuevas figuras! ¡A trazar!",
+    matching_show: "¡Encuentra las parejas!",
+    matching_say: "¡Encuentra {x} iguales! ¡Toca una carta para voltearla!",
+    listen_show: "¡Escucha a los animales!",
+    listen_say: "¡Escucha a la banda de animales!",
+    yourturn_show: "¡Ahora tú! ¡Presiona los animales que brillan!",
+    yourturn_say: "¡Tu turno! ¡Presiona los animales que brillan!",
+    who_show: "¿Quién hace este sonido?",
+    who_say: "¡Escucha! ¿Quién hace este sonido?",
+    countdown_show: "¡Cuenta regresiva! ¡Toca {next}!",
+    countdown_say: "¡Contemos para el despegue! ¡Toca el número {next}!",
+    blastoff_screen: "🚀 ¡DESPEGUE! 🌟",
+    find_num: "¡Busca el número {next}!",
+    sortsize_show: "¡Ordena por tamaño!",
+    sortsize_say: "¡Arrastra los grandes al planeta grande y los pequeños al planeta pequeño!",
+    that_big: "¡Ese es grande! ¡Ponlo en el planeta grande!",
+    that_small: "¡Ese es pequeño! ¡Ponlo en el planeta pequeño!",
+    sortcolor_show: "¡Ordena por color!",
+    sortkind_show: "¡A ordenar!",
+    sorted_one: "¡{x}!",
+    that_basket: "Eso es {x}. ¡Busca la canasta {y}!",
+    goes_with: "¡Eso va con {x}!",
+    next_show: "¿Qué sigue?",
+    next_say: "¡Mira el patrón! ¿Qué sigue?",
+    try_pattern: "¡Inténtalo otra vez! ¡Mira el patrón!",
+    feed_dragon_show: "¡Dale {count} {x} al dragón!",
+    eggs_show: "¡Toca {count} {x} para abrir los dinos!",
+    eggs_say: "¡Toca {count} {x} para abrir los bebés dinosaurios!",
+    scoop_show: "¡Agrega una bola {x}!",
+    scoop_say: "¡Agrega una bola {x} encima!",
+    thats_find_scoop: "¡Eso es {color}! ¡Busca la bola {color2}!",
+    scoop_count: "¡{color}! ¡{num} {x}!",
+    cherry_show: "¡Toca la cereza de arriba!",
+    cherry_say: "¡Ahora toca la cereza para terminar tu helado!",
+    yummy_cherry: "¡Qué rico! ¡Ahora pon una cereza arriba!",
+    tap_pet: "¡Toca {x}!",
+    yes_pet: "¡Sí! ¡{x}!",
+    lookfor_pet: "¡Busca {x}!",
+    takecare_show: "¡Cuida {x}!",
+    takecare_say: "¡Cuida {x}! ¡Dale un baño, comida y un juguete!",
+    give_pet_show: "¡Dale {count} {x} para {animal}!",
+    count_x: "¡{count} {x}!",
+    paint_intro: "¡A pintar! Elige un color y dibuja con tu dedo, {n}!",
+    paint_color_q: "¿Puedes pintar con {color}?",
+    paint_stamp_q: "¿Puedes poner un {x} en tu dibujo?",
+    paint_outline_q: "¡Vamos a pintar {x}!",
+    paint_finish: "¡Qué bonito dibujo!",
+    paint_stamp_win: "¡Genial! ¡Un {x}!",
+    dash_title: "📊 Progreso para adultos",
+    dash_stars: "Estrellas", dash_played: "Juegos jugados", dash_stickers: "Calcomanías",
+    dash_tried: "Actividades probadas", dash_trips: "Viajes en cohete", dash_sparks: "Chispas de Estrella",
+    dressup_intro: "¡A vestirse! Elige una parte abajo para ponerla, {n}!",
+    cool_look: "¡Qué estilo tan genial!",
+    story_find: "¿Puedes encontrar {x}? ¡Tócalo!",
+    story_tap: "👆 ¡Toca el dibujo!",
+    story_end: "¡Fin! ¡Buenas noches, {n}!",
+    name_title: "¡Hola! ¿Cómo te llamas?", name_ph: "Escribe un nombre…",
+    name_start: "¡A jugar! 🎉", name_skip: "Ahora no",
+    char_title: "¡Elige tu amigo!", char_done: "¡Vamos! 🎉",
+    hub_title: "🌈 El Mundo de {n} 🌈", book_title: "📒 Álbum de {n} 📒",
+    sticker_empty_hint: "¡Juega para ganar calcomanías para decorar!",
+    sticker_empty_say: "¡Juega para ganar calcomanías!",
+    sticker_hint: "¡Toca una calcomanía y luego toca el dibujo para colocarla! 🎨",
+    sticker_intro: "¡Aquí está tu álbum de calcomanías, {n}! ¡Toca una calcomanía y luego el dibujo para colocarla!",
+    sticker_belongs: "¡Perfecto! ¡{x} va en {scene}!",
+    off_slot: "Quitar",
+    theme_animals: "los animales", theme_food: "las comidas", theme_frozen: "las cosas heladas", theme_ocean: "las cosas del mar",
+    kind_animal: "los animales", kind_food: "la comida rica", kind_vehicle: "las cosas que ruedan",
+    celeb_done_sub: "⚡ ¡Encontraste la ÚLTIMA Chispa de Estrella! ¡El cohete está listo! 🚀",
+    celeb_more_sub: "⚡ ¡Chispa de Estrella! Faltan {left} para arreglar el cohete 🚀",
+    quest_onemore: "¡El cohete está arreglado! ¡Juega un juego más para despegar!",
+    trip_complete: "¡Viaje #{trips} completo — eres Explorador de Estrellas! {badge}",
+    trace_number: "¡Traza el número {x}!", trace_letter: "¡Traza la letra {x}!", trace_shape: "¡Traza {x}!",
+    follow_dots: "¡Sigue los puntos!",
+    tap_next: "🚀 ¡Toca {next}!", lbl_big: "GRANDE", lbl_small: "pequeño",
+    sortcolor_say: "¡Pon cada cosa en la canasta de su color!",
+    sortkind_say: "¡Pon cada cosa donde va!"
   }
 };
 
@@ -1159,10 +1372,75 @@ function t(key, params = {}) {
   let str = DICT[lang][key] || DICT["en"][key] || key;
   if (Array.isArray(str)) str = rand(str);
   params.n = NAME;
-  for (const k in params) str = str.replace(`{${k}}`, params[k]);
+  for (const k in params) str = str.split(`{${k}}`).join(params[k]);
   return str;
 }
 const praise = () => t("praise");
+
+/* ===== Content vocabulary (gendered nouns) for grammar-correct Spanish =====
+   key = the English token already used in game data. es = Spanish noun, g = gender
+   (m/f) for article + adjective agreement, espl = irregular/multiword Spanish plural. */
+const VOC = {
+  // shapes
+  circle:{es:"círculo",g:"m"}, square:{es:"cuadrado",g:"m"}, triangle:{es:"triángulo",g:"m"},
+  star:{es:"estrella",g:"f"}, heart:{es:"corazón",g:"m"}, oval:{es:"óvalo",g:"m"}, diamond:{es:"diamante",g:"m"},
+  // animals (Who Says / band / pets)
+  dog:{es:"perro",g:"m"}, cat:{es:"gato",g:"m"}, cow:{es:"vaca",g:"f"}, frog:{es:"rana",g:"f"},
+  duck:{es:"pato",g:"m"}, sheep:{es:"oveja",g:"f"}, bird:{es:"pájaro",g:"m"}, lion:{es:"león",g:"m"},
+  pig:{es:"cerdo",g:"m"}, horse:{es:"caballo",g:"m"},
+  puppy:{es:"perrito",g:"m"}, kitten:{es:"gatito",g:"m"}, kitty:{es:"gatito",g:"m"}, bunny:{es:"conejito",g:"m"},
+  hamster:{es:"hámster",g:"m"}, birdie:{es:"pajarito",g:"m"}, fishy:{es:"pececito",g:"m"}, pony:{es:"poni",g:"m"},
+  butterfly:{es:"mariposa",g:"f"}, penguin:{es:"pingüino",g:"m"},
+  // snow critters
+  snowflake:{es:"copo de nieve",g:"m",espl:"copos de nieve"}, snowman:{es:"muñeco de nieve",g:"m",espl:"muñecos de nieve"},
+  mitten:{es:"mitón",g:"m"}, reindeer:{es:"reno",g:"m"}, present:{es:"regalo",g:"m"},
+  // pasta / food nouns
+  meatball:{es:"albóndiga",g:"f"}, cookie:{es:"galleta",g:"f"}, blueberry:{es:"arándano",g:"m"},
+  cherry:{es:"cereza",g:"f"}, strawberry:{es:"fresa",g:"f"}, grape:{es:"uva",g:"f"}, carrot:{es:"zanahoria",g:"f"},
+  donut:{es:"dona",g:"f"}, egg:{es:"huevo",g:"m"}, banana:{es:"plátano",g:"m"}, cupcake:{es:"pastelito",g:"m"},
+  pizza:{es:"pizza",g:"f"}, "ice cream":{es:"helado",g:"m"},
+  // food bases
+  spaghetti:{es:"espagueti",g:"m"}, plate:{es:"plato",g:"m"}, pancake:{es:"panqueque",g:"m"}, cake:{es:"pastel",g:"m"},
+  // pizza toppings
+  mushroom:{es:"champiñón",g:"m"}, olive:{es:"aceituna",g:"f"}, pepper:{es:"pimiento",g:"m"},
+  // ocean / frozen memory items
+  fish:{es:"pez",g:"m"}, dolphin:{es:"delfín",g:"m"}, shell:{es:"concha",g:"f"}, wave:{es:"ola",g:"f"},
+  starfish:{es:"estrella de mar",g:"f",espl:"estrellas de mar"}, crab:{es:"cangrejo",g:"m"},
+  octopus:{es:"pulpo",g:"m"}, turtle:{es:"tortuga",g:"f"},
+  crown:{es:"corona",g:"f"}, castle:{es:"castillo",g:"m"}, sparkle:{es:"destello",g:"m"}, skate:{es:"patín",g:"m"},
+  // misc
+  treat:{es:"premio",g:"m"}, scoop:{es:"bola",g:"f"}, flower:{es:"flor",g:"f"}, dino:{es:"dino",g:"m"}
+};
+const COLOR_ES = { red:"rojo", blue:"azul", yellow:"amarillo", green:"verde", orange:"naranja",
+  purple:"morado", pink:"rosa", brown:"marrón", gray:"gris", black:"negro", white:"blanco" };
+const curLang = () => settings.lang || "en";
+function esPlural(w) {
+  if (/[aeiouáéíóú]$/i.test(w)) return w + "s";
+  if (/z$/i.test(w)) return w.slice(0, -1) + "ces";
+  return w.replace(/ón$/, "on").replace(/ín$/, "in").replace(/én$/, "en") + "es";
+}
+const numWord = n => ((DICT[curLang()] && DICT[curLang()].num) || DICT.en.num)[n] || "";
+function word(key) { const v = VOC[key]; return (curLang() === "es" && v) ? v.es : key; }      // bare singular
+function words(key, n) {                                                                          // count-agreeing plural
+  const v = VOC[key];
+  if (curLang() === "es") return !v ? key : (n === 1 ? v.es : (v.espl || esPlural(v.es)));
+  return (v && v.enpl && n !== 1) ? v.enpl : plural(key, n);
+}
+const genderOf = key => (VOC[key] ? VOC[key].g : "m");
+function theWord(key) { return curLang() === "es" ? (genderOf(key) === "f" ? "la " : "el ") + word(key) : "the " + key; }
+function aWord(key)   { return curLang() === "es" ? (genderOf(key) === "f" ? "una " : "un ") + word(key) : "a " + key; }
+const locName = o => (curLang() === "es" && o && o.es) ? o.es : (o ? o.name : "");                // localized data-object name
+function applyI18n(root = document) {                                                             // translate static [data-i18n] markup
+  root.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
+  root.querySelectorAll("[data-i18n-ph]").forEach(el => el.placeholder = t(el.dataset.i18nPh));
+}
+function colorName(key) { return curLang() === "es" ? (COLOR_ES[key] || key) : key; }            // standalone color
+function colorAdj(key, g) {                                                                       // color agreeing with a noun's gender
+  if (curLang() !== "es") return key;
+  let c = COLOR_ES[key] || key;
+  if (g === "f" && c.endsWith("o")) c = c.slice(0, -1) + "a";
+  return c;
+}
 
 /* ===== Centralized quest ===== */
 const QUEST_GOAL = 6;
@@ -1481,8 +1759,8 @@ const trail = {
 const fillName = s => s.replace(/\{n\}/g, NAME);
 function applyName() {
   document.title = NAME + "'s World";
-  const h1 = document.querySelector("#hub h1"); if (h1) h1.textContent = `🌈 ${NAME}'s World 🌈`;
-  const h2 = document.querySelector("#stickerbook h2"); if (h2) h2.textContent = `📒 ${NAME}'s Sticker Book 📒`;
+  const h1 = document.querySelector("#hub h1"); if (h1) h1.textContent = t("hub_title");
+  const h2 = document.querySelector("#stickerbook h2"); if (h2) h2.textContent = t("book_title");
 }
 const COLORS = {
   red: "#e63946", blue: "#2f6fde", yellow: "#f4c726", green: "#3fa84f",
@@ -1494,26 +1772,26 @@ const COLOR_TIERS = [
   ["red", "blue", "yellow", "green", "orange", "purple", "pink", "brown"],
   ["red", "blue", "yellow", "green", "orange", "purple", "pink", "brown", "gray", "black", "white"]
 ];
-const NUM_WORDS = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
 const STICKER_POOL = ["🦄", "👑", "🦋", "🌈", "⛄", "🐬", "🌺", "🍦", "🎈", "🐠", "🍕", "💎", "🚲", "🌟", "🐧", "🦁", "🌸", "🍩",
   "🐉", "🦕", "🐶", "🐱", "🐰", "🦊", "🐻", "🐢", "🦩", "🐙", "🦜", "🌙", "⭐", "🍭", "🧁", "🎀", "🚀", "🪐", "🏰", "🦖", "🌷", "🍓"];
 
 const ANIMALS = {
-  dog:   { e: "🐶", sound: "Woof woof", freq: 300 },
-  cat:   { e: "🐱", sound: "Meow",      freq: 520 },
-  cow:   { e: "🐮", sound: "Moo",       freq: 160 },
-  frog:  { e: "🐸", sound: "Ribbit",    freq: 440 },
-  duck:  { e: "🦆", sound: "Quack quack", freq: 560 },
-  sheep: { e: "🐑", sound: "Baa baa",   freq: 380 },
-  bird:  { e: "🐦", sound: "Tweet tweet", freq: 900 },
-  lion:  { e: "🦁", sound: "Roar",      freq: 130 },
-  pig:   { e: "🐷", sound: "Oink oink", freq: 250 },
-  horse: { e: "🐴", sound: "Neigh",     freq: 320 }
+  dog:   { e: "🐶", sound: "Woof woof", es: "Guau guau", freq: 300 },
+  cat:   { e: "🐱", sound: "Meow",      es: "Miau",      freq: 520 },
+  cow:   { e: "🐮", sound: "Moo",       es: "Muu",       freq: 160 },
+  frog:  { e: "🐸", sound: "Ribbit",    es: "Croac",     freq: 440 },
+  duck:  { e: "🦆", sound: "Quack quack", es: "Cuac cuac", freq: 560 },
+  sheep: { e: "🐑", sound: "Baa baa",   es: "Bee bee",   freq: 380 },
+  bird:  { e: "🐦", sound: "Tweet tweet", es: "Pío pío", freq: 900 },
+  lion:  { e: "🦁", sound: "Roar",      es: "Grr",       freq: 130 },
+  pig:   { e: "🐷", sound: "Oink oink", es: "Oinc oinc", freq: 250 },
+  horse: { e: "🐴", sound: "Neigh",     es: "Iiii",      freq: 320 }
 };
+const animalSound = key => curLang() === "es" ? ANIMALS[key].es : ANIMALS[key].sound;
 function speakAnimal(key, opts = {}) {
   const a = ANIMALS[key];
   tone(a.freq, 0, .4, "sine", .16);
-  speak(a.sound, { pitch: clamp(a.freq / 430, 0.6, 1.7), rate: 0.9, queue: opts.queue });
+  speak(animalSound(key), { pitch: clamp(a.freq / 430, 0.6, 1.7), rate: 0.9, queue: opts.queue });
 }
 
 /* ================= Shared helpers ================= */
@@ -1619,19 +1897,15 @@ function celebrateWith(levelId, opts = {}) {
   sparks = Math.min(QUEST_GOAL, sparks + 1); saveQuest();   // every win powers up the rocket
   const questDone = sparks >= QUEST_GOAL, left = QUEST_GOAL - sparks;
   sfx.win(); confetti(); fireworks();
-  $("celebText").textContent = `You did it, ${NAME}!`;
+  $("celebText").textContent = t("well_done");
   $("celebSticker").textContent = sticker;
-  $("celebSub").textContent = questDone
-    ? "⚡ You found the LAST Star Spark! The rocket is ready! 🚀"
-    : `⚡ Star Spark collected! ${left} more to fix the rocket 🚀`;
+  $("celebSub").textContent = questDone ? t("celeb_done_sub") : t("celeb_more_sub", { left });
   // when the rocket is full, swap the normal buttons for a big Blast off!
   $("celebLaunch").classList.toggle("hidden", !questDone);
   $("celebBook").classList.toggle("hidden", questDone);
   $("celebHome").classList.toggle("hidden", questDone);
   $("celebrate").classList.remove("hidden");
-  speak(questDone
-    ? `Hooray ${NAME}! You found the last Star Spark! The rocket is all fixed! Let's blast off!`
-    : `Hooray! You earned a Star Spark, ${NAME}! ${left} more to fix the rocket!`);
+  speak(questDone ? t("quest_fixed_praise") : t("quest_collect", { left }));
 }
 
 /* ================= Rocket Quest ================= */
@@ -1653,12 +1927,10 @@ function renderQuest() {
 }
 function questSpeak() {
   const left = QUEST_GOAL - sparks;
-  speak(left <= 0
-    ? "The rocket is all fixed! Play one more game to blast off!"
-    : `We're collecting Star Sparks to fix the rocket! ${left} more to go. Tap a world to play!`);
+  speak(left <= 0 ? t("quest_onemore") : t("quest_status", { left }));
 }
 function questIntro() {
-  speak(`Hi ${NAME}! Let's find shiny Star Sparks to fix the rocket ship! Tap a world to play!`);
+  speak(t("hi_star_sparks"));
 }
 function rocketLaunch() {
   if ("speechSynthesis" in window) speechSynthesis.cancel();
@@ -1666,22 +1938,22 @@ function rocketLaunch() {
   document.body.className = "theme-space";
   const ov = $("rocketLaunch"); ov.classList.remove("hidden");
   const rocket = $("rlRocket"), count = $("rlCount"), txt = $("rlText");
-  rocket.className = "rl-rocket shake"; count.textContent = ""; txt.textContent = "🚀 Rocket ready!";
-  speak("The rocket is all fixed! Get ready to blast off!");
+  rocket.className = "rl-rocket shake"; count.textContent = ""; txt.textContent = t("rocket_ready");
+  speak(t("quest_fixed"));
   let n = 3;
   const tick = () => {
     if (n > 0) { count.textContent = n; speak(String(n)); tone(440, 0, .18, "triangle"); n--; setTimeout(tick, 900); }
     else {
-      count.textContent = "🚀"; speak("Blast off!");
+      count.textContent = "🚀"; speak(t("blastoff"));
       rocket.className = "rl-rocket blast";
       sfx.win(); fireworks(); confetti(50);
       trips++; sparks = 0; saveQuest();                       // reset the journey for endless replay
       const badge = rand(["🏅", "🌟", "🚀", "👑", "🎖️"]); stickers.push({ e: badge }); saveStickers();
-      txt.textContent = `Trip #${trips} complete — you're a Star Explorer! ${badge}`;
+      txt.textContent = t("trip_complete", { trips, badge });
       setTimeout(() => {
         ov.classList.add("hidden");
         showHub();
-        setTimeout(() => speak(`Amazing job ${NAME}! The rocket zoomed to the stars! Let's find more Star Sparks!`), 700);
+        setTimeout(() => speak(t("rocket_zoomed")), 700);
       }, 3200);
     }
   };
@@ -1698,8 +1970,8 @@ const snowLevel = {
     if (state.round === 0) this.critter = rand(CRITTERS);   // one critter per playthrough
     this.count = count; this.done = 0;
     const [emoji, noun] = this.critter;
-    const word = plural(noun, count);
-    setInstruction(`${emoji} Tap ${count} ${word}!`, `Tap ${count} ${word}!`);
+    const x = words(noun, count);
+    setInstruction(`${emoji} ` + t("tap_count", { count, x }), t("tap_count", { count, x }));
     const area = $("playArea");
     area.innerHTML = `
       <svg class="snow-scene" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -1741,8 +2013,8 @@ const snowLevel = {
     const num = $("countNum");                                  // ...and the numeral grows: quantity ↔ symbol
     num.textContent = n; num.classList.remove("bump"); void num.offsetWidth; num.classList.add("bump");
     tone(440 + n * 60, 0, .14, "sine", .14);
-    if (n < this.count) speak(NUM_WORDS[n] + "!");
-    else { speak(`${NUM_WORDS[n]}! You counted ${this.count}! ${praise()}`); roundComplete(); }
+    if (n < this.count) speak(numWord(n) + "!");
+    else { speak(t("you_counted", { num: numWord(n), count: this.count }) + " " + praise()); roundComplete(); }
     setTimeout(() => el.remove(), 480);
   }
 };
@@ -1764,7 +2036,7 @@ const oceanLevel = {
     const palette = COLOR_TIERS[state.tier];
     const picks = shuffle(palette).slice(0, howMany);
     this.target = rand(picks);
-    setInstruction(`🐠 Tap the ${this.target} fish!`, `Tap the ${this.target} fish!`);
+    setInstruction("🐠 " + t("tap_fish", { x: colorAdj(this.target, "m") }), t("tap_fish", { x: colorAdj(this.target, "m") }));
     const area = $("playArea");
     area.innerHTML = `<div class="wave" style="animation-duration:7s;"></div>
                       <div class="wave" style="animation-duration:9.5s; height:18%; bottom:-4%;"></div>`;
@@ -1794,9 +2066,9 @@ const oceanLevel = {
     if (color === this.target) {
       btn.classList.add("popped");
       miniStar(e.clientX, e.clientY);
-      speak(`${color}! ${praise()}`);
+      speak(t("color_excl", { color: colorName(color) }) + " " + praise());
       roundComplete();
-    } else { sfx.bad(); wiggle(btn); speak(`Good try! Look for the ${this.target} fish!`); }
+    } else { sfx.bad(); wiggle(btn); speak(t("goodtry_fish", { x: colorAdj(this.target, "m") })); }
   }
 };
 
@@ -1838,7 +2110,7 @@ const pizzaLevel = {
   startShape() {
     const picks = shuffle(Object.keys(SHAPES)).slice(0, [3, 3, 4][state.tier]);
     this.target = rand(picks);
-    setInstruction(`🍕 Drag the ${this.target} onto the pizza!`, `Find the ${this.target}, and drag it onto the pizza!`);
+    setInstruction("🍕 " + t("drag_pizza_show", { x: theWord(this.target) }), t("drag_pizza_say", { x: theWord(this.target) }));
     const outline = `<g transform="translate(75,75) scale(1.5)" fill="none" stroke="#8a5a1d" stroke-width="5" stroke-dasharray="12 8">${SHAPES[this.target]}</g>`;
     this.shell(pizzaBase(outline));
     picks.forEach(shape => {
@@ -1852,8 +2124,8 @@ const pizzaLevel = {
             el.classList.add("popped"); miniStar(ev.clientX || innerWidth/2, ev.clientY || innerHeight/2);
             tone(660, 0, .18, "triangle", .16); floaters(["✨", "🌟"], ev.clientX || innerWidth/2, ev.clientY || innerHeight/2, 4);
             $("pizzaHolder").innerHTML = pizzaBase(`<g transform="translate(75,75) scale(1.5)" fill="${TOPPING_COLORS[this.target]}" class="landed">${SHAPES[this.target]}</g>`);
-            speak(`Yummy! The ${shape} fits! ${praise()}`); roundComplete();
-          } else { info.reset(); sfx.bad(); wiggle(el); speak(`That's the ${shape}! Look for the ${this.target}!`); }
+            speak(t("shape_fits", { x: theWord(shape) }) + " " + praise()); roundComplete();
+          } else { info.reset(); sfx.bad(); wiggle(el); speak(t("thats_look", { x: theWord(shape), y: theWord(this.target) })); }
         } else info.reset();
       });
       $("pizChoices").appendChild(b);
@@ -1864,8 +2136,8 @@ const pizzaLevel = {
     this.need = need;
     const [tname, temoji] = rand(Object.entries(PIZZA_TOPPINGS));
     this.tname = tname;
-    const tplural = plural(tname, need);
-    setInstruction(`🍕 Put ${need} ${tplural} on the pizza!`, `Put ${need} ${tplural} on the pizza!`);
+    const tplural = words(tname, need);
+    setInstruction("🍕 " + t("put_pizza", { count: need, x: tplural }), t("put_pizza", { count: need, x: tplural }));
     this.shell(pizzaBase());
     document.querySelector(".pizza-wrap").insertAdjacentHTML("afterbegin", `<div class="count-badge" id="pizCount">0</div>`);
     for (let i = 0; i < need; i++) {
@@ -1888,8 +2160,8 @@ const pizzaLevel = {
           floaters(["✨"], ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2, 3);
           this.placed++;
           const badge = $("pizCount"); if (badge) { badge.textContent = this.placed; badge.classList.remove("bump"); void badge.offsetWidth; badge.classList.add("bump"); }
-          if (this.placed < need) speak(NUM_WORDS[this.placed] + "!");
-          else { speak(`${NUM_WORDS[this.placed]}! ${need} ${tplural}! ${praise()}`); roundComplete(); }
+          if (this.placed < need) speak(numWord(this.placed) + "!");
+          else { speak(t("placed_pizza", { num: numWord(this.placed), count: need, x: tplural }) + " " + praise()); roundComplete(); }
         } else info.reset();
       });
       $("pizChoices").appendChild(b);
@@ -1899,7 +2171,7 @@ const pizzaLevel = {
     const palette = COLOR_TIERS[Math.min(1, state.tier)];
     const picks = shuffle(palette).slice(0, [3, 3, 4][state.tier]);
     this.target = rand(picks);
-    setInstruction(`🍕 Drag the ${this.target} topping onto the pizza!`, `Drag the ${this.target} topping onto the pizza!`);
+    setInstruction("🍕 " + t("drag_topping", { color: colorAdj(this.target, "m") }), t("drag_topping", { color: colorAdj(this.target, "m") }));
     this.shell(pizzaBase());
     picks.forEach(color => {
       const b = document.createElement("button");
@@ -1916,8 +2188,8 @@ const pizzaLevel = {
             t.innerHTML = `<svg width="60" height="60"><circle cx="30" cy="30" r="26" fill="${COLORS[color]}"/></svg>`;
             t.className = "laid-topping"; t.style.left = "50%"; t.style.top = "50%";
             holder.appendChild(t);
-            speak(`${color}! ${praise()}`); roundComplete();
-          } else { info.reset(); sfx.bad(); wiggle(el); speak(`That's ${color}! Find the ${this.target} one!`); }
+            speak(t("color_excl", { color: colorName(color) }) + " " + praise()); roundComplete();
+          } else { info.reset(); sfx.bad(); wiggle(el); speak(t("thats_find_one", { color: colorName(color), color2: colorAdj(this.target, "m") })); }
         } else info.reset();
       });
       $("pizChoices").appendChild(b);
@@ -1940,7 +2212,7 @@ const bikeLevel = {
     this.maxN = maxN;
     this.speedMul = [1, 1.25, 1.5][state.tier];
     this.maxBalloons = [3, 4, 5][state.tier];
-    setInstruction(`🎈 Pop balloon number ${this.target}!`, `Pop the balloon with the number ${this.target}!`);
+    setInstruction("🎈 " + t("pop_balloon_show", { target: this.target }), t("pop_balloon_say", { target: this.target }));
     const trees = "🌳 🌲 🌳 🛝 🌳 🌷 🌲 🌳 ⛲ 🌳 ";
     $("playArea").innerHTML = `
       <div class="treeline far"><div class="marquee" style="animation-duration:26s;">${trees.repeat(2)}${trees.repeat(2)}</div></div>
@@ -2002,8 +2274,8 @@ const bikeLevel = {
       tone(1100, 0, .04, "square", .2); tone(180, .03, .14, "sawtooth", .12);   // snappy balloon pop
       floaters(["🎈", "⭐", "✨"], e.clientX, e.clientY, b.num);                  // burst exactly b.num pieces = the quantity
       miniStar(e.clientX, e.clientY);
-      speak(`${NUM_WORDS[b.num]}! That's ${b.num}! ${praise()}`); roundComplete();
-    } else { sfx.bad(); wiggle(b.el); speak(`That's number ${b.num}. Find number ${this.target}!`); }
+      speak(t("thats_that_num", { num: numWord(b.num), target: b.num }) + " " + praise()); roundComplete();
+    } else { sfx.bad(); wiggle(b.el); speak(t("thats_find_num", { num: b.num, target: this.target })); }
   },
   cleanup() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.balloons = []; }
 };
@@ -2043,9 +2315,8 @@ const pastaLevel = {
     const need = counts[state.round];
     this.need = need; this.on = 0;
     const { item, base, noun } = this.food;
-    const plural = noun + "s";
-    setInstruction(`Put ${need} ${plural} on the ${base === "spaghetti" ? "spaghetti" : base}!`,
-                   `Put ${need} ${plural} on the ${base === "spaghetti" ? "spaghetti" : base}!`);
+    const x = words(noun, need);
+    setInstruction(t("put_base", { count: need, x, base: theWord(base) }), t("put_base", { count: need, x, base: theWord(base) }));
     $("playArea").innerHTML = `<div class="pasta-wrap">
         <div class="yum-badge" id="yumCount">0</div>
         <div class="food-row" id="foodRow"></div>
@@ -2083,8 +2354,8 @@ const pastaLevel = {
     sfx.tap(); tone(440 + i * 60, 0, .14, "sine", .14); floaters(["✨"], px, py, 3);
     this.on++;
     const badge = $("yumCount"); if (badge) { badge.textContent = this.on; badge.classList.remove("bump"); void badge.offsetWidth; badge.classList.add("bump"); }
-    if (this.on < this.need) speak(NUM_WORDS[this.on] + "!");
-    else { speak(`${NUM_WORDS[this.on]}! ${this.need} ${plural(this.food.noun, this.need)}! Yummy! ${praise()}`); roundComplete(); }
+    if (this.on < this.need) speak(numWord(this.on) + "!");
+    else { speak(t("fed_count", { num: numWord(this.on), count: this.need, x: words(this.food.noun, this.need) }) + " " + praise()); roundComplete(); }
   }
 };
 
@@ -2153,9 +2424,9 @@ function glyphPoints(item, w, h) {
   }
 }
 function traceLabel(item) {
-  if (/[0-9]/.test(item)) return { say: `Trace the number ${item}!`, show: `✨ Trace the number ${item}!` };
-  if (/[A-Z]/.test(item)) return { say: `Trace the letter ${item}!`, show: `✨ Trace the letter ${item}!` };
-  return { say: `Trace the ${item}!`, show: `✨ Trace the ${item}!` };
+  if (/[0-9]/.test(item)) return { say: t("trace_number", { x: item }), show: "✨ " + t("trace_number", { x: item }) };
+  if (/[A-Z]/.test(item)) return { say: t("trace_letter", { x: item }), show: "✨ " + t("trace_letter", { x: item }) };
+  return { say: t("trace_shape", { x: theWord(item) }), show: "✨ " + t("trace_shape", { x: theWord(item) }) };
 }
 const traceLevel = {
   theme: "theme-trace", rounds: 5,
@@ -2168,7 +2439,7 @@ const traceLevel = {
     const item = this.order[state.round];
     this.item = item; this.done = false; this.hue = 0; this.last = null; this.hits = 0;
     const lab = traceLabel(item);
-    setInstruction(lab.show, lab.say + " Follow the dots!");
+    setInstruction(lab.show, lab.say + " " + t("follow_dots"));
     const area = $("playArea");
     area.innerHTML = `<canvas id="guideC"></canvas><canvas id="inkC"></canvas><div class="trace-start" id="traceStart"></div><button class="round-btn trace-shuffle" id="traceShuffle" aria-label="New shapes to trace">🎲</button>`;
     const rect = area.getBoundingClientRect();
@@ -2205,7 +2476,7 @@ const traceLevel = {
     state.round = 0;
     sfx.tap(); tone(620, 0, .16, "triangle", .15);
     const b = $("traceShuffle"); if (b) { const r = b.getBoundingClientRect(); miniStar(r.left + r.width / 2, r.top + r.height / 2); }
-    speak("New shapes! Let's trace!");
+    speak(t("new_shapes"));
     this.startRound();   // round === 0 → buildOrder() produces a fresh shuffled set
   },
   // re-sync both canvas buffers to the live play-area size after a resize (rotation, mobile bar).
@@ -2261,7 +2532,7 @@ const traceLevel = {
         this.done = true; this.pts.forEach(pt => pt.hit = true); this.drawGuide(); confetti(14);
         sfx.good();
         const ir = $("inkC").getBoundingClientRect(); floaters(["✨", "🌟", "💫"], ir.left + p.x, ir.top + p.y, 7);
-        speak(`You traced it! ${praise()}`); roundComplete();
+        speak(t("traced_it") + " " + praise()); roundComplete();
       }
     }
   }
@@ -2280,7 +2551,7 @@ const memoryLevel = {
     const pairs = [3, 4, 6][state.tier];
     this.remaining = pairs; this.first = null; this.locked = false;
     const themeName = rand(Object.keys(MEM_THEMES));
-    setInstruction(`🃏 Find the matching pairs!`, `Find the matching ${themeName}! Tap a card to flip it!`);
+    setInstruction("🃏 " + t("matching_show"), t("matching_say", { x: t("theme_" + themeName) }));
     const picks = shuffle(MEM_THEMES[themeName]).slice(0, pairs);
     const deck = shuffle([...picks, ...picks]);
     const total = deck.length;
@@ -2323,8 +2594,8 @@ const memoryLevel = {
         a.classList.add("matched"); b.classList.add("matched");
         a.classList.remove("flipped"); b.classList.remove("flipped");
         sfx.good(); this.locked = false; this.remaining--;
-        if (this.remaining > 0) speak(`A match! Two ${plural(a.dataset.word, 2)}!`);
-        else { speak(`You found them all! ${praise()}`); roundComplete(); }
+        if (this.remaining > 0) speak(t("match", { item: words(a.dataset.word, 2) }));
+        else { speak(t("found_all") + " " + praise()); roundComplete(); }
       }, 550);
     } else {
       this.locked = true; sfx.bad();
@@ -2345,7 +2616,7 @@ const musicLevel = {
     this.seq = Array.from({ length: len }, () => Math.floor(Math.random() * nKeys));
     this.toPlay = this.seq.slice();
     this.listening = false;
-    setInstruction(`🥁 Listen to the animals!`, `Listen to the animal band!`);
+    setInstruction("🥁 " + t("listen_show"), t("listen_say"));
     $("playArea").innerHTML = `<div class="music-stage"><div class="music-keys" id="musicKeys"></div></div>`;
     this.keys.forEach((k, i) => {
       const b = document.createElement("button");
@@ -2357,7 +2628,7 @@ const musicLevel = {
     core.wait(() => {
       this.listening = true;
       this.keys.forEach((_, i) => { if (this.seq.includes(i)) this.keyEl(i).classList.add("glow"); });
-      setInstruction(`🥁 Now you play! Press the glowing animals!`, `Your turn! Press the glowing animals!`);
+      setInstruction("🥁 " + t("yourturn_show"), t("yourturn_say"));
     }, 1100 + this.seq.length * 1150 + 400);
   },
   keyEl(i) { return document.querySelector(`.mkey[data-i="${i}"]`); },
@@ -2382,7 +2653,7 @@ const musicLevel = {
       this.toPlay.splice(idx, 1);
       if (!this.toPlay.includes(i)) el.classList.remove("glow");
       miniStar(e.clientX, e.clientY);
-      if (this.toPlay.length === 0) { speak(`Beautiful music! ${praise()}`); roundComplete(); }
+      if (this.toPlay.length === 0) { speak(t("beautiful_music") + " " + praise()); roundComplete(); }
     }
   }
 };
@@ -2394,7 +2665,7 @@ const whosaysLevel = {
     const nChoices = [2, 3, 4][state.tier];
     const picks = shuffle(Object.keys(ANIMALS)).slice(0, nChoices);
     this.target = rand(picks);
-    setInstruction(`🔊 Who makes this sound?`, `Listen! Who makes this sound?`);
+    setInstruction("🔊 " + t("who_show"), t("who_say"));
     $("playArea").innerHTML = `<div class="ws-wrap">
         <button id="wsListen">🔊</button>
         <div class="ws-choices" id="wsChoices"></div></div>`;
@@ -2411,7 +2682,7 @@ const whosaysLevel = {
     if (state.busy) return;
     if (key === this.target) {
       btn.classList.add("popped"); miniStar(e.clientX, e.clientY);
-      speak(`Yes! The ${this.target} says ${ANIMALS[this.target].sound}! ${praise()}`);
+      speak(t("yes_it", { animal: theWord(this.target), sound: animalSound(this.target) }) + " " + praise());
       roundComplete();
     } else { sfx.bad(); wiggle(btn); speakAnimal(this.target); }
   }
@@ -2446,7 +2717,7 @@ const rocketLevel = {
     const starts = [[3, 3, 3, 4, 5], [5, 5, 6, 7, 8], [5, 8, 10, 10, 10]][state.tier];
     this.start = starts[state.round];
     this.next = this.start;
-    setInstruction(`🚀 Count down! Tap ${this.next}!`, `Let's count down to blast off! Tap number ${this.next}!`);
+    setInstruction("🚀 " + t("countdown_show", { next: this.next }), t("countdown_say", { next: this.next }));
     $("playArea").innerHTML = `<div class="space-bg" id="spaceBg"></div>
       <div class="rocket-pad"><div class="rocket" id="rocketEl">${ROCKET_ART}<div class="rk-flame" id="rkFlame"></div></div></div>
       <div class="num-pad" id="numPad"></div>`;
@@ -2470,20 +2741,20 @@ const rocketLevel = {
       if (fl) { fl.classList.remove("puff"); void fl.offsetWidth; fl.classList.add("puff"); }   // flame puff each count
       this.next--;
       if (this.next > 0) {
-        speak(NUM_WORDS[this.next] + "!");
-        $("instruction").textContent = `🚀 Tap ${this.next}!`;
+        speak(numWord(this.next) + "!");
+        $("instruction").textContent = t("tap_next", { next: this.next });
         const nb = $("numPad").querySelector(`.numkey[data-n="${this.next}"]`);
         if (nb) nb.classList.add("glow");
       } else {
         state.busy = true;
         rk.classList.add("launch");
         tone(110, 0, .7, "sawtooth", .2); tone(80, .1, .6, "sawtooth", .15);
-        $("instruction").textContent = "🚀 BLAST OFF! 🌟";
-        speak(`Blast off! ${praise()}`);
+        $("instruction").textContent = t("blastoff_screen");
+        speak(t("blastoff") + " " + praise());
         confetti(22);
         roundComplete();
       }
-    } else { sfx.bad(); wiggle(b); speak(`Find number ${this.next}!`); }
+    } else { sfx.bad(); wiggle(b); speak(t("find_num", { next: this.next })); }
   }
 };
 
@@ -2494,11 +2765,11 @@ const sortLevel = {
   startRound() {
     const n = [2, 3, 4][state.tier];
     this.em = rand(SORT_EMOJIS);
-    setInstruction(`🪐 Sort by size!`, `Drag the big ones to the big planet, and the small ones to the small planet!`);
+    setInstruction("🪐 " + t("sortsize_show"), t("sortsize_say"));
     $("playArea").innerHTML = `<div class="space-bg" id="spaceBg"></div>
       <div class="sort-bins">
-        <div class="bin big" id="binBig">🪐<div class="binlbl">BIG</div></div>
-        <div class="bin small" id="binSmall">🌑<div class="binlbl">small</div></div>
+        <div class="bin big" id="binBig">🪐<div class="binlbl">${t("lbl_big")}</div></div>
+        <div class="bin small" id="binSmall">🌑<div class="binlbl">${t("lbl_small")}</div></div>
       </div>
       <div class="sort-tray" id="sortTray"></div>`;
     addStars($("spaceBg"));
@@ -2525,9 +2796,9 @@ const sortLevel = {
         (sz === "big" ? $("binBig") : $("binSmall")).appendChild(el);
         sfx.tap(); miniStar(ev.clientX, ev.clientY);
         this.remaining--;
-        speak(sz === "big" ? "Big!" : "Small!");
+        speak(sz === "big" ? t("big") : t("small"));
         if (this.remaining === 0) { speak(praise()); roundComplete(); }
-      } else { info.reset(); sfx.bad(); wiggle(el); speak(sz === "big" ? "That one is big! Put it on the big planet!" : "That one is small! Put it on the small planet!"); }
+      } else { info.reset(); sfx.bad(); wiggle(el); speak(sz === "big" ? t("that_big") : t("that_small")); }
     } else info.reset();
   }
 };
@@ -2555,12 +2826,13 @@ const sortkindLevel = {
     const sets = this.mode === "color" ? SORT_COLORS : SORT_KINDS;
     this.sets = sets;
     const keys = shuffle(Object.keys(sets)).slice(0, nBins);
-    setInstruction(this.mode === "color" ? "🧺 Sort by color!" : "🧺 Sort them out!",
-      this.mode === "color" ? "Put each thing in the basket that matches its color!" : "Put each thing where it belongs!");
+    setInstruction(this.mode === "color" ? "🧺 " + t("sortcolor_show") : "🧺 " + t("sortkind_show"),
+      this.mode === "color" ? t("sortcolor_say") : t("sortkind_say"));
     const binsHtml = keys.map(k => {
       const s = sets[k];
       const badge = this.mode === "color" ? `<div class="sk-badge" style="background:${s.color}"></div>` : `<div class="sk-badge">${s.label}</div>`;
-      return `<div class="sk-bin" data-bin="${k}">${badge}<div class="sk-basket sk-drop"></div><div class="sk-binlbl">${s.name}</div></div>`;
+      const label = this.mode === "color" ? colorName(k) : t("kind_" + k);
+      return `<div class="sk-bin" data-bin="${k}">${badge}<div class="sk-basket sk-drop"></div><div class="sk-binlbl">${label}</div></div>`;
     }).join("");
     $("playArea").innerHTML = `<div class="sk-stage"><div class="sk-bins">${binsHtml}</div><div class="sk-tray" id="skTray"></div></div>`;
     let items = [];
@@ -2586,16 +2858,17 @@ const sortkindLevel = {
       sfx.tap(); tone(540, 0, .14, "sine", .15); miniStar(ev.clientX, ev.clientY);
       const cc = centerOf(over); floaters(["✨"], cc.x, cc.y, 3);
       this.remaining--;
-      speak(this.sets[got].name + "!");
-      if (this.remaining === 0) { speak(`All sorted! ${praise()}`); roundComplete(); }
+      speak(t("sorted_one", { x: this.mode === "color" ? colorName(got) : t("kind_" + got) }));
+      if (this.remaining === 0) { speak(t("all_sorted") + " " + praise()); roundComplete(); }
     } else {
       info.reset(); sfx.bad(); this.wrong++;
-      const wantName = this.sets[want].name;
       if (this.wrong >= 2) {                                 // hint ladder: highlight the right basket after the 2nd miss
         const tb = document.querySelector(`.sk-bin[data-bin="${want}"]`);
         if (tb) { tb.classList.remove("hint"); void tb.offsetWidth; tb.classList.add("hint"); }
       }
-      speak(this.mode === "color" ? `That one is ${wantName}. Find the ${wantName} basket!` : `That goes with the ${wantName}!`);
+      speak(this.mode === "color"
+        ? t("that_basket", { x: colorName(want), y: colorAdj(want, "f") })
+        : t("goes_with", { x: t("kind_" + want) }));
     }
   }
 };
@@ -2615,7 +2888,7 @@ const patternLevel = {
     for (let r = 0; r < reps; r++) full.push(...unit);
     this.answer = full[full.length - 1];
     const shown = full.slice(0, full.length - 1);
-    setInstruction(`🔮 What comes next?`, `Look at the pattern! What comes next?`);
+    setInstruction("🔮 " + t("next_show"), t("next_say"));
     $("playArea").innerHTML = `<div class="space-bg" id="spaceBg"></div>
       <div class="pattern-row" id="patRow"></div>
       <div class="pattern-choices" id="patChoices"></div>`;
@@ -2635,7 +2908,7 @@ const patternLevel = {
       b.classList.add("popped");
       const q = document.querySelector(".patcell.q"); if (q) { q.textContent = x; q.classList.remove("q"); }
       miniStar(e.clientX, e.clientY); speak(praise()); roundComplete();
-    } else { sfx.bad(); wiggle(b); speak("Try again! Look at the pattern!"); }
+    } else { sfx.bad(); wiggle(b); speak(t("try_pattern")); }
   }
 };
 
@@ -2665,7 +2938,7 @@ const dragonLevel = {
     const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
     const need = counts[state.round];
     this.need = need; this.fed = 0;
-    setInstruction(`🐉 Feed the dragon ${need} ${plural("treat", need)}!`, `Feed the dragon ${need} ${need === 1 ? "treat" : "treats"}!`);
+    setInstruction("🐉 " + t("feed_dragon_show", { count: need, x: words("treat", need) }), t("feed_dragon_show", { count: need, x: words("treat", need) }));
     $("playArea").innerHTML = `<div class="dragon-wrap">
         <div class="count-badge" id="dragonCount">0</div>
         <div class="dragon" id="dragonEl">${DRAGON_ART}</div>
@@ -2689,11 +2962,11 @@ const dragonLevel = {
     const dc = centerOf(d); floaters(["🔥", "💨"], dc.x, dc.y - d.getBoundingClientRect().height * 0.18, 3);   // fire puff each bite
     this.fed++;
     const badge = $("dragonCount"); if (badge) { badge.textContent = this.fed; badge.classList.remove("bump"); void badge.offsetWidth; badge.classList.add("bump"); }
-    if (this.fed < this.need) speak(NUM_WORDS[this.fed] + "!");
+    if (this.fed < this.need) speak(numWord(this.fed) + "!");
     else {
       floaters(["🔥", "✨", "💛"], innerWidth / 2, innerHeight / 2.5, 9);
       tone(120, 0, .5, "sawtooth", .18);
-      speak(`${this.need} ${plural("treat", this.need)}! Yum yum! ${praise()}`);
+      speak(t("count_x", { count: this.need, x: words("treat", this.need) }) + " " + t("pet_yum") + " " + praise());
       roundComplete();
     }
   }
@@ -2707,7 +2980,7 @@ const dinoLevel = {
     const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
     const count = counts[state.round];
     this.left = count; this.count = count;
-    setInstruction(`🥚 Tap ${count} ${plural("egg", count)} to hatch the dinos!`, `Tap ${count} ${count === 1 ? "egg" : "eggs"} to hatch the baby dinosaurs!`);
+    setInstruction("🥚 " + t("eggs_show", { count, x: words("egg", count) }), t("eggs_say", { count, x: words("egg", count) }));
     const area = $("playArea"); area.innerHTML = "";
     scatter(count).forEach(pos => {
       const b = document.createElement("button");
@@ -2722,8 +2995,8 @@ const dinoLevel = {
     el.dataset.hatched = "1"; el.textContent = rand(BABY_DINOS); el.classList.add("hatched");
     sfx.tap(); tone(500, 0, .12, "triangle"); miniStar(e.clientX, e.clientY);
     const n = this.count - (--this.left);
-    if (this.left > 0) speak(NUM_WORDS[n] + "!");
-    else { speak(`${NUM_WORDS[n]}! ${this.count} baby ${this.count === 1 ? "dino" : "dinos"}! ${praise()}`); roundComplete(); }
+    if (this.left > 0) speak(numWord(n) + "!");
+    else { speak(numWord(n) + "! " + t("hatched_all", { count: this.count, item: words("dino", this.count) }) + " " + praise()); roundComplete(); }
   }
 };
 
@@ -2745,7 +3018,7 @@ const icecreamLevel = {
     const palette = COLOR_TIERS[Math.min(1, state.tier)];
     const picks = shuffle(palette).slice(0, [3, 3, 4][state.tier]);
     this.target = rand(picks);
-    setInstruction(`🍨 Add a ${this.target} scoop!`, `Add a ${this.target} scoop on top!`);
+    setInstruction("🍨 " + t("scoop_show", { x: colorAdj(this.target, "f") }), t("scoop_say", { x: colorAdj(this.target, "f") }));
     const wrap = $("tubRow"); wrap.innerHTML = "";
     picks.forEach(c => {
       const b = document.createElement("button");
@@ -2762,7 +3035,7 @@ const icecreamLevel = {
       sfx.bad();
       const b = [...document.querySelectorAll(".tub")].find(x => x.dataset.color === c);
       if (b) wiggle(b);
-      speak(`That's ${c}! Find the ${this.target} scoop!`);
+      speak(t("thats_find_scoop", { color: colorName(c), color2: colorAdj(this.target, "f") }));
       return;
     }
     // spawn a fresh scoop that drops + squashes onto the stack at a dynamic offset
@@ -2773,14 +3046,14 @@ const icecreamLevel = {
     $("iceStack").appendChild(s);
     sfx.tap(); tone(540 - this.on * 28, 0, .16, "sine", .16); miniStar(e.clientX, e.clientY);
     this.on++;
-    if (this.on < this.need) { speak(`${this.target}! ${NUM_WORDS[this.on]} ${this.on === 1 ? "scoop" : "scoops"}!`); this.nextColor(); }
+    if (this.on < this.need) { speak(t("scoop_count", { color: colorName(this.target), num: numWord(this.on), x: words("scoop", this.on) })); this.nextColor(); }
     else { this.capped = true; this.showCherry(); }
   },
   showCherry() {
-    setInstruction("🍒 Tap the cherry on top!", "Now tap the cherry to finish your ice cream!");
+    setInstruction("🍒 " + t("cherry_show"), t("cherry_say"));
     $("tubRow").style.visibility = "hidden";
     const cb = $("iceCherry"); cb.classList.remove("hidden", "pulse"); void cb.offsetWidth; cb.classList.add("pulse");
-    speak("Yummy! Now pop a cherry on top!");
+    speak(t("yummy_cherry"));
   },
   cherry(e) {
     if (state.busy) return;
@@ -2791,7 +3064,7 @@ const icecreamLevel = {
     $("iceCherry").classList.add("hidden");
     sfx.good(); miniStar(e.clientX || innerWidth / 2, e.clientY || innerHeight / 2);
     floaters(["🍒", "✨", "😋"], innerWidth / 2, innerHeight / 2.4, 7);
-    speak(`A yummy ${this.need}-scoop ice cream! ${praise()}`);
+    speak(t("icecream_finish", { count: this.need }) + " " + praise());
     roundComplete();
   }
 };
@@ -2809,7 +3082,7 @@ const petmatchLevel = {
     const n = [2, 3, 4][state.tier];
     const picks = shuffle(PETS).slice(0, n);
     this.target = rand(picks);
-    setInstruction(`🐾 Tap the ${this.target.name}!`, `Tap the ${this.target.name}!`);
+    setInstruction("🐾 " + t("tap_pet", { x: theWord(this.target.name) }), t("tap_pet", { x: theWord(this.target.name) }));
     $("playArea").innerHTML = `<div class="pet-choices" id="petChoices"></div>`;
     picks.forEach(p => {
       const b = document.createElement("button");
@@ -2822,8 +3095,8 @@ const petmatchLevel = {
     if (state.busy) return;
     if (p.name === this.target.name) {
       btn.classList.add("popped"); miniStar(e.clientX, e.clientY);
-      speak(`Yes! The ${this.target.name}! ${praise()}`); roundComplete();
-    } else { sfx.bad(); wiggle(btn); speak(`Look for the ${this.target.name}!`); }
+      speak(t("yes_pet", { x: theWord(this.target.name) }) + " " + praise()); roundComplete();
+    } else { sfx.bad(); wiggle(btn); speak(t("lookfor_pet", { x: theWord(this.target.name) })); }
   }
 };
 
@@ -2833,7 +3106,7 @@ const petcareLevel = {
   startRound() {
     this.pet = rand(PETS.slice(0, 6));
     this.needs = new Set(["wash", "feed", "play"]);
-    setInstruction(`🛁 Take care of the ${this.pet.name}!`, `Take care of the ${this.pet.name}! Give it a bath, some food, and a toy!`);
+    setInstruction("🛁 " + t("takecare_show", { x: theWord(this.pet.name) }), t("takecare_say", { x: theWord(this.pet.name) }));
     $("playArea").innerHTML = `<div class="petcare-wrap">
         <div class="care-pet" id="carePet">${this.pet.e}</div>
         <div class="care-status" id="careStatus">🫧 🍖 🎾</div>
@@ -2849,12 +3122,12 @@ const petcareLevel = {
     this.needs.delete(act);
     const pet = $("carePet"); pet.classList.remove("happy"); void pet.offsetWidth; pet.classList.add("happy");
     const c = centerOf(pet);
-    if (act === "wash") { floaters(["🫧", "✨", "💧"], c.x, c.y, 9); tone(700, 0, .2, "sine"); speak("All clean!"); }
-    else if (act === "feed") { floaters(["😋", "❤️", "🍖"], c.x, c.y, 6); tone(400, 0, .2, "square"); speak("Yum yum!"); }
-    else { floaters(["🎾", "⭐", "🐾"], c.x, c.y, 7); tone(600, 0, .2, "triangle"); speak("Wheee!"); }
+    if (act === "wash") { floaters(["🫧", "✨", "💧"], c.x, c.y, 9); tone(700, 0, .2, "sine"); speak(t("pet_clean")); }
+    else if (act === "feed") { floaters(["😋", "❤️", "🍖"], c.x, c.y, 6); tone(400, 0, .2, "square"); speak(t("pet_yum")); }
+    else { floaters(["🎾", "⭐", "🐾"], c.x, c.y, 7); tone(600, 0, .2, "triangle"); speak(t("pet_whee")); }
     const icons = { wash: "🫧", feed: "🍖", play: "🎾" };
     $("careStatus").textContent = [...this.needs].map(n => icons[n]).join(" ") || "💖";
-    if (this.needs.size === 0) { floaters(["💖", "⭐", "🐾", "✨"], c.x, c.y, 12); speak(`The ${this.pet.name} is so happy! ${praise()}`); roundComplete(); }
+    if (this.needs.size === 0) { floaters(["💖", "⭐", "🐾", "✨"], c.x, c.y, 12); speak(t("pet_happy", { animal: theWord(this.pet.name) }) + " " + praise()); roundComplete(); }
   }
 };
 
@@ -2870,7 +3143,7 @@ const petfeedLevel = {
     const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
     const need = counts[state.round];
     this.need = need; this.fed = 0;
-    setInstruction(`Give the ${this.pet.name} ${need} ${plural("treat", need)}!`, `Give the ${this.pet.name} ${need} ${need === 1 ? "treat" : "treats"}!`);
+    setInstruction(t("give_pet_show", { animal: theWord(this.pet.name), count: need, x: words("treat", need) }), t("give_pet_show", { animal: theWord(this.pet.name), count: need, x: words("treat", need) }));
     $("playArea").innerHTML = `<div class="dragon-wrap"><div class="dragon" id="petEl">${this.pet.e}</div><div class="treat-row" id="treatRow"></div></div>`;
     for (let i = 0; i < need; i++) {
       const t = document.createElement("button");
@@ -2889,8 +3162,8 @@ const petfeedLevel = {
     const d = $("petEl"); d.classList.remove("chomp"); void d.offsetWidth; d.classList.add("chomp");
     sfx.tap(); tone(300, 0, .15, "square", .14); miniStar(ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2);
     this.fed++;
-    if (this.fed < this.need) speak(NUM_WORDS[this.fed] + "!");
-    else { floaters(["❤️", "✨", "🐾"], innerWidth / 2, innerHeight / 2.5, 8); speak(`${this.need} ${plural("treat", this.need)}! ${praise()}`); roundComplete(); }
+    if (this.fed < this.need) speak(numWord(this.fed) + "!");
+    else { floaters(["❤️", "✨", "🐾"], innerWidth / 2, innerHeight / 2.5, 8); speak(t("count_x", { count: this.need, x: words("treat", this.need) }) + " " + praise()); roundComplete(); }
   }
 };
 
@@ -2921,7 +3194,7 @@ const paint = {
     $("paintStamp").textContent = this.stamps[this.stampIdx];
     $("paintStamp").classList.remove("on"); $("paintErase").classList.remove("on");
     this.setup();
-    speak(`Let's paint! Pick a color and draw with your finger, ${NAME}!`);
+    speak(t("paint_intro"));
     this.challenge = null;
     $("paintInstruct").classList.remove("on");
     core.wait(() => this.nextChallenge(), 4000);
@@ -2932,13 +3205,13 @@ const paint = {
     if (type === "color") {
       const idx = Math.floor(Math.random() * this.colors.length);
       this.challenge = { type: "color", val: this.colors[idx], name: this.colorNames[idx] };
-      this.setInstruct(`Can you paint with ${this.challenge.name}?`);
+      this.setInstruct(t("paint_color_q", { color: colorName(this.challenge.name) }));
     } else if (type === "stamp") {
       const idx = Math.floor(Math.random() * this.stamps.length);
       this.challenge = { type: "stamp", val: this.stamps[idx] };
-      this.setInstruct(`Can you put a ${this.challenge.val} on your picture?`);
+      this.setInstruct(t("paint_stamp_q", { x: this.challenge.val }));
     } else {
-      this.setInstruct(`Let's paint the ${this.outline}!`);
+      this.setInstruct(t("paint_outline_q", { x: theWord(this.outline) }));
       this.challenge = { type: "outline" };
     }
   },
@@ -2948,9 +3221,9 @@ const paint = {
   },
   checkChallenge(type, val) {
     if (!this.challenge || this.challenge.type !== type) return;
-    if (type === "color" && val === this.challenge.val) this.winChallenge(`Yes! You found ${this.challenge.name}!`);
-    else if (type === "stamp" && val === this.challenge.val) this.winChallenge(`Great! A ${this.challenge.val}!`);
-    else if (type === "outline") this.winChallenge(`Beautiful painting!`);
+    if (type === "color" && val === this.challenge.val) this.winChallenge(t("found_it", { item: colorName(this.challenge.name) }));
+    else if (type === "stamp" && val === this.challenge.val) this.winChallenge(t("paint_stamp_win", { x: this.challenge.val }));
+    else if (type === "outline") this.winChallenge(t("paint_finish"));
   },
   winChallenge(txt) {
     this.challenge = null;
@@ -3113,13 +3386,13 @@ function dFriendSVG(emoji) {
   return emoji === "none" ? "" : `<text x="166" y="216" font-size="38" text-anchor="middle" dominant-baseline="middle">${emoji}</text>`;
 }
 const DRESS = {
-  skin:    { tab: "🎨", word: "New color!", type: "color",  opts: ["#ffdcb1", "#f1c084", "#e0a062", "#c6824a", "#9b5e2e", "#7ad3a0", "#b9c6ff", "#f3a6c9"] },
-  face:    { tab: "😊", word: "Funny face!", type: "face",   opts: ["happy", "big", "wink", "sleepy", "surprised", "silly", "love", "starry"] },
-  hair:    { tab: "💇", word: "New hair!",  type: "hair",   opts: ["none", "tuft", "bob", "curls", "spiky", "pig", "mohawk"] },
-  hat:     { tab: "🎩", word: "Nice hat!",  type: "hat",    opts: ["none", "party", "crown", "bow", "beanie", "cap", "flower"] },
-  glasses: { tab: "👓", word: "Cool glasses!", type: "glasses", opts: ["none", "round", "sun", "star", "heart"] },
-  outfit:  { tab: "👕", word: "New shirt!", type: "color",  opts: ["#ff6b6b", "#ffa94d", "#ffd43b", "#69db7c", "#4dabf7", "#9775fa", "#f783ac", "#ffffff"] },
-  friend:  { tab: "🧸", word: "A friend!",  type: "friend", opts: ["none", "🧸", "🎈", "🌸", "🍦", "⭐", "🎁", "🐶", "🍭", "🎸"] }
+  skin:    { tab: "🎨", word: "New color!", es: "¡Nuevo color!", type: "color",  opts: ["#ffdcb1", "#f1c084", "#e0a062", "#c6824a", "#9b5e2e", "#7ad3a0", "#b9c6ff", "#f3a6c9"] },
+  face:    { tab: "😊", word: "Funny face!", es: "¡Cara graciosa!", type: "face",   opts: ["happy", "big", "wink", "sleepy", "surprised", "silly", "love", "starry"] },
+  hair:    { tab: "💇", word: "New hair!",  es: "¡Nuevo pelo!", type: "hair",   opts: ["none", "tuft", "bob", "curls", "spiky", "pig", "mohawk"] },
+  hat:     { tab: "🎩", word: "Nice hat!",  es: "¡Bonito gorro!", type: "hat",    opts: ["none", "party", "crown", "bow", "beanie", "cap", "flower"] },
+  glasses: { tab: "👓", word: "Cool glasses!", es: "¡Lentes geniales!", type: "glasses", opts: ["none", "round", "sun", "star", "heart"] },
+  outfit:  { tab: "👕", word: "New shirt!", es: "¡Nueva camisa!", type: "color",  opts: ["#ff6b6b", "#ffa94d", "#ffd43b", "#69db7c", "#4dabf7", "#9775fa", "#f783ac", "#ffffff"] },
+  friend:  { tab: "🧸", word: "A friend!",  es: "¡Un amigo!", type: "friend", opts: ["none", "🧸", "🎈", "🌸", "🍦", "⭐", "🎁", "🐶", "🍭", "🎸"] }
 };
 const dressOrder = ["skin", "face", "hair", "hat", "glasses", "outfit", "friend"];
 function dDollSVG(idx, popCat) {
@@ -3154,7 +3427,7 @@ const dressup = {
     this.buildTabs();
     this.renderDoll();
     this.openTab(this.cur);
-    speak(`Let's dress up! Pick a part at the bottom to put it on, ${NAME}!`);
+    speak(t("dressup_intro"));
   },
   renderDoll(popCat) {
     $("dressStage").style.background = this.bgs[this.bg];
@@ -3178,8 +3451,8 @@ const dressup = {
       const s = document.createElement("button");
       s.className = "cslot" + (i === this.idx[cat] ? " sel" : "");
       if (def.type === "color") { s.style.background = opt; if (opt === "#ffffff") s.style.boxShadow = "inset 0 0 0 2px #cfd4df, 0 4px 0 rgba(0,0,0,.16)"; }
-      else if (def.type === "friend") { if (opt === "none") { s.classList.add("none-slot"); s.textContent = "Off"; } else s.textContent = opt; }
-      else if (opt === "none") { s.classList.add("none-slot"); s.textContent = "Off"; }       // hair/hat/glasses removable
+      else if (def.type === "friend") { if (opt === "none") { s.classList.add("none-slot"); s.textContent = t("off_slot"); } else s.textContent = opt; }
+      else if (opt === "none") { s.classList.add("none-slot"); s.textContent = t("off_slot"); }       // hair/hat/glasses removable
       else s.innerHTML = dSlotSVG(cat, opt, DRESS.skin.opts[this.idx.skin]);
       s.onclick = () => this.pick(cat, i);
       tray.appendChild(s);
@@ -3192,7 +3465,7 @@ const dressup = {
     this.renderDoll(cat);
     const w = $("dollWrap"); w.classList.remove("snap"); void w.offsetWidth; w.classList.add("snap");   // happy wiggle
     const c = centerOf(w); floaters(["✨", "💫"], c.x, c.y, 4);
-    speak(DRESS[cat].word);
+    speak(curLang() === "es" ? DRESS[cat].es : DRESS[cat].word);
   },
   cycleBg() { this.bg = (this.bg + 1) % this.bgs.length; sfx.tick(); $("dressStage").style.background = this.bgs[this.bg]; },
   shuffle() {
@@ -3202,33 +3475,33 @@ const dressup = {
     const w = $("dollWrap"); w.classList.remove("snap"); void w.offsetWidth; w.classList.add("snap");
     floaters(["✨", "🌟", "💫"], innerWidth / 2, innerHeight / 2.5, 9);
   },
-  done() { speak(`What a cool look! ${praise()}`); celebrateWith("dressup", { noLevelUp: true }); }
+  done() { speak(t("cool_look") + " " + praise()); celebrateWith("dressup", { noLevelUp: true }); }
 };
 
 /* ================= Categories & games ================= */
 const GAMES = {
-  snow:    { icon: "❄️", name: "Count" },     ocean:   { icon: "🐠", name: "Colors" },
-  memory:  { icon: "🃏", name: "Memory" },    bike:    { icon: "🚲", name: "Numbers" },
-  music:   { icon: "🥁", name: "Animal Band" }, whosays: { icon: "🔊", name: "Who Says?" },
-  pizza:   { icon: "🍕", name: "Pizza" },     pasta:   { icon: "🍝", name: "Yum Count" },
-  trace:   { icon: "✨", name: "Tracing" },   rocket:  { icon: "🚀", name: "Countdown" },
-  sort:    { icon: "🪐", name: "Big & Small" }, pattern: { icon: "🔮", name: "Patterns" },
-  sortkind:{ icon: "🧺", name: "Sort It" },
-  paint:   { icon: "🎨", name: "Paint" },     story:   { icon: "📖", name: "Story" },
-  dragon:  { icon: "🐉", name: "Dragon Feed" }, dino:  { icon: "🦕", name: "Dino Eggs" },
-  icecream:{ icon: "🍦", name: "Ice Cream" },  petfeed: { icon: "🦴", name: "Feed Pet" },
-  petmatch:{ icon: "🐶", name: "Find Pet" },   petcare: { icon: "🛁", name: "Pet Care" },
-  dressup: { icon: "👗", name: "Dress Up" }
+  snow:    { icon: "❄️", name: "Count", es: "Contar" },     ocean:   { icon: "🐠", name: "Colors", es: "Colores" },
+  memory:  { icon: "🃏", name: "Memory", es: "Memoria" },    bike:    { icon: "🚲", name: "Numbers", es: "Números" },
+  music:   { icon: "🥁", name: "Animal Band", es: "Banda Animal" }, whosays: { icon: "🔊", name: "Who Says?", es: "¿Quién Dice?" },
+  pizza:   { icon: "🍕", name: "Pizza", es: "Pizza" },     pasta:   { icon: "🍝", name: "Yum Count", es: "A Contar" },
+  trace:   { icon: "✨", name: "Tracing", es: "Trazar" },   rocket:  { icon: "🚀", name: "Countdown", es: "Cuenta Atrás" },
+  sort:    { icon: "🪐", name: "Big & Small", es: "Grande y Pequeño" }, pattern: { icon: "🔮", name: "Patterns", es: "Patrones" },
+  sortkind:{ icon: "🧺", name: "Sort It", es: "A Ordenar" },
+  paint:   { icon: "🎨", name: "Paint", es: "Pintar" },     story:   { icon: "📖", name: "Story", es: "Cuento" },
+  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón" }, dino:  { icon: "🦕", name: "Dino Eggs", es: "Huevos de Dino" },
+  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado" },  petfeed: { icon: "🦴", name: "Feed Pet", es: "Alimenta" },
+  petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca" },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida" },
+  dressup: { icon: "👗", name: "Dress Up", es: "Vestir" }
 };
 const CATEGORIES = [
-  { id: "num",    icon: "🔢", name: "Numbers",        cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
-  { id: "shape",  icon: "🎨", name: "Colors & Shapes", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
-  { id: "brain",  icon: "🧩", name: "Brain Games",     cls: "c-brain",  games: ["memory", "pattern", "sort", "sortkind"] },
-  { id: "animal", icon: "🐾", name: "Animals",         cls: "c-animal", games: ["music", "whosays", "dino"] },
-  { id: "pets",   icon: "🐶", name: "Pets",            cls: "c-pets",   games: ["petcare", "petmatch", "petfeed"] },
-  { id: "space",  icon: "🚀", name: "Space",           cls: "c-space",  games: ["rocket", "sort", "pattern"] },
-  { id: "fantasy",icon: "🐉", name: "Make-Believe",    cls: "c-fantasy", games: ["dragon", "dino", "icecream"] },
-  { id: "create", icon: "✏️", name: "Create",          cls: "c-create", games: ["paint", "story", "dressup"] }
+  { id: "num",    icon: "🔢", name: "Numbers",        es: "Números",          cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
+  { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
+  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   cls: "c-brain",  games: ["memory", "pattern", "sort", "sortkind"] },
+  { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          cls: "c-animal", games: ["music", "whosays", "dino"] },
+  { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          cls: "c-pets",   games: ["petcare", "petmatch", "petfeed"] },
+  { id: "space",  icon: "🚀", name: "Space",           es: "Espacio",           cls: "c-space",  games: ["rocket", "sort", "pattern"] },
+  { id: "fantasy",icon: "🐉", name: "Make-Believe",    es: "Fantasía",          cls: "c-fantasy", games: ["dragon", "dino", "icecream"] },
+  { id: "create", icon: "✏️", name: "Create",          es: "Crear",             cls: "c-create", games: ["paint", "story", "dressup"] }
 ];
 function launchGame(id) {
   if (id === "paint") paint.show();
@@ -3242,8 +3515,8 @@ function buildHub() {
   CATEGORIES.forEach(cat => {
     const b = document.createElement("button");
     b.className = "node";
-    b.innerHTML = `<div class="node-disc ${cat.cls}"><span>${cat.icon}</span></div><div class="node-label">${cat.name}</div>`;
-    b.onclick = () => { sfx.tap(); speak(cat.name); openCategory(cat.id); };
+    b.innerHTML = `<div class="node-disc ${cat.cls}"><span>${cat.icon}</span></div><div class="node-label">${locName(cat)}</div>`;
+    b.onclick = () => { sfx.tap(); speak(locName(cat)); openCategory(cat.id); };
     wrap.appendChild(b);
   });
   renderQuest();
@@ -3255,14 +3528,14 @@ function openCategory(id) {
   $("games").classList.remove("hidden");
   animScreen("games", "fwd");
   document.body.className = "";
-  $("gamesTitle").textContent = `${cat.icon} ${cat.name}`;
+  $("gamesTitle").textContent = `${cat.icon} ${locName(cat)}`;
   const wrap = $("gameNodes"); wrap.innerHTML = "";
   cat.games.forEach(gid => {
     const g = GAMES[gid];
     const b = document.createElement("button");
     b.className = "node";
     b.innerHTML = `<div class="node-disc b-${gid}"><span>${g.icon}</span></div>
-                   <div class="node-label">${g.name}</div>
+                   <div class="node-label">${locName(g)}</div>
                    <div class="node-stars">${"⭐".repeat(Math.min(3, completions[gid] || 0))}</div>`;
     b.onclick = () => { sfx.tap(); launchGame(gid); };
     wrap.appendChild(b);
@@ -3271,14 +3544,15 @@ function openCategory(id) {
 
 /* ================= Story mode ================= */
 const STORY = [
-  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. “I'm going on an adventure!” she said, and rode into the magical park.", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle"), task: "🚲" },
-  { theme: "theme-snow",  art: "🏔️⛄❄️", text: "First she climbed a sparkly snow mountain. A friendly snowman waved hello. Together they counted the snowflakes: one, two, three!", tapEmoji: ["❄️", "✨", "⛄"], tapSound: () => tone(880, 0, .2, "sine"), task: "⛄" },
-  { theme: "theme-ocean", art: "🌊🐠🐬", text: "Next, {n} sailed across the bright blue ocean. Red, yellow, and green fish swam all around, and a dolphin did a happy flip!", tapEmoji: ["🐠", "💦", "🐬"], tapSound: () => tone(523, 0, .25, "sine"), task: "🐬" },
-  { theme: "theme-pizza", art: "🍕🍝🧆", text: "All that adventuring made {n} hungry! She stopped in Yummy Town for a slice of pizza and spaghetti with three little meatballs.", tapEmoji: ["🍕", "😋", "🍝"], tapSound: () => tone(440, 0, .2, "triangle"), task: "🍕" },
-  { theme: "theme-music", art: "🐸🐱🐮", text: "In the meadow, the animal band was playing! The frog went ribbit, the cat went meow, and the cow went moo. {n} danced and danced.", tapEmoji: ["🎵", "🎶", "💃"], tapSound: () => speakAnimal(rand(["frog", "cat", "cow", "duck"]), { queue: true }), task: "🐱" },
-  { theme: "theme-space", art: "🚀🌙⭐", text: "Then {n} put on a shiny space helmet and zoomed to the moon in a rocket! Five, four, three, two, one... blast off! She counted the twinkly stars up high.", tapEmoji: ["⭐", "🚀", "🪐"], tapSound: () => tone(130, 0, .5, "sawtooth", .15), task: "🚀" },
-  { theme: "theme-story", art: "🌈⭐💖", text: "As the sun set, {n} flew home, happy and sleepy. “What a wonderful day!” she yawned. Goodnight, {n}. The End. 💖", tapEmoji: ["⭐", "🌙", "💖"], tapSound: () => sfx.good(), last: true }
+  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. “I'm going on an adventure!” she said, and rode into the magical park.", es: "Una mañana soleada, {n} se subió a su bici. «¡Voy de aventura!», dijo, y entró al parque mágico.", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle"), task: "🚲" },
+  { theme: "theme-snow",  art: "🏔️⛄❄️", text: "First she climbed a sparkly snow mountain. A friendly snowman waved hello. Together they counted the snowflakes: one, two, three!", es: "Primero subió una montaña de nieve brillante. Un muñeco de nieve la saludó. ¡Juntos contaron los copos de nieve: uno, dos, tres!", tapEmoji: ["❄️", "✨", "⛄"], tapSound: () => tone(880, 0, .2, "sine"), task: "⛄" },
+  { theme: "theme-ocean", art: "🌊🐠🐬", text: "Next, {n} sailed across the bright blue ocean. Red, yellow, and green fish swam all around, and a dolphin did a happy flip!", es: "Después, {n} navegó por el océano azul. Peces rojos, amarillos y verdes nadaban alrededor, ¡y un delfín dio un saltito feliz!", tapEmoji: ["🐠", "💦", "🐬"], tapSound: () => tone(523, 0, .25, "sine"), task: "🐬" },
+  { theme: "theme-pizza", art: "🍕🍝🧆", text: "All that adventuring made {n} hungry! She stopped in Yummy Town for a slice of pizza and spaghetti with three little meatballs.", es: "¡Tanta aventura le dio hambre a {n}! Paró en Pueblo Rico por una rebanada de pizza y espagueti con tres albóndigas.", tapEmoji: ["🍕", "😋", "🍝"], tapSound: () => tone(440, 0, .2, "triangle"), task: "🍕" },
+  { theme: "theme-music", art: "🐸🐱🐮", text: "In the meadow, the animal band was playing! The frog went ribbit, the cat went meow, and the cow went moo. {n} danced and danced.", es: "En el prado, ¡la banda de animales tocaba! La rana hacía croac, el gato miau y la vaca muu. {n} bailó y bailó.", tapEmoji: ["🎵", "🎶", "💃"], tapSound: () => speakAnimal(rand(["frog", "cat", "cow", "duck"]), { queue: true }), task: "🐱" },
+  { theme: "theme-space", art: "🚀🌙⭐", text: "Then {n} put on a shiny space helmet and zoomed to the moon in a rocket! Five, four, three, two, one... blast off! She counted the twinkly stars up high.", es: "Luego {n} se puso un casco espacial brillante y voló a la luna en un cohete. ¡Cinco, cuatro, tres, dos, uno... despegue! Contó las estrellas brillantes en lo alto.", tapEmoji: ["⭐", "🚀", "🪐"], tapSound: () => tone(130, 0, .5, "sawtooth", .15), task: "🚀" },
+  { theme: "theme-story", art: "🌈⭐💖", text: "As the sun set, {n} flew home, happy and sleepy. “What a wonderful day!” she yawned. Goodnight, {n}. The End. 💖", es: "Cuando el sol se ocultó, {n} voló a casa, feliz y con sueño. «¡Qué día tan maravilloso!», bostezó. Buenas noches, {n}. Fin. 💖", tapEmoji: ["⭐", "🌙", "💖"], tapSound: () => sfx.good(), last: true }
 ];
+const storyText = p => fillName(curLang() === "es" ? p.es : p.text);
 let storyPage = 0, storySolved = false;
 function showStory() {
   cleanupLevel();
@@ -3299,14 +3573,14 @@ function renderStory() {
   const artHtml = [...p.art].map(e => `<span class="s-em" onclick="storyTap('${e}', event)">${e}</span>`).join("");
   
   scene.innerHTML = `<div class="story-art">${artHtml}</div>
-      <div class="story-textbox" id="storyText">${fillName(p.text)}</div>
-      <div class="story-tap-hint">👆 Tap the picture!</div>`;
+      <div class="story-textbox" id="storyText">${storyText(p)}</div>
+      <div class="story-tap-hint">${t("story_tap")}</div>`;
   
   $("storyDots").innerHTML = STORY.map((_, i) => `<div class="sdot ${i === storyPage ? "on" : ""}"></div>`).join("");
   $("storyPrev").style.visibility = storyPage === 0 ? "hidden" : "visible";
   updateStoryNav();
-  speak(fillName(p.text));
-  if (p.task) core.wait(() => speak(`Can you find the ${p.task}? Tap it!`), 6000);
+  speak(storyText(p));
+  if (p.task) core.wait(() => speak(t("story_find", { x: p.task })), 6000);
 }
 function updateStoryNav() {
   const p = STORY[storyPage];
@@ -3324,24 +3598,24 @@ function storyTap(e, ev) {
     storySolved = true;
     sfx.good();
     confetti();
-    speak(`Yes! You found the ${e}! ${praise()}`);
+    speak(t("found_it", { item: e }) + " " + praise());
     updateStoryNav();
   }
 }
 function storyNav(dir) {
   const p = STORY[storyPage];
-  if (dir > 0 && p.last) { confetti(); sfx.win(); speak(`The end! Goodnight, ${NAME}!`); setTimeout(showHub, 1800); return; }
+  if (dir > 0 && p.last) { confetti(); sfx.win(); speak(t("story_end")); setTimeout(showHub, 1800); return; }
   storyPage = clamp(storyPage + dir, 0, STORY.length - 1);
   renderStory();
 }
 
 /* ================= Sticker book ================= */
 const SCENES = [
-  { id: "park",   name: "Park 🌳",   cls: "sc-park",   deco: "🌳 🛝 🌷 🌳 ⛲" },
-  { id: "space",  name: "Space 🚀",  cls: "sc-space",  deco: "🌑 🪐 ⭐ 🌙 ⭐" },
-  { id: "ocean",  name: "Ocean 🌊",  cls: "sc-ocean",  deco: "🐚 🪸 🌊 🐚 🌊" },
-  { id: "castle", name: "Castle 🏰", cls: "sc-castle", deco: "🌸 🏰 🌳 🌸" },
-  { id: "bed",    name: "Cozy 🌙",   cls: "sc-bed",    deco: "🛏️ 🧸 🪟 🌙" }
+  { id: "park",   name: "Park 🌳",   es: "Parque 🌳",   cls: "sc-park",   deco: "🌳 🛝 🌷 🌳 ⛲" },
+  { id: "space",  name: "Space 🚀",  es: "Espacio 🚀",  cls: "sc-space",  deco: "🌑 🪐 ⭐ 🌙 ⭐" },
+  { id: "ocean",  name: "Ocean 🌊",  es: "Océano 🌊",  cls: "sc-ocean",  deco: "🐚 🪸 🌊 🐚 🌊" },
+  { id: "castle", name: "Castle 🏰", es: "Castillo 🏰", cls: "sc-castle", deco: "🌸 🏰 🌳 🌸" },
+  { id: "bed",    name: "Cozy 🌙",   es: "Acogedor 🌙", cls: "sc-bed",    deco: "🛏️ 🧸 🪟 🌙" }
 ];
 let decor = JSON.parse(localStorage.getItem("fionaDecor") || "{}");
 let curScene = localStorage.getItem("fionaScene") || "park";
@@ -3359,7 +3633,7 @@ function showStickerBook() {
   SCENES.forEach(sc => {
     const b = document.createElement("button");
     b.className = "scene-btn" + (sc.id === curScene ? " sel" : "");
-    b.textContent = sc.name;
+    b.textContent = locName(sc);
     b.onclick = () => { curScene = sc.id; localStorage.setItem("fionaScene", curScene); palSel = null; showStickerBook(); };
     sb.appendChild(b);
   });
@@ -3368,12 +3642,12 @@ function showStickerBook() {
   const earned = [...new Set(stickers.map(s => s.e))];
   const pal = $("stickerPalette"); pal.innerHTML = "";
   if (!earned.length) {
-    $("stickerHint").textContent = "Play games to earn stickers to decorate with!";
-    speak("Play games to earn stickers!");
+    $("stickerHint").textContent = t("sticker_empty_hint");
+    speak(t("sticker_empty_say"));
     return;
   }
-  $("stickerHint").textContent = "Tap a sticker, then tap the picture to place it! 🎨";
-  speak(`Here is your sticker book, ${NAME}! Tap a sticker, then tap the picture to place it!`);
+  $("stickerHint").textContent = t("sticker_hint");
+  speak(t("sticker_intro"));
   earned.forEach(e => {
     const b = document.createElement("button");
     b.className = "pal-item" + (e === palSel ? " sel" : "");
@@ -3393,10 +3667,10 @@ function renderScene() {
     const x = (e.clientX - r.left) / r.width * 100, y = (e.clientY - r.top) / r.height * 100;
     (decor[curScene] = decor[curScene] || []).push({ e: palSel, x, y });
     saveDecor(); sfx.tap();
-    const d = STICKER_DATA[palSel];
+    const d = (typeof STICKER_DATA !== "undefined") ? STICKER_DATA[palSel] : null;
     if (d && d.h === curScene) {
       confetti();
-      speak(`Perfect! The ${d.n} belongs in the ${curScene}!`);
+      speak(t("sticker_belongs", { x: d.n, scene: locName(SCENES.find(s => s.id === curScene)) }));
     }
     addPlaced({ e: palSel, x, y }, decor[curScene].length - 1);
   };
@@ -3434,12 +3708,15 @@ function addPlaced(d, idx) {
 function openSettings() {
   $("charscreen").classList.add("hidden"); $("namescreen").classList.add("hidden");
   $("settings").classList.remove("hidden");
+  applyI18n($("settings"));
+  document.querySelectorAll("#segLang button").forEach(b => b.classList.toggle("sel", b.dataset.l === (settings.lang || "en")));
   document.querySelectorAll("#segDiff button").forEach(b => b.classList.toggle("sel", b.dataset.d === settings.diff));
   document.querySelectorAll("#segVoice button").forEach(b => b.classList.toggle("sel", String(settings.voice) === b.dataset.v));
   document.querySelectorAll("#segMusic button").forEach(b => b.classList.toggle("sel", b.dataset.m === settings.music));
 }
 function showCharScreen(returnTo) {
   hideAllScreens();
+  applyI18n($("charscreen"));
   $("charscreen").classList.remove("hidden");
   $("charDone").dataset.return = returnTo || "hub";
   const grid = $("charGrid"); grid.innerHTML = "";
@@ -3472,6 +3749,7 @@ function showHub() {
   hideAllScreens();
   $("hub").classList.remove("hidden");
   animScreen("hub", "back");
+  applyName();
   buildHub();
   if (!questGreeted && settings.voice) { questGreeted = true; core.wait(questIntro, 800); }
 }
@@ -3491,26 +3769,27 @@ function showDashboard() {
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   document.body.className = "";
   hideAllScreens();
+  applyI18n($("dashboard"));
   $("dashboard").classList.remove("hidden");
   const plays = id => completions[id] || 0;
   const totalPlays = Object.values(completions).reduce((a, b) => a + b, 0);
   const totalStars = Object.keys(completions).reduce((a, k) => a + Math.min(3, completions[k]), 0);
   const gamesTried = Object.keys(completions).filter(k => completions[k] > 0).length;
   $("dashStats").innerHTML =
-    `<div class="stat"><div class="sv">⭐ ${totalStars}</div><div class="sl">Stars</div></div>
-     <div class="stat"><div class="sv">🎮 ${totalPlays}</div><div class="sl">Games played</div></div>
-     <div class="stat"><div class="sv">📒 ${stickers.length}</div><div class="sl">Stickers</div></div>
-     <div class="stat"><div class="sv">🗂️ ${gamesTried}/${Object.keys(GAMES).length}</div><div class="sl">Activities tried</div></div>
-     <div class="stat"><div class="sv">🚀 ${trips}</div><div class="sl">Rocket trips</div></div>
-     <div class="stat"><div class="sv">⚡ ${sparks}/${QUEST_GOAL}</div><div class="sl">Star Sparks</div></div>`;
+    `<div class="stat"><div class="sv">⭐ ${totalStars}</div><div class="sl">${t("dash_stars")}</div></div>
+     <div class="stat"><div class="sv">🎮 ${totalPlays}</div><div class="sl">${t("dash_played")}</div></div>
+     <div class="stat"><div class="sv">📒 ${stickers.length}</div><div class="sl">${t("dash_stickers")}</div></div>
+     <div class="stat"><div class="sv">🗂️ ${gamesTried}/${Object.keys(GAMES).length}</div><div class="sl">${t("dash_tried")}</div></div>
+     <div class="stat"><div class="sv">🚀 ${trips}</div><div class="sl">${t("dash_trips")}</div></div>
+     <div class="stat"><div class="sv">⚡ ${sparks}/${QUEST_GOAL}</div><div class="sl">${t("dash_sparks")}</div></div>`;
   const list = $("dashList"); list.innerHTML = "";
   CATEGORIES.forEach(cat => {
     const rows = cat.games.map(gid => {
       const g = GAMES[gid], p = plays(gid);
-      return `<div class="dash-row"><span class="dg">${g.icon} ${g.name}</span>
+      return `<div class="dash-row"><span class="dg">${g.icon} ${locName(g)}</span>
               <span class="dp">${p ? "⭐".repeat(Math.min(3, p)) + (p > 3 ? ` ×${p}` : "") : "—"}</span></div>`;
     }).join("");
-    list.innerHTML += `<div class="dash-cat"><h3>${cat.icon} ${cat.name}</h3>${rows}</div>`;
+    list.innerHTML += `<div class="dash-cat"><h3>${cat.icon} ${locName(cat)}</h3>${rows}</div>`;
   });
 }
 
@@ -3538,6 +3817,11 @@ $("setReset").onclick = () => {
   }
 };
 $("setName").onclick = () => { $("settings").classList.add("hidden"); showNameScreen(NAME); };
+document.querySelectorAll("#segLang button").forEach(b => b.onclick = () => {
+  settings.lang = b.dataset.l; saveSettings();
+  document.documentElement.lang = settings.lang === "es" ? "es" : "en";
+  sfx.tap(); openSettings();
+});
 document.querySelectorAll("#segDiff button").forEach(b => b.onclick = () => { settings.diff = b.dataset.d; saveSettings(); openSettings(); });
 document.querySelectorAll("#segVoice button").forEach(b => b.onclick = () => { settings.voice = +b.dataset.v; saveSettings(); openSettings(); });
 document.querySelectorAll("#segMusic button").forEach(b => b.onclick = () => {
@@ -3550,7 +3834,7 @@ $("charDone").onclick = () => { clearTimeout(charTimer); $("charDone").dataset.r
 $("storyHome").onclick = showHub;
 $("storyPrev").onclick = () => storyNav(-1);
 $("storyNext").onclick = () => storyNav(1);
-$("storyRead").onclick = () => speak(fillName(STORY[storyPage].text));
+$("storyRead").onclick = () => speak(storyText(STORY[storyPage]));
 $("paintHome").onclick = showHub;
 $("paintStamp").onclick = () => {
   if (paint.mode !== "stamp") paint.mode = "stamp";
@@ -3596,6 +3880,7 @@ function showNameScreen(prefill) {
   $("nameMascot").innerHTML = buddyMarkup();
   $("nameInput").value = prefill || "";
   hideAllScreens();
+  applyI18n($("namescreen"));
   $("namescreen").classList.remove("hidden");
   setTimeout(() => { try { $("nameInput").focus(); } catch (_) {} }, 250);
 }
@@ -3608,7 +3893,7 @@ function commitName() {
   applyName();
   $("namescreen").classList.add("hidden");
   if (settings.music !== "off" && !musicOn) startMusic();   // kick off the happy background tune
-  speak(`Hi ${NAME}! Let's play!`);
+  speak(t("hi_let_play"));
   if (!localStorage.getItem("fionaBuddySet")) showCharScreen("hub");   // first run: pick a buddy next
   else showHub();
 }
@@ -3622,6 +3907,7 @@ $("nameSkip").onclick = () => {
 };
 $("nameInput").addEventListener("keydown", e => { if (e.key === "Enter") commitName(); });
 
+document.documentElement.lang = (settings.lang === "es") ? "es" : "en";
 applyName();
 if (!localStorage.getItem("fionaNameSet")) showNameScreen("");
 else showHub();
