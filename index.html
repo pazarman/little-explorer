@@ -1048,13 +1048,119 @@ window.addEventListener("beforeunload", () => core.flush());
 /* ================= Persistent state ================= */
 const completions = JSON.parse(localStorage.getItem("fionaStars") || "{}");
 const stickers = JSON.parse(localStorage.getItem("fionaStickers") || "[]");
-let settings = Object.assign({ diff: "auto", voice: 1, music: "bouncy" },
+let settings = Object.assign({ lang: "en", diff: "auto", voice: 1, music: "bouncy" },
   JSON.parse(localStorage.getItem("fionaSettings") || "{}"));
 const perf = JSON.parse(localStorage.getItem("fionaPerf") || "{}");
 const saveCompletions = () => core.save("fionaStars", completions);
 const saveStickers = () => core.save("fionaStickers", stickers);
 const saveSettings = () => core.save("fionaSettings", settings);
 const savePerf = () => core.save("fionaPerf", perf);
+
+/* ================= Localization ================= */
+const DICT = {
+  en: {
+    num: ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"],
+    praise: ["Great job, {n}!", "Wonderful!", "Amazing!", "Hooray!", "You did it, {n}!", "Super!", "Fantastic!", "Woohoo!"],
+    blastoff: "Blast off!",
+    well_done: "You did it, {n}!",
+    hi_let_play: "Hi {n}! Let's play!",
+    hi_star_sparks: "Hi {n}! Let's find shiny Star Sparks to fix the rocket ship! Tap a world to play!",
+    quest_fixed: "The rocket is all fixed! Get ready to blast off!",
+    quest_fixed_praise: "Hooray {n}! You found the last Star Spark! The rocket is all fixed! Let's blast off!",
+    quest_collect: "Hooray! You earned a Star Spark, {n}! {left} more to fix the rocket!",
+    quest_status: "We're collecting Star Sparks to fix the rocket! {left} more to go. Tap a world to play!",
+    quest_ready: "The rocket is fixed! Tap it to blast off!",
+    settings_lang: "Language",
+    settings_voice: "Talking voice",
+    settings_music: "Music",
+    settings_diff: "Difficulty",
+    settings_buddy: "🧸 Buddy",
+    settings_name: "✏️ Name",
+    settings_progress: "📊 Progress",
+    settings_reset: "Reset stars",
+    settings_done: "Done",
+    back: "Back",
+    next: "Next",
+    home: "Home",
+    clear: "Clear",
+    done: "Done",
+    big: "Big!",
+    small: "Small!",
+    try_again: "Try again!",
+    look_at_pattern: "Look at the pattern!",
+    yes_it: "Yes! The {animal} says {sound}!",
+    found_it: "Yes! You found {item}!",
+    all_sorted: "All sorted!",
+    found_all: "You found them all!",
+    match: "A match! Two {item}!",
+    beautiful_music: "Beautiful music!",
+    traced_it: "You traced it!",
+    yummy: "Yummy!",
+    fed_all: "{count} {item}! Yum yum!",
+    hatched_all: "{count} baby {item}!",
+    icecream_finish: "A yummy {count}-scoop ice cream!",
+    pet_clean: "All clean!",
+    pet_yum: "Yum yum!",
+    pet_whee: "Wheee!",
+    pet_happy: "The {animal} is so happy!"
+  },
+  es: {
+    num: ["", "Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"],
+    praise: ["¡Buen trabajo, {n}!", "¡Maravilloso!", "¡Increíble!", "¡Hurra!", "¡Lo hiciste, {n}!", "¡Súper!", "¡Fantástico!", "¡Bravo!"],
+    blastoff: "¡Despegue!",
+    well_done: "¡Lo hiciste, {n}!",
+    hi_let_play: "¡Hola {n}! ¡Vamos a jugar!",
+    hi_star_sparks: "¡Hola {n}! ¡Busquemos Chispas de Estrella para arreglar el cohete! ¡Toca un mundo!",
+    quest_fixed: "¡El cohete está arreglado! ¡Prepárate para el despegue!",
+    quest_fixed_praise: "¡Hurra {n}! ¡Encontraste la última Chispa de Estrella! ¡El cohete está listo!",
+    quest_collect: "¡Hurra! ¡Ganaste una Chispa de Estrella, {n}! ¡Faltan {left} para arreglarlo!",
+    quest_status: "¡Estamos juntando Chispas de Estrella! Faltan {left}. ¡Toca un mundo!",
+    quest_ready: "¡El cohete está listo! ¡Tócalo para despegar!",
+    settings_lang: "Idioma",
+    settings_voice: "Voz",
+    settings_music: "Música",
+    settings_diff: "Dificultad",
+    settings_buddy: "🧸 Amigo",
+    settings_name: "✏️ Nombre",
+    settings_progress: "📊 Progreso",
+    settings_reset: "Reiniciar",
+    settings_done: "Listo",
+    back: "Atrás",
+    next: "Siguiente",
+    home: "Inicio",
+    clear: "Borrar",
+    done: "Listo",
+    big: "¡Grande!",
+    small: "¡Pequeño!",
+    try_again: "¡Inténtalo de nuevo!",
+    look_at_pattern: "¡Mira el patrón!",
+    yes_it: "¡Sí! ¡El {animal} dice {sound}!",
+    found_it: "¡Sí! ¡Encontraste {item}!",
+    all_sorted: "¡Todo ordenado!",
+    found_all: "¡Los encontraste todos!",
+    match: "¡Pareja! ¡Dos {item}!",
+    beautiful_music: "¡Música hermosa!",
+    traced_it: "¡Lo trazaste!",
+    yummy: "¡Qué rico!",
+    fed_all: "¡{count} {item}! ¡Ñam ñam!",
+    hatched_all: "¡{count} bebés {item}!",
+    icecream_finish: "¡Un rico helado de {count} bolas!",
+    pet_clean: "¡Muy limpio!",
+    pet_yum: "¡Ñam ñam!",
+    pet_whee: "¡Siiii!",
+    pet_happy: "¡El {animal} está muy feliz!"
+  }
+};
+
+function t(key, params = {}) {
+  const lang = settings.lang || "en";
+  let str = DICT[lang][key] || DICT["en"][key] || key;
+  if (Array.isArray(str)) str = rand(str);
+  params.n = NAME;
+  for (const k in params) str = str.replace(`{${k}}`, params[k]);
+  return str;
+}
+const praise = () => t("praise");
 
 /* ===== Centralized quest ===== */
 const QUEST_GOAL = 6;
@@ -1156,8 +1262,16 @@ function speak(text, opts = {}) {
   if (!opts.queue) speechSynthesis.cancel();
   lastSpeakEnd = performance.now() + Math.min(7000, 500 + text.length * 72);   // estimated finish time
   const u = new SpeechSynthesisUtterance(text + " ");   // trailing space: stops Chrome clipping the last word
+  u.lang = settings.lang === "es" ? "es-ES" : "en-US";
   u.rate = opts.rate || 0.95;
   u.pitch = opts.pitch || 1.25;
+  
+  // Find a matching voice if possible (browser support varies)
+  const voices = speechSynthesis.getVoices();
+  const langTag = settings.lang === "es" ? "es" : "en";
+  const v = voices.find(v => v.lang.startsWith(langTag) && (v.name.includes("Google") || v.localService));
+  if (v) u.voice = v;
+
   setMascots("talking", true);
   
   const stopTalk = () => {
@@ -1362,9 +1476,7 @@ const trail = {
 };
 
 /* ================= Shared data ================= */
-const PRAISE = ["Great job, {n}!", "Wonderful!", "Amazing!", "Hooray!", "You did it, {n}!", "Super!", "Fantastic!", "Woohoo!"];
 const fillName = s => s.replace(/\{n\}/g, NAME);
-function praise() { return fillName(rand(PRAISE)); }
 function applyName() {
   document.title = NAME + "'s World";
   const h1 = document.querySelector("#hub h1"); if (h1) h1.textContent = `🌈 ${NAME}'s World 🌈`;
@@ -2072,11 +2184,33 @@ const traceLevel = {
     this.drawGuide();
     const start = $("traceStart"); start.style.left = this.pts[0].x + "px"; start.style.top = this.pts[0].y + "px";   // "start here"
     const ink = $("inkC");
-    const pos = e => { const r = ink.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+    // map to the canvas's own coordinate space via the live ratio, so ink stays under the finger
+    // even if the container was resized after setup (mobile address bar collapse, rotation, etc.)
+    const pos = e => { const b = ink.getBoundingClientRect(); return { x: (e.clientX - b.left) * (ink.width / dpr) / b.width, y: (e.clientY - b.top) * (ink.height / dpr) / b.height }; };
     ink.addEventListener("pointerdown", e => { e.preventDefault(); try { ink.setPointerCapture(e.pointerId); } catch (_) {} const ts = $("traceStart"); if (ts) ts.style.display = "none"; this.last = pos(e); this.paint(this.last); trail.add(e.clientX, e.clientY, this.hue, 4); });
     ink.addEventListener("pointermove", e => { if (this.last) { const p = pos(e); this.paint(p); this.last = p; trail.add(e.clientX, e.clientY, this.hue, this.done ? 0 : 2); } });
     const stop = () => this.last = null;
     ink.addEventListener("pointerup", stop); ink.addEventListener("pointercancel", stop);
+  },
+  // re-sync both canvas buffers to the live play-area size after a resize (rotation, mobile bar).
+  // Guide points are scaled (keeping hit state) and the child's ink is stretched onto the new buffer.
+  resize() {
+    const area = $("playArea"), ink = $("inkC"), guide = $("guideC");
+    if (!area || !ink || !guide || !this.pts) return;
+    const rect = area.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    if (!rect.width || !rect.height) return;
+    const oldW = ink.width / dpr, oldH = ink.height / dpr;
+    if (Math.abs(oldW - rect.width) < 1 && Math.abs(oldH - rect.height) < 1) return;
+    const snap = document.createElement("canvas"); snap.width = ink.width; snap.height = ink.height;
+    snap.getContext("2d").drawImage(ink, 0, 0);
+    const sx = rect.width / oldW, sy = rect.height / oldH;
+    for (const p of this.pts) { p.x *= sx; p.y *= sy; }
+    for (const c of [guide, ink]) { c.width = rect.width * dpr; c.height = rect.height * dpr; c.getContext("2d").scale(dpr, dpr); }
+    this.drawGuide();
+    ink.getContext("2d").drawImage(snap, 0, 0, rect.width, rect.height);
+    this.last = null;
+    const ts = $("traceStart");
+    if (ts && ts.style.display !== "none") { ts.style.left = this.pts[0].x + "px"; ts.style.top = this.pts[0].y + "px"; }
   },
   drawGuide() {
     const c = $("guideC"), ctx = c.getContext("2d");
@@ -2831,7 +2965,9 @@ const paint = {
     const ctx = c.getContext("2d"); ctx.scale(dpr, dpr);
     this.w = r.width; this.h = r.height; this.ctx = ctx;
     this.redraw();
-    const pos = e => { const b = c.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; };
+    // map to the canvas's own coordinate space via the live ratio, so paint stays under the finger
+    // even if the container was resized after setup (mobile address bar collapse, rotation, etc.)
+    const pos = e => { const b = c.getBoundingClientRect(); return { x: (e.clientX - b.left) * (c.width / dpr) / b.width, y: (e.clientY - b.top) * (c.height / dpr) / b.height }; };
     c.onpointerdown = e => {
       e.preventDefault(); try { c.setPointerCapture(e.pointerId); } catch (_) {}
       const p = pos(e);
@@ -2849,6 +2985,21 @@ const paint = {
     c.onpointerup = stop; c.onpointercancel = stop;
   },
   redraw() { this.ctx.clearRect(0, 0, this.w, this.h); this.drawOutline(); },
+  // re-sync the canvas buffer to the live container size after a resize (rotation, mobile bar),
+  // stretching the existing painting onto the new buffer so it (and the outline) stays crisp.
+  resize() {
+    const wrap = $("paintCanvasWrap"), c = $("paintC");
+    if (!wrap || !c || !this.ctx) return;
+    const r = wrap.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    if (!r.width || !r.height) return;
+    if (Math.abs(this.w - r.width) < 1 && Math.abs(this.h - r.height) < 1) return;
+    const snap = document.createElement("canvas"); snap.width = c.width; snap.height = c.height;
+    snap.getContext("2d").drawImage(c, 0, 0);
+    c.width = r.width * dpr; c.height = r.height * dpr;
+    const ctx = c.getContext("2d"); ctx.scale(dpr, dpr);
+    this.w = r.width; this.h = r.height; this.ctx = ctx; this.last = null;
+    ctx.drawImage(snap, 0, 0, r.width, r.height);
+  },
   drawOutline() {
     const ctx = this.ctx, cx = this.w / 2, cy = this.h / 2, s = Math.min(this.w, this.h) * 0.3;
     ctx.save(); ctx.strokeStyle = "rgba(150,150,160,.45)"; ctx.lineWidth = 4; ctx.setLineDash([9, 9]); ctx.lineCap = "round";
@@ -3394,6 +3545,22 @@ $("paintStamp").onclick = () => {
 $("paintErase").onclick = () => { paint.mode = "erase"; $("paintErase").classList.add("on"); $("paintStamp").classList.remove("on"); };
 $("paintClear").onclick = () => paint.redraw();
 $("paintDone").onclick = () => { celebrateWith("paint", { noLevelUp: true }); };
+
+// Keep drawing canvases aligned with their container when the viewport changes (rotation,
+// mobile address-bar collapse). Coalesced via rAF so layout has settled before we re-measure.
+let _canvasResizeRAF = 0;
+function syncDrawingCanvases() {
+  const p = $("paint");
+  if (p && !p.classList.contains("hidden") && $("paintC")) paint.resize();
+  if ($("inkC") && $("guideC")) traceLevel.resize();   // trace canvases only exist while that level is active
+}
+function onCanvasViewportChange() {
+  cancelAnimationFrame(_canvasResizeRAF);
+  _canvasResizeRAF = requestAnimationFrame(syncDrawingCanvases);
+}
+addEventListener("resize", onCanvasViewportChange);
+addEventListener("orientationchange", onCanvasViewportChange);
+if (window.visualViewport) visualViewport.addEventListener("resize", onCanvasViewportChange);
 
 /* ---- dress-up ---- */
 $("dressHome").onclick = showHub;
