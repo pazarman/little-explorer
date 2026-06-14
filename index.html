@@ -435,6 +435,8 @@
     background:#48d168; border:3px solid #fff; box-shadow:0 0 0 0 rgba(72,209,104,.55);
     animation:traceStartPulse 1.1s ease-out infinite; }
   @keyframes traceStartPulse { 0%{box-shadow:0 0 0 0 rgba(72,209,104,.55);} 100%{box-shadow:0 0 0 18px rgba(72,209,104,0);} }
+  /* "new shapes" shuffle button, floating in the top-right of the trace canvas */
+  .trace-shuffle { position:absolute; top:1.4vmin; right:1.4vmin; z-index:8; }
 
   /* ----- memory ----- */
   .mem-grid { position:absolute; inset:0; display:flex; flex-wrap:wrap; gap:1.8vmin;
@@ -2159,15 +2161,7 @@ const traceLevel = {
   theme: "theme-trace", rounds: 5,
   startRound() {
     if (state.round === 0) {
-      if (state.tier === 2) {
-        const letters = NAME.toUpperCase().replace(/[^A-Z]/g, "").split("").slice(0, 8);
-        this.order = letters.length ? letters : ["S", "T", "A", "R"];   // tier 2 spells the child's name!
-      } else {
-        this.order = [
-          ["circle", "square", "triangle", "star", "heart"],
-          shuffle(["triangle", "star", "oval", "diamond", "1", "2", "3"]).slice(0, 5)
-        ][state.tier];
-      }
+      this.order = this.buildOrder();
       this.rounds = this.order.length;
       drawProgress();
     }
@@ -2176,7 +2170,7 @@ const traceLevel = {
     const lab = traceLabel(item);
     setInstruction(lab.show, lab.say + " Follow the dots!");
     const area = $("playArea");
-    area.innerHTML = `<canvas id="guideC"></canvas><canvas id="inkC"></canvas><div class="trace-start" id="traceStart"></div>`;
+    area.innerHTML = `<canvas id="guideC"></canvas><canvas id="inkC"></canvas><div class="trace-start" id="traceStart"></div><button class="round-btn trace-shuffle" id="traceShuffle" aria-label="New shapes to trace">🎲</button>`;
     const rect = area.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
     for (const id of ["guideC", "inkC"]) { const c = $(id); c.width = rect.width * dpr; c.height = rect.height * dpr; c.getContext("2d").scale(dpr, dpr); }
@@ -2191,6 +2185,28 @@ const traceLevel = {
     ink.addEventListener("pointermove", e => { if (this.last) { const p = pos(e); this.paint(p); this.last = p; trail.add(e.clientX, e.clientY, this.hue, this.done ? 0 : 2); } });
     const stop = () => this.last = null;
     ink.addEventListener("pointerup", stop); ink.addEventListener("pointercancel", stop);
+    const sh = $("traceShuffle"); if (sh) sh.onclick = () => this.regenerate();
+  },
+  // Build a fresh set of shapes/glyphs for the current tier. Shuffled each time so the trace
+  // set varies every play (tier 0 used to be a fixed circle→square→… list — same every session).
+  buildOrder() {
+    if (state.tier === 2) {
+      const letters = NAME.toUpperCase().replace(/[^A-Z]/g, "").split("").slice(0, 8);
+      return letters.length ? letters : ["S", "T", "A", "R"];   // tier 2 spells the child's name!
+    }
+    const pool = state.tier === 1
+      ? ["triangle", "star", "oval", "diamond", "square", "circle", "1", "2", "3"]
+      : ["circle", "square", "triangle", "star", "heart", "oval", "diamond"];
+    return shuffle(pool).slice(0, 5);
+  },
+  // 🎲 button: reshuffle to a brand-new set and restart from the first shape.
+  regenerate() {
+    if (state.busy) return;
+    state.round = 0;
+    sfx.tap(); tone(620, 0, .16, "triangle", .15);
+    const b = $("traceShuffle"); if (b) { const r = b.getBoundingClientRect(); miniStar(r.left + r.width / 2, r.top + r.height / 2); }
+    speak("New shapes! Let's trace!");
+    this.startRound();   // round === 0 → buildOrder() produces a fresh shuffled set
   },
   // re-sync both canvas buffers to the live play-area size after a resize (rotation, mobile bar).
   // Guide points are scaled (keeping hit state) and the child's ink is stretched onto the new buffer.
