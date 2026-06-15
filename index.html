@@ -581,8 +581,10 @@
 
   /* ----- body match ----- */
   .body-wrap { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:5; }
-  .body-doll { width:clamp(200px, 65vmin, 480px); filter:drop-shadow(0 8px 15px rgba(0,0,0,.2)); }
-  .body-overlay { position:absolute; width:clamp(200px, 65vmin, 480px); height:auto; }
+  .body-doll { width:clamp(200px, 65vmin, 480px); filter:drop-shadow(0 8px 15px rgba(0,0,0,.2)); transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: top center; }
+  .body-doll.zoom-face { transform: scale(2.5) translateY(20%); }
+  .body-overlay { position:absolute; width:clamp(200px, 65vmin, 480px); height:auto; transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: top center; }
+  .body-overlay.zoom-face { transform: scale(2.5) translateY(20%); }
 
   /* ----- dino eggs ----- */
   .dino-egg { position:absolute; border:none; background:none; font-size:clamp(46px,11vmin,86px); z-index:5;
@@ -3218,6 +3220,8 @@ const bodyLevel = {
     { name: "head",     x: 100, y: 96,  r: 58 },
     { name: "hand",     x: 46,  y: 98,  r: 15 },
     { name: "hand",     x: 154, y: 98,  r: 15 },
+    { name: "foot",     x: 74,  y: 380, r: 20 },
+    { name: "foot",     x: 126, y: 380, r: 20 },
     { name: "tummy",    x: 100, y: 230, r: 35 },
     { name: "eye",      x: 80,  y: 98,  r: 12 },
     { name: "eye",      x: 120, y: 98,  r: 12 },
@@ -3228,8 +3232,14 @@ const bodyLevel = {
     { name: "hair",     x: 100, y: 45,  r: 35 },
     { name: "arm",      x: 65,  y: 160, r: 20 },
     { name: "arm",      x: 135, y: 160, r: 20 },
+    { name: "leg",      x: 80,  y: 320, r: 25 },
+    { name: "leg",      x: 120, y: 320, r: 25 },
+    { name: "knee",     x: 80,  y: 320, r: 15 },
+    { name: "knee",     x: 120, y: 320, r: 15 },
     { name: "shoulder", x: 70,  y: 175, r: 18 },
     { name: "shoulder", x: 130, y: 175, r: 18 },
+    { name: "toe",      x: 74,  y: 380, r: 10 },
+    { name: "toe",      x: 126, y: 380, r: 10 },
     { name: "teeth",    x: 100, y: 128, r: 10 },
     { name: "neck",     x: 100, y: 165, r: 12 },
     { name: "tongue",   x: 100, y: 135, r: 8 },
@@ -3238,19 +3248,20 @@ const bodyLevel = {
     { name: "cheek",    x: 128, y: 116, r: 12 }
   ],
   tiers: [
-    ["head", "hand", "tummy"],
+    ["head", "hand", "tummy", "foot", "leg"],
     ["eye", "nose", "mouth", "ear", "hair", "arm"],
-    ["shoulder", "teeth", "neck", "tongue", "chin", "cheek"]
+    ["knee", "shoulder", "toe", "teeth", "neck", "tongue", "chin", "cheek"]
   ],
   startRound() {
     const pool = this.tiers[state.tier];
     this.target = rand(pool);
+    const isFace = ["eye", "nose", "mouth", "ear", "teeth", "neck", "tongue", "chin", "cheek", "hair"].includes(this.target);
     setInstruction("📍 " + t("tap_part", { part: theWord(this.target) }), t("tap_part", { part: theWord(this.target) }));
     
     const idx = { skin: 0, face: 0, hair: 1, hat: 0, glasses: 0, outfit: 3, friend: 0 };
     $("playArea").innerHTML = `<div class="body-wrap">
-      <div class="body-doll" id="bodyDoll">${dDollSVG(idx)}</div>
-      <svg class="body-overlay" viewBox="0 0 200 298" id="bodyOverlay"></svg>
+      <div class="body-doll${isFace ? " zoom-face" : ""}" id="bodyDoll">${dFullBodySVG(idx)}</div>
+      <svg class="body-overlay${isFace ? " zoom-face" : ""}" viewBox="0 0 200 400" id="bodyOverlay"></svg>
     </div>`;
     
     const ov = $("bodyOverlay");
@@ -3528,6 +3539,22 @@ function dDollSVG(idx, popCat) {
 function dSlotSVG(cat, opt, skin) {
   const part = cat === "face" ? dFaceSVG(opt) : cat === "hair" ? dHairSVG(opt) : cat === "hat" ? dHatSVG(opt) : cat === "glasses" ? dGlassesSVG(opt) : "";
   return `<svg viewBox="22 0 156 168" xmlns="http://www.w3.org/2000/svg"><circle cx="46" cy="98" r="12" fill="${skin}"/><circle cx="154" cy="98" r="12" fill="${skin}"/><ellipse cx="100" cy="96" rx="58" ry="60" fill="${skin}"/>${part}</svg>`;
+}
+function dFullBodySVG(idx) {
+  const skin = DRESS.skin.opts[idx.skin], outfit = DRESS.outfit.opts[idx.outfit];
+  return `<svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="390" rx="40" ry="6" fill="rgba(0,0,0,.1)"/>
+    <path d="M60 280 L70 380 L90 380 L80 280 Z" fill="${skin}"/>
+    <path d="M140 280 L130 380 L110 380 L120 280 Z" fill="${skin}"/>
+    <path d="M75 380 L95 380 A5 5 0 0 1 95 390 L75 390 Z" fill="${skin}"/>
+    <path d="M125 380 L105 380 A5 5 0 0 0 105 390 L125 390 Z" fill="${skin}"/>
+    <g class="L-outfit"><path d="M56 292 Q52 182 100 176 Q148 182 144 292 Z" fill="${outfit}" stroke="rgba(0,0,0,.14)" stroke-width="2"/><path d="M84 178 Q100 191 116 178" fill="none" stroke="rgba(0,0,0,.13)" stroke-width="3"/></g>
+    <g class="L-skin"><rect x="91" y="150" width="18" height="26" rx="9" fill="${skin}"/><circle cx="46" cy="98" r="12" fill="${skin}"/><circle cx="154" cy="98" r="12" fill="${skin}"/><ellipse cx="100" cy="96" rx="58" ry="60" fill="${skin}"/></g>
+    <g class="L-hair">${dHairSVG(DRESS.hair.opts[idx.hair])}</g>
+    <g class="L-face">${dFaceSVG(DRESS.face.opts[idx.face])}</g>
+    <g class="L-glasses">${dGlassesSVG(DRESS.glasses.opts[idx.glasses])}</g>
+    <g class="L-hat">${dHatSVG(DRESS.hat.opts[idx.hat])}</g>
+  </svg>`;
 }
 const dressup = {
   idx: { skin: 0, face: 0, hair: 1, hat: 0, glasses: 0, outfit: 3, friend: 0 },
