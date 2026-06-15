@@ -3218,8 +3218,6 @@ const bodyLevel = {
     { name: "head",     x: 100, y: 96,  r: 58 },
     { name: "hand",     x: 46,  y: 98,  r: 15 },
     { name: "hand",     x: 154, y: 98,  r: 15 },
-    { name: "foot",     x: 74,  y: 290, r: 20 },
-    { name: "foot",     x: 126, y: 290, r: 20 },
     { name: "tummy",    x: 100, y: 230, r: 35 },
     { name: "eye",      x: 80,  y: 98,  r: 12 },
     { name: "eye",      x: 120, y: 98,  r: 12 },
@@ -3230,16 +3228,8 @@ const bodyLevel = {
     { name: "hair",     x: 100, y: 45,  r: 35 },
     { name: "arm",      x: 65,  y: 160, r: 20 },
     { name: "arm",      x: 135, y: 160, r: 20 },
-    { name: "leg",      x: 80,  y: 260, r: 20 },
-    { name: "leg",      x: 120, y: 260, r: 20 },
-    { name: "knee",     x: 80,  y: 265, r: 15 },
-    { name: "knee",     x: 120, y: 265, r: 15 },
-    { name: "elbow",    x: 55,  y: 150, r: 15 },
-    { name: "elbow",    x: 145, y: 150, r: 15 },
     { name: "shoulder", x: 70,  y: 175, r: 18 },
     { name: "shoulder", x: 130, y: 175, r: 18 },
-    { name: "finger",   x: 46,  y: 98,  r: 15 },
-    { name: "toe",      x: 100, y: 292, r: 15 },
     { name: "teeth",    x: 100, y: 128, r: 10 },
     { name: "neck",     x: 100, y: 165, r: 12 },
     { name: "tongue",   x: 100, y: 135, r: 8 },
@@ -3248,9 +3238,9 @@ const bodyLevel = {
     { name: "cheek",    x: 128, y: 116, r: 12 }
   ],
   tiers: [
-    ["head", "hand", "foot", "tummy"],
-    ["eye", "nose", "mouth", "ear", "hair", "arm", "leg"],
-    ["knee", "elbow", "shoulder", "finger", "toe", "teeth", "neck", "tongue", "chin", "cheek"]
+    ["head", "hand", "tummy"],
+    ["eye", "nose", "mouth", "ear", "hair", "arm"],
+    ["shoulder", "teeth", "neck", "tongue", "chin", "cheek"]
   ],
   startRound() {
     const pool = this.tiers[state.tier];
