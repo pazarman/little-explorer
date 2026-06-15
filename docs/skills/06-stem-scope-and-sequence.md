@@ -14,7 +14,7 @@ and (c) sequence difficulty tiers by child development, not by arbitrary counts.
 | Sorting / classification / data | by 1 attribute | by 2 attributes | simple "which has more" | Big & Small (size) | **Gap**: sort by color/kind/shape; compare sets |
 | Spatial reasoning | in / on / under | here/there, simple fit | positional language | — | **Gap** (none) |
 | Logic / cause–effect | tap → reaction | sequence / order | simple if–then | implicit only | **Gap**: explicit ordering/sequencing |
-| Scientific thinking | name + observe | living/nonliving, weather/seasons | predict | Animal games (naming) | **Gap** (weather/seasons on roadmap) |
+| Scientific thinking | name + observe | living/nonliving, weather/seasons | predict | Animal games, Body Match | **Gap** (weather/seasons on roadmap) |
 
 ## Sequencing rule
 

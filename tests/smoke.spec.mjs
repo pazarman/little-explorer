@@ -55,3 +55,26 @@ test("exactly one full-screen surface is visible at a time", async ({ page }) =>
   );
   expect(visibleScreens).toBe(1);
 });
+
+test("Body Match game can be played", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(() => {
+    localStorage.setItem("fionaName", "Tester");
+    localStorage.setItem("fionaNameSet", "1");
+    localStorage.setItem("fionaBuddy", "puppy");
+    localStorage.setItem("fionaBuddySet", "1");
+  });
+  await page.goto("/index.html?test=1");
+
+  // Jump straight to the game for speed
+  await page.evaluate(() => startLevel("body"));
+
+  await expect(page.locator("#game")).toBeVisible();
+  await expect(page.locator(".body-doll")).toBeVisible();
+  
+  // Verify instructions are present and localized
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("📍");
+
+  expect(errors, "console/page errors in Body Match:\n" + errors.join("\n")).toEqual([]);
+});

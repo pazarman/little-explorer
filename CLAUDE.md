@@ -17,7 +17,7 @@ This repo has a hard quality bar. Use it; don't freelance.
 - **Hub** (`buildHub`): 8 world discs (`CATEGORIES`) → a world's game grid (`GAMES`) → a game.
   Nodes are the self-contained `.node`/`.node-disc` system; navigation goes through `hideAllScreens()` +
   `animScreen()` (never leave two screens visible).
-- **~21 games** (`LEVELS` + specials `paint`/`story`/`dressup`). Each level object has `theme`, `rounds`,
+- **~22 games** (`LEVELS` + specials `paint`/`story`/`dressup`). Each level object has `theme`, `rounds`,
   `startRound()`, and reads `state.tier` (0–2).
 - **Difficulty**: `tierFor(level)` — manual easy/med/hard force 0/1/2; **auto mode uses a performance model**
   (`fionaPerf`: `autoTierFor`, EMA of round quality, down-shift on ≥3 mistakes). Mistakes are counted via the
