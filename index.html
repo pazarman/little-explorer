@@ -166,6 +166,16 @@
                font-size:clamp(18px,4vmin,28px); font-weight:bold; background:#ffd23e; color:#5b3c00; box-shadow:0 5px 0 rgba(0,0,0,.22); }
   #nameStart:active { transform:scale(.95); }
   #nameSkip { border:none; background:none; color:#aaa; font-family:inherit; font-size:clamp(13px,2.8vmin,18px); text-decoration:underline; }
+  .diff-grid { display:flex; gap:2.4vmin; flex-wrap:wrap; justify-content:center; }
+  .diff-btn { border:none; border-radius:22px; padding:2.4vmin 3vmin; min-width:clamp(96px,26vw,150px);
+              display:flex; flex-direction:column; align-items:center; gap:.6vmin; font-family:inherit;
+              background:#f3ecff; color:#5b3c8c; box-shadow:0 5px 0 rgba(0,0,0,.18); cursor:pointer; }
+  .diff-btn:nth-child(2) { background:#fff0d6; color:#7a5300; }
+  .diff-btn:nth-child(3) { background:#ffe0ec; color:#8a2350; }
+  .diff-btn:active { transform:scale(.95); }
+  .diff-emoji { font-size:clamp(34px,8vmin,56px); line-height:1; }
+  .diff-name { font-size:clamp(17px,3.8vmin,26px); font-weight:bold; }
+  .diff-btn small { font-size:clamp(12px,2.6vmin,16px); opacity:.7; }
   #setName { background:#cdeafe; color:#1b4e7a; }
   #setDash { background:#d8f0d0; color:#2b5e1f; }
 
@@ -848,6 +858,18 @@
   </div>
 </div>
 
+<div id="diffscreen" class="screen hidden">
+  <div class="name-card">
+    <div class="mascot" id="diffMascot"></div>
+    <h2 data-i18n="diff_title">Pick a level!</h2>
+    <div class="diff-grid" id="diffGrid">
+      <button class="diff-btn" data-d="easy"><span class="diff-emoji">🐤</span><span class="diff-name" data-i18n="diff_easy">Easy</span><small data-i18n="diff_easy_age">Ages 2-3</small></button>
+      <button class="diff-btn" data-d="med"><span class="diff-emoji">🐰</span><span class="diff-name" data-i18n="diff_med">Medium</span><small data-i18n="diff_med_age">Ages 3-4</small></button>
+      <button class="diff-btn" data-d="hard"><span class="diff-emoji">🦉</span><span class="diff-name" data-i18n="diff_hard">Hard</span><small data-i18n="diff_hard_age">Ages 4-5</small></button>
+    </div>
+  </div>
+</div>
+
 <div id="game" class="screen hidden">
   <header>
     <button class="round-btn" id="homeBtn" aria-label="Home">🏠</button>
@@ -1115,6 +1137,8 @@ const DICT = {
     settings_title: "⚙️ Grown-up Settings",
     lang_en: "English", lang_es: "Español",
     diff_auto: "Auto ⬆️", diff_easy: "Easy", diff_med: "Medium", diff_hard: "Hard",
+    diff_title: "Grown-ups: pick a level!", diff_say: "Grown-ups, pick a level for your little one!",
+    diff_easy_age: "Ages 2-3", diff_med_age: "Ages 3-4", diff_hard_age: "Ages 4-5",
     voice_on: "On", voice_off: "Off",
     music_bouncy: "Bouncy", music_calm: "Calm", music_march: "March", music_off: "Off",
     rocket_ready: "🚀 Rocket ready!",
@@ -1264,6 +1288,8 @@ const DICT = {
     settings_title: "⚙️ Ajustes para adultos",
     lang_en: "English", lang_es: "Español",
     diff_auto: "Auto ⬆️", diff_easy: "Fácil", diff_med: "Medio", diff_hard: "Difícil",
+    diff_title: "Adultos: ¡elijan un nivel!", diff_say: "Adultos, elijan un nivel para su pequeño.",
+    diff_easy_age: "2-3 años", diff_med_age: "3-4 años", diff_hard_age: "4-5 años",
     voice_on: "Sí", voice_off: "No",
     music_bouncy: "Alegre", music_calm: "Tranquila", music_march: "Marcha", music_off: "No",
     rocket_ready: "🚀 ¡Cohete listo!",
@@ -3361,7 +3387,11 @@ function dHairSVG(style) {
     curls: `<g fill="#5a3318"><circle cx="74" cy="44" r="14"/><circle cx="100" cy="36" r="16"/><circle cx="126" cy="44" r="14"/><circle cx="58" cy="58" r="11"/><circle cx="142" cy="58" r="11"/></g>`,
     spiky: `<g fill="#d94f3a"><path d="M60 56 L70 22 L84 52 Z"/><path d="M84 52 L100 16 L116 52 Z"/><path d="M116 52 L130 22 L140 56 Z"/></g>`,
     pig: `<circle cx="42" cy="98" r="20" fill="#e8c45a"/><circle cx="158" cy="98" r="20" fill="#e8c45a"/><path d="M60 50 Q100 28 140 50 Q120 40 100 40 Q80 40 60 50 Z" fill="#e8c45a"/>`,
-    mohawk: `<path d="M80 52 L88 22 L96 50 Z" fill="#4dabf7"/><path d="M92 50 L100 12 L108 50 Z" fill="#ff5d8f"/><path d="M104 50 L112 22 L120 52 Z" fill="#69db7c"/>`
+    mohawk: `<path d="M80 52 L88 22 L96 50 Z" fill="#4dabf7"/><path d="M92 50 L100 12 L108 50 Z" fill="#ff5d8f"/><path d="M104 50 L112 22 L120 52 Z" fill="#69db7c"/>`,
+    long: `<path d="M44 60 Q36 142 54 216 Q48 150 62 96 Q52 70 44 60 Z" fill="#8a5a2b"/><path d="M156 60 Q164 142 146 216 Q152 150 138 96 Q148 70 156 60 Z" fill="#8a5a2b"/><path d="M46 58 Q100 30 154 58 Q150 44 100 40 Q50 44 46 58 Z" fill="#8a5a2b"/>`,
+    ponytail: `<path d="M150 58 Q188 86 176 152 Q168 116 150 104 Q150 80 150 58 Z" fill="#6b3a1a"/><path d="M60 50 Q100 28 140 50 Q120 40 100 40 Q80 40 60 50 Z" fill="#6b3a1a"/><circle cx="150" cy="60" r="6" fill="#ff5d8f"/>`,
+    braids: `<g fill="#5a3318"><circle cx="50" cy="104" r="11"/><circle cx="49" cy="124" r="10"/><circle cx="50" cy="142" r="9"/><circle cx="150" cy="104" r="11"/><circle cx="151" cy="124" r="10"/><circle cx="150" cy="142" r="9"/></g><path d="M60 50 Q100 30 140 50 Q120 40 100 40 Q80 40 60 50 Z" fill="#5a3318"/><circle cx="50" cy="92" r="5" fill="#ff5d8f"/><circle cx="150" cy="92" r="5" fill="#ff5d8f"/>`,
+    buns: `<g fill="#8a5a2b"><circle cx="64" cy="36" r="15"/><circle cx="136" cy="36" r="15"/><path d="M60 56 Q100 34 140 56 Q120 44 100 44 Q80 44 60 56 Z"/></g><circle cx="64" cy="36" r="6" fill="#ff7eb0"/><circle cx="136" cy="36" r="6" fill="#ff7eb0"/>`
   }[style] || "";
 }
 function dHatSVG(style) {
@@ -3372,7 +3402,10 @@ function dHatSVG(style) {
     bow: `<path d="M100 42 L76 28 Q72 42 76 56 Z" fill="#ff5d8f"/><path d="M100 42 L124 28 Q128 42 124 56 Z" fill="#ff5d8f"/><circle cx="100" cy="42" r="8" fill="#e63b6f"/>`,
     beanie: `<path d="M46 62 Q100 14 154 62 Z" fill="#4dabf7"/><rect x="44" y="55" width="112" height="13" rx="6.5" fill="#2f8fe0"/><circle cx="100" cy="14" r="7" fill="#dff0ff"/>`,
     cap: `<path d="M50 60 Q100 18 150 60 Z" fill="#69db7c"/><path d="M98 60 Q152 58 158 72 Q120 72 98 66 Z" fill="#46b85e"/><circle cx="100" cy="22" r="4" fill="#2f8f44"/>`,
-    flower: `<g transform="translate(140,46)"><g fill="#ff7eb0"><circle cx="0" cy="-9" r="7"/><circle cx="9" cy="0" r="7"/><circle cx="0" cy="9" r="7"/><circle cx="-9" cy="0" r="7"/></g><circle r="6" fill="#ffd23e"/></g>`
+    flower: `<g transform="translate(140,46)"><g fill="#ff7eb0"><circle cx="0" cy="-9" r="7"/><circle cx="9" cy="0" r="7"/><circle cx="0" cy="9" r="7"/><circle cx="-9" cy="0" r="7"/></g><circle r="6" fill="#ffd23e"/></g>`,
+    tiara: `<path d="M62 52 Q100 22 138 52" fill="none" stroke="#ffd23e" stroke-width="5" stroke-linejoin="round"/><path d="M100 26 L107 43 L93 43 Z" fill="#ff5d8f" stroke="#e0a400" stroke-width="1.5"/><circle cx="76" cy="46" r="3.5" fill="#7ad3ff"/><circle cx="124" cy="46" r="3.5" fill="#7ad3ff"/>`,
+    princess: `<path d="M100 0 L82 48 L118 48 Z" fill="#ff7eb0" stroke="#e63b6f" stroke-width="2"/><path d="M100 2 Q122 14 126 54 Q112 50 100 50 Z" fill="#ffd1e6" opacity=".85"/><circle cx="100" cy="2" r="5" fill="#ffd23e"/>`,
+    flowercrown: `<path d="M58 54 Q100 36 142 54" stroke="#69c46a" stroke-width="4" fill="none"/><g transform="translate(66,48)"><g fill="#ff9ed1"><circle cx="0" cy="-6" r="5"/><circle cx="6" cy="0" r="5"/><circle cx="0" cy="6" r="5"/><circle cx="-6" cy="0" r="5"/></g><circle r="3.5" fill="#ffd23e"/></g><g transform="translate(100,42)"><g fill="#c77dff"><circle cx="0" cy="-6" r="5"/><circle cx="6" cy="0" r="5"/><circle cx="0" cy="6" r="5"/><circle cx="-6" cy="0" r="5"/></g><circle r="3.5" fill="#ffd23e"/></g><g transform="translate(134,48)"><g fill="#ff9ed1"><circle cx="0" cy="-6" r="5"/><circle cx="6" cy="0" r="5"/><circle cx="0" cy="6" r="5"/><circle cx="-6" cy="0" r="5"/></g><circle r="3.5" fill="#ffd23e"/></g>`
   }[style] || "";
 }
 function dGlassesSVG(style) {
@@ -3388,11 +3421,11 @@ function dFriendSVG(emoji) {
 const DRESS = {
   skin:    { tab: "🎨", word: "New color!", es: "¡Nuevo color!", type: "color",  opts: ["#ffdcb1", "#f1c084", "#e0a062", "#c6824a", "#9b5e2e", "#7ad3a0", "#b9c6ff", "#f3a6c9"] },
   face:    { tab: "😊", word: "Funny face!", es: "¡Cara graciosa!", type: "face",   opts: ["happy", "big", "wink", "sleepy", "surprised", "silly", "love", "starry"] },
-  hair:    { tab: "💇", word: "New hair!",  es: "¡Nuevo pelo!", type: "hair",   opts: ["none", "tuft", "bob", "curls", "spiky", "pig", "mohawk"] },
-  hat:     { tab: "🎩", word: "Nice hat!",  es: "¡Bonito gorro!", type: "hat",    opts: ["none", "party", "crown", "bow", "beanie", "cap", "flower"] },
+  hair:    { tab: "💇", word: "New hair!",  es: "¡Nuevo pelo!", type: "hair",   opts: ["none", "tuft", "bob", "curls", "spiky", "pig", "mohawk", "long", "ponytail", "braids", "buns"] },
+  hat:     { tab: "🎩", word: "Nice hat!",  es: "¡Bonito gorro!", type: "hat",    opts: ["none", "party", "crown", "bow", "beanie", "cap", "flower", "tiara", "princess", "flowercrown"] },
   glasses: { tab: "👓", word: "Cool glasses!", es: "¡Lentes geniales!", type: "glasses", opts: ["none", "round", "sun", "star", "heart"] },
-  outfit:  { tab: "👕", word: "New shirt!", es: "¡Nueva camisa!", type: "color",  opts: ["#ff6b6b", "#ffa94d", "#ffd43b", "#69db7c", "#4dabf7", "#9775fa", "#f783ac", "#ffffff"] },
-  friend:  { tab: "🧸", word: "A friend!",  es: "¡Un amigo!", type: "friend", opts: ["none", "🧸", "🎈", "🌸", "🍦", "⭐", "🎁", "🐶", "🍭", "🎸"] }
+  outfit:  { tab: "👕", word: "New shirt!", es: "¡Nueva camisa!", type: "color",  opts: ["#ff6b6b", "#ffa94d", "#ffd43b", "#69db7c", "#4dabf7", "#9775fa", "#f783ac", "#ffffff", "#ff8fc7", "#ffc0e0", "#c77dff", "#e63b8a"] },
+  friend:  { tab: "🧸", word: "A friend!",  es: "¡Un amigo!", type: "friend", opts: ["none", "🧸", "🎈", "🌸", "🍦", "⭐", "🎁", "🐶", "🍭", "🎸", "🦄", "👸", "🧚", "🌈", "🦋", "💖", "🌺", "🐱"] }
 };
 const dressOrder = ["skin", "face", "hair", "hat", "glasses", "outfit", "friend"];
 function dDollSVG(idx, popCat) {
@@ -3479,20 +3512,25 @@ const dressup = {
 };
 
 /* ================= Categories & games ================= */
+// lvl: difficulty rating (0 = easy/ages 2-3, 1 = medium/3-4, 2 = hard/4-5). Used to hide games above the chosen level.
 const GAMES = {
-  snow:    { icon: "❄️", name: "Count", es: "Contar" },     ocean:   { icon: "🐠", name: "Colors", es: "Colores" },
-  memory:  { icon: "🃏", name: "Memory", es: "Memoria" },    bike:    { icon: "🚲", name: "Numbers", es: "Números" },
-  music:   { icon: "🥁", name: "Animal Band", es: "Banda Animal" }, whosays: { icon: "🔊", name: "Who Says?", es: "¿Quién Dice?" },
-  pizza:   { icon: "🍕", name: "Pizza", es: "Pizza" },     pasta:   { icon: "🍝", name: "Yum Count", es: "A Contar" },
-  trace:   { icon: "✨", name: "Tracing", es: "Trazar" },   rocket:  { icon: "🚀", name: "Countdown", es: "Cuenta Atrás" },
-  sort:    { icon: "🪐", name: "Big & Small", es: "Grande y Pequeño" }, pattern: { icon: "🔮", name: "Patterns", es: "Patrones" },
-  sortkind:{ icon: "🧺", name: "Sort It", es: "A Ordenar" },
-  paint:   { icon: "🎨", name: "Paint", es: "Pintar" },     story:   { icon: "📖", name: "Story", es: "Cuento" },
-  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón" }, dino:  { icon: "🦕", name: "Dino Eggs", es: "Huevos de Dino" },
-  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado" },  petfeed: { icon: "🦴", name: "Feed Pet", es: "Alimenta" },
-  petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca" },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida" },
-  dressup: { icon: "👗", name: "Dress Up", es: "Vestir" }
+  snow:    { icon: "❄️", name: "Count", es: "Contar", lvl: 0 },     ocean:   { icon: "🐠", name: "Colors", es: "Colores", lvl: 0 },
+  memory:  { icon: "🃏", name: "Memory", es: "Memoria", lvl: 1 },    bike:    { icon: "🚲", name: "Numbers", es: "Números", lvl: 1 },
+  music:   { icon: "🥁", name: "Animal Band", es: "Banda Animal", lvl: 1 }, whosays: { icon: "🔊", name: "Who Says?", es: "¿Quién Dice?", lvl: 0 },
+  pizza:   { icon: "🍕", name: "Pizza", es: "Pizza", lvl: 1 },     pasta:   { icon: "🍝", name: "Yum Count", es: "A Contar", lvl: 0 },
+  trace:   { icon: "✨", name: "Tracing", es: "Trazar", lvl: 2 },   rocket:  { icon: "🚀", name: "Countdown", es: "Cuenta Atrás", lvl: 2 },
+  sort:    { icon: "🪐", name: "Big & Small", es: "Grande y Pequeño", lvl: 0 }, pattern: { icon: "🔮", name: "Patterns", es: "Patrones", lvl: 2 },
+  sortkind:{ icon: "🧺", name: "Sort It", es: "A Ordenar", lvl: 1 },
+  paint:   { icon: "🎨", name: "Paint", es: "Pintar", lvl: 0 },     story:   { icon: "📖", name: "Story", es: "Cuento", lvl: 0 },
+  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón", lvl: 0 }, dino:  { icon: "🦕", name: "Dino Eggs", es: "Huevos de Dino", lvl: 0 },
+  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado", lvl: 0 },  petfeed: { icon: "🦴", name: "Feed Pet", es: "Alimenta", lvl: 1 },
+  petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca", lvl: 0 },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida", lvl: 0 },
+  dressup: { icon: "👗", name: "Dress Up", es: "Vestir", lvl: 0 }
 };
+// chosen difficulty → max game level shown (auto/hard show everything)
+const diffLevel = () => settings.diff === "easy" ? 0 : settings.diff === "med" ? 1 : 2;
+const gameVisible = gid => (GAMES[gid].lvl || 0) <= diffLevel();
+const visibleGames = cat => cat.games.filter(gameVisible);
 const CATEGORIES = [
   { id: "num",    icon: "🔢", name: "Numbers",        es: "Números",          cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
   { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
@@ -3512,7 +3550,7 @@ function launchGame(id) {
 function buildHub() {
   $("mapPath").setAttribute("points", "");
   const wrap = $("mapNodes"); wrap.className = "cats"; wrap.innerHTML = "";
-  CATEGORIES.forEach(cat => {
+  CATEGORIES.filter(cat => visibleGames(cat).length).forEach(cat => {
     const b = document.createElement("button");
     b.className = "node";
     b.innerHTML = `<div class="node-disc ${cat.cls}"><span>${cat.icon}</span></div><div class="node-label">${locName(cat)}</div>`;
@@ -3530,7 +3568,7 @@ function openCategory(id) {
   document.body.className = "";
   $("gamesTitle").textContent = `${cat.icon} ${locName(cat)}`;
   const wrap = $("gameNodes"); wrap.innerHTML = "";
-  cat.games.forEach(gid => {
+  visibleGames(cat).forEach(gid => {
     const g = GAMES[gid];
     const b = document.createElement("button");
     b.className = "node";
@@ -3734,9 +3772,22 @@ function showCharScreen(returnTo) {
     grid.appendChild(btn);
   });
 }
+function showDiffScreen() {
+  hideAllScreens();
+  $("diffMascot").innerHTML = buddyMarkup();
+  applyI18n($("diffscreen"));
+  $("diffscreen").classList.remove("hidden");
+  speak(t("diff_say"));
+}
+// first-run chain: name → difficulty → buddy → hub (each step only if not already set)
+function proceedAfterName() {
+  if (!localStorage.getItem("fionaDiffSet")) showDiffScreen();
+  else if (!localStorage.getItem("fionaBuddySet")) showCharScreen("hub");
+  else showHub();
+}
 
 /* ================= Navigation ================= */
-const ALL_SCREENS = ["hub", "games", "game", "stickerbook", "story", "paint", "dressup", "dashboard", "namescreen", "charscreen", "settings", "celebrate"];
+const ALL_SCREENS = ["hub", "games", "game", "stickerbook", "story", "paint", "dressup", "dashboard", "namescreen", "charscreen", "diffscreen", "settings", "celebrate"];
 function hideAllScreens() { ALL_SCREENS.forEach(id => { const e = $(id); if (e) e.classList.add("hidden"); }); playWipe(); }
 function playWipe() { const w = $("wipe"); if (!w) return; w.classList.remove("run"); void w.offsetWidth; w.classList.add("run"); }
 // contextual screen entrance: "fwd" (drill in) or "back" (go home); falls back to default screenIn
@@ -3808,7 +3859,7 @@ $("bookHome").onclick = showHub;
 $("musicBtn").onclick = toggleMusic;
 $("speakBtn").onclick = () => speak($("instruction").dataset.spoken || $("instruction").textContent);
 $("settingsBtn").onclick = openSettings;
-$("setDone").onclick = () => { $("settings").classList.add("hidden"); };
+$("setDone").onclick = () => { $("settings").classList.add("hidden"); buildHub(); };   // rebuild hub so a difficulty change re-filters games
 $("setReset").onclick = () => {
   if (confirm("Reset all of " + NAME + "'s stars and stickers?")) {
     for (const k in completions) delete completions[k];
@@ -3894,8 +3945,7 @@ function commitName() {
   $("namescreen").classList.add("hidden");
   if (settings.music !== "off" && !musicOn) startMusic();   // kick off the happy background tune
   speak(t("hi_let_play"));
-  if (!localStorage.getItem("fionaBuddySet")) showCharScreen("hub");   // first run: pick a buddy next
-  else showHub();
+  proceedAfterName();   // first run: difficulty → buddy → hub
 }
 $("nameStart").onclick = commitName;
 $("nameSkip").onclick = () => {
@@ -3903,8 +3953,14 @@ $("nameSkip").onclick = () => {
   localStorage.setItem("fionaName", NAME); localStorage.setItem("fionaNameSet", "1");
   applyName(); $("namescreen").classList.add("hidden");
   if (settings.music !== "off" && !musicOn) startMusic();
-  if (!localStorage.getItem("fionaBuddySet")) showCharScreen("hub"); else showHub();
+  proceedAfterName();
 };
+document.querySelectorAll("#diffGrid .diff-btn").forEach(b => b.onclick = () => {
+  settings.diff = b.dataset.d; saveSettings();
+  localStorage.setItem("fionaDiffSet", "1");
+  sfx.good(); $("diffscreen").classList.add("hidden");
+  if (!localStorage.getItem("fionaBuddySet")) showCharScreen("hub"); else showHub();
+});
 $("nameInput").addEventListener("keydown", e => { if (e.key === "Enter") commitName(); });
 
 document.documentElement.lang = (settings.lang === "es") ? "es" : "en";
