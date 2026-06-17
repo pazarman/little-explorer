@@ -578,10 +578,10 @@
 
   /* ----- body match ----- */
   .body-wrap { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:5; }
-  .body-doll { width:clamp(200px, 65vmin, 480px); filter:drop-shadow(0 8px 15px rgba(0,0,0,.2)); transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: top center; }
-  .body-doll.zoom-face { transform: scale(2.5) translateY(20%); }
-  .body-overlay { position:absolute; width:clamp(200px, 65vmin, 480px); height:auto; transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: top center; }
-  .body-overlay.zoom-face { transform: scale(2.5) translateY(20%); }
+  .body-doll { width:clamp(200px, 65vmin, 480px); filter:drop-shadow(0 8px 15px rgba(0,0,0,.2)); transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: center 15%; }
+  .body-doll.zoom-face { transform: scale(2.2) translateY(5%); }
+  .body-overlay { position:absolute; width:clamp(200px, 65vmin, 480px); height:auto; transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: center 15%; }
+  .body-overlay.zoom-face { transform: scale(2.2) translateY(5%); }
 
   /* ----- dino eggs ----- */
   .dino-egg { position:absolute; border:none; background:none; font-size:clamp(46px,11vmin,86px); z-index:5;
