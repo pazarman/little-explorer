@@ -1,5 +1,6 @@
 "use strict";
-/* ================= LEVEL: Dragon Feed (counting) ================= */
+/* LEVEL: Dragon Feed (counting)
+   Domain · Number sense · Concept · Age band 3–4 · Success = Child counts 1–5 treats as they feed the dragon. */
 const TREATS = ["🍪", "🍖", "🧁", "🍩", "🍰", "🍗"];
 const DRAGON_ART = `<svg class="dragon-svg" viewBox="0 0 200 195" xmlns="http://www.w3.org/2000/svg">
   <path d="M40 122 Q4 96 12 152 Q40 142 56 138 Z" fill="#3f8e46"/>
@@ -21,6 +22,7 @@ const DRAGON_ART = `<svg class="dragon-svg" viewBox="0 0 200 195" xmlns="http://
 const dragonLevel = {
   theme: "theme-dragon", rounds: 5,
   startRound() {
+    this.mistakes = 0;
     if (state.round === 0) this.treat = rand(TREATS);
     const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
     const need = counts[state.round];
@@ -40,7 +42,15 @@ const dragonLevel = {
   release(el, ev, info) {
     if (state.busy) { info.reset(); return; }
     if (inside(centerOf(el), $("dragonEl")) || !info.moved) this.feed(el, ev);
-    else { sfx.bad(); info.reset(); }
+    else {
+      this.mistakes++;
+      sfx.bad(); info.reset();
+      if (this.mistakes === 2) {
+        $("dragonEl").classList.add("hint-highlight");
+      } else if (this.mistakes >= 3) {
+        wiggle($("dragonEl"));
+      }
+    }
   },
   feed(el, ev) {
     el.style.visibility = "hidden"; el.classList.add("on-plate");

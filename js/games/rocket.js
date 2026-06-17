@@ -44,6 +44,7 @@ const rocketLevel = {
   tap(b, n, e) {
     if (state.busy) return;
     if (n === this.next) {
+      this.mistakes = 0;
       b.classList.add("popped");
       tone(700 - (this.start - this.next) * 60, 0, .18, "square", .18);  // descending beeps
       miniStar(e.clientX, e.clientY);
@@ -65,6 +66,17 @@ const rocketLevel = {
         confetti(22);
         roundComplete();
       }
-    } else { sfx.bad(); wiggle(b); speak(t("find_num", { next: this.next })); }
+    } else {
+      this.mistakes++;
+      sfx.bad(); wiggle(b);
+      if (this.mistakes === 2) {
+        const nb = $("numPad").querySelector(`.numkey[data-n="${this.next}"]`);
+        if (nb) nb.classList.add("hint-highlight");
+      } else if (this.mistakes >= 3) {
+        const nb = $("numPad").querySelector(`.numkey[data-n="${this.next}"]`);
+        if (nb) wiggle(nb);
+      }
+      speak(t("find_num", { next: this.next }));
+    }
   }
 };

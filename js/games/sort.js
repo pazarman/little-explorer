@@ -1,9 +1,11 @@
 "use strict";
-/* ================= LEVEL: Big & Small (size sorting) ================= */
+/* LEVEL: Big & Small (size sorting)
+   Domain · Measurement / comparison · Concept · Age band 2–4 · Success = Child identifies and sorts objects by size (big/small). */
 const SORT_EMOJIS = ["⭐", "🪐", "☄️", "🌟", "👽", "🛸", "🌙"];
 const sortLevel = {
   theme: "theme-space", rounds: 5,
   startRound() {
+    this.mistakes = 0;
     const n = [2, 3, 4][state.tier];
     this.em = rand(SORT_EMOJIS);
     setInstruction("🪐 " + t("sortsize_show"), t("sortsize_say"));
@@ -39,7 +41,16 @@ const sortLevel = {
         this.remaining--;
         speak(sz === "big" ? t("big") : t("small"));
         if (this.remaining === 0) { speak(praise()); roundComplete(); }
-      } else { info.reset(); sfx.bad(); wiggle(el); speak(sz === "big" ? t("that_big") : t("that_small")); }
+      } else {
+        this.mistakes++;
+        info.reset(); sfx.bad(); wiggle(el);
+        if (this.mistakes === 2) {
+          (sz === "big" ? $("binBig") : $("binSmall")).classList.add("hint-highlight");
+        } else if (this.mistakes >= 3) {
+          wiggle(sz === "big" ? $("binBig") : $("binSmall"));
+        }
+        speak(sz === "big" ? t("that_big") : t("that_small"));
+      }
     } else info.reset();
   }
 };
@@ -62,7 +73,8 @@ const sortkindLevel = {
   theme: "theme-sort", rounds: 4,
   startRound() {
     this.mode = rand(["color", "kind"]);
-    this.wrong = 0;
+    this.mistakes = 0;
+    this.wrong = 0; // existing counter, keeping for safety
     const nBins = [2, 2, 3][state.tier], perBin = 2;
     const sets = this.mode === "color" ? SORT_COLORS : SORT_KINDS;
     this.sets = sets;
@@ -114,11 +126,13 @@ const sortkindLevel = {
   }
 };
 
-/* ================= LEVEL: Star Patterns (sequencing) ================= */
+/* LEVEL: Star Patterns (sequencing)
+   Domain · Patterns / algebra · Concept · Age band 2–4 · Success = Child identifies the next item in a pattern. */
 const PAT_PALETTES = [["🔴", "🔵"], ["⭐", "🌙"], ["🟣", "🟢"], ["🔴", "🟡", "🔵"], ["❤️", "💛", "💚"], ["🌟", "☄️", "🪐"]];
 const patternLevel = {
   theme: "theme-space", rounds: 5,
   startRound() {
+    this.mistakes = 0;
     const types = state.tier === 0 ? ["AB"] : state.tier === 1 ? ["AB", "ABC", "AAB"] : ["ABC", "AAB", "ABB"];
     this.type = rand(types);
     const distinct = new Set(this.type).size;
@@ -149,6 +163,17 @@ const patternLevel = {
       b.classList.add("popped");
       const q = document.querySelector(".patcell.q"); if (q) { q.textContent = x; q.classList.remove("q"); }
       miniStar(e.clientX, e.clientY); speak(praise()); roundComplete();
-    } else { sfx.bad(); wiggle(b); speak(t("try_pattern")); }
+    } else {
+      this.mistakes++;
+      sfx.bad(); wiggle(b);
+      if (this.mistakes === 2) {
+        const correct = [...document.querySelectorAll(".patchoice")].find(c => c.textContent === this.answer);
+        if (correct) correct.classList.add("hint-highlight");
+      } else if (this.mistakes >= 3) {
+        const correct = [...document.querySelectorAll(".patchoice")].find(c => c.textContent === this.answer);
+        if (correct) wiggle(correct);
+      }
+      speak(t("try_pattern"));
+    }
   }
 };

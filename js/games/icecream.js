@@ -31,12 +31,21 @@ const icecreamLevel = {
   tap(c, e) {
     if (state.busy || this.capped) return;
     if (c !== this.target) {
+      this.mistakes++;
       sfx.bad();
       const b = [...document.querySelectorAll(".tub")].find(x => x.dataset.color === c);
       if (b) wiggle(b);
+      if (this.mistakes === 2) {
+        const correct = [...document.querySelectorAll(".tub")].find(x => x.dataset.color === this.target);
+        if (correct) correct.classList.add("hint-highlight");
+      } else if (this.mistakes >= 3) {
+        const correct = [...document.querySelectorAll(".tub")].find(x => x.dataset.color === this.target);
+        if (correct) wiggle(correct);
+      }
       speak(t("thats_find_scoop", { color: colorName(c), color2: colorAdj(this.target, "f") }));
       return;
     }
+    this.mistakes = 0;
     // spawn a fresh scoop that drops + squashes onto the stack at a dynamic offset
     const s = document.createElement("div");
     s.className = "scoop";

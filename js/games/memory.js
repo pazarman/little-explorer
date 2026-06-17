@@ -1,5 +1,6 @@
 "use strict";
-/* ================= LEVEL: Memory match ================= */
+/* LEVEL: Memory match
+   Domain · Logic / cause–effect · Concept · Age band 3–5 · Success = Child matches pairs of identical items. */
 const MEM_THEMES = {
   animals: [["🐶", "puppy"], ["🐱", "kitten"], ["🐮", "cow"], ["🐸", "frog"], ["🦁", "lion"], ["🐧", "penguin"], ["🦋", "butterfly"], ["🐰", "bunny"]],
   food:    [["🍕", "pizza"], ["🍝", "spaghetti"], ["🍦", "ice cream"], ["🍓", "strawberry"], ["🍌", "banana"], ["🧁", "cupcake"], ["🍪", "cookie"], ["🍩", "donut"]],

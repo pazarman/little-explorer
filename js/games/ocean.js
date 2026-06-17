@@ -48,6 +48,17 @@ const oceanLevel = {
       miniStar(e.clientX, e.clientY);
       speak(t("color_excl", { color: colorName(color) }) + " " + praise());
       roundComplete();
-    } else { sfx.bad(); wiggle(btn); speak(t("goodtry_fish", { x: colorAdj(this.target, "m") })); }
+    } else {
+      this.mistakes++;
+      sfx.bad(); wiggle(btn);
+      if (this.mistakes === 2) {
+        const correct = [...document.querySelectorAll(".fish-btn")].find(x => x.dataset.color === this.target);
+        if (correct) correct.classList.add("hint-highlight");
+      } else if (this.mistakes >= 3) {
+        const correct = [...document.querySelectorAll(".fish-btn")].find(x => x.dataset.color === this.target);
+        if (correct) wiggle(correct);
+      }
+      speak(t("goodtry_fish", { x: colorAdj(this.target, "m") }));
+    }
   }
 };

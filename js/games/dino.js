@@ -1,9 +1,11 @@
 "use strict";
-/* ================= LEVEL: Dino Eggs (counting + hatching) ================= */
+/* LEVEL: Dino Eggs (counting + hatching)
+   Domain · Number sense · Concept · Age band 2–3 · Success = Child counts 1–3 eggs as they hatch. */
 const BABY_DINOS = ["🦕", "🦖", "🐊", "🐲"];
 const dinoLevel = {
   theme: "theme-dino", rounds: 5,
   startRound() {
+    this.mistakes = 0; // Not strictly needed for exploration but consistent
     const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
     const count = counts[state.round];
     this.left = count; this.count = count;

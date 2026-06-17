@@ -1,5 +1,6 @@
 "use strict";
-/* ================= Dress-Up Studio (creative) ================= */
+/* Dress-Up Studio (creative)
+   Domain · Sorting / classification / data · Concept · Age band 2–5 · Success = Child selects and categorizes clothing items. */
 // fly an emoji from a closet slot onto its layer position on the doll, then snap
 /* ---- Drawn character: every part is real SVG art designed to align & compose ---- */
 function dStarPath(cx, cy, r) {

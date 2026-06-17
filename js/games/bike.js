@@ -60,6 +60,7 @@ const bikeLevel = {
   spawn(W, num) {
     const el = document.createElement("button");
     el.className = "balloon";
+    if (num === this.target) el.dataset.target = "1";
     const color = rand(BALLOON_COLORS);
     el.innerHTML = `<div class="b-body" style="background:${color}; animation-delay:${Math.random() * 2}s;"><span class="b-shine"></span><span class="b-num">${num}</span></div><div class="b-knot" style="border-top-color:${color}"></div><div class="b-string"></div>`;
     el.style.top = randBetween(3, 48) + "%";
@@ -77,7 +78,16 @@ const bikeLevel = {
       floaters(["🎈", "⭐", "✨"], e.clientX, e.clientY, b.num);                  // burst exactly b.num pieces = the quantity
       miniStar(e.clientX, e.clientY);
       speak(t("thats_that_num", { num: numWord(b.num), target: b.num }) + " " + praise()); roundComplete();
-    } else { sfx.bad(); wiggle(b.el); speak(t("thats_find_num", { num: b.num, target: this.target })); }
+    } else {
+      this.mistakes++;
+      sfx.bad(); wiggle(b.el);
+      if (this.mistakes === 2) {
+        document.querySelectorAll(".balloon[data-target='1']").forEach(el => el.classList.add("hint-highlight"));
+      } else if (this.mistakes >= 3) {
+        document.querySelectorAll(".balloon[data-target='1']").forEach(el => wiggle(el));
+      }
+      speak(t("thats_find_num", { num: b.num, target: this.target }));
+    }
   },
   cleanup() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.balloons = []; }
 };

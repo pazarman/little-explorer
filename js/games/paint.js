@@ -1,5 +1,6 @@
 "use strict";
-/* ================= Paint Studio (free drawing) ================= */
+/* Paint Studio (free drawing)
+   Domain · Scientific thinking · Concept · Age band 2–5 · Success = Child observes color mixing and predicts drawing outcomes. */
 const paint = {
   colors: ["#e63946", "#f07f13", "#f4c726", "#3fa84f", "#2f6fde", "#8e4fd0", "#f06ba8", "#8a5a2b", "#2b2b2b"],
   colorNames: ["red", "orange", "yellow", "green", "blue", "purple", "pink", "brown", "black"],

@@ -1,5 +1,6 @@
 "use strict";
-/* ================= LEVEL: Magic tracing (shapes, numbers, letters) ================= */
+/* LEVEL: Magic tracing (shapes, numbers, letters)
+   Domain · Geometry / shapes · Concept · Age band 3–5 · Success = Child traces shapes and symbols accurately. */
 const GLYPHS = {
   "1": [[[.5, .06], [.5, .94]], [[.33, .22], [.5, .06]]],
   "2": [[[.26, .28], [.4, .12], [.62, .12], [.74, .3], [.58, .52], [.3, .8], [.26, .94], [.78, .94]]],

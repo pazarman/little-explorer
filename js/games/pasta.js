@@ -1,5 +1,6 @@
 "use strict";
-/* ================= LEVEL: Food counting (pasta) ================= */
+/* LEVEL: Food counting (pasta)
+   Domain · Number sense · Concept · Age band 3–4 · Success = Child counts 1–5 items and places them on a plate. */
 const FOODS = [
   { item: "🧆", base: "spaghetti", noun: "meatball" },
   { item: "🍪", base: "plate",     noun: "cookie" },
@@ -29,6 +30,7 @@ function plateSVG(base) {
 const pastaLevel = {
   theme: "theme-pasta", rounds: 5,
   startRound() {
+    this.mistakes = 0;
     if (state.round === 0) this.food = rand(FOODS);
     const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
     const need = counts[state.round];
@@ -57,7 +59,15 @@ const pastaLevel = {
       el.style.left = (r.left + r.width * randBetween(.3, .62)) + "px";
       el.style.top = (r.top + r.height * randBetween(.25, .5)) + "px";
       this.land(el);
-    } else { sfx.bad(); info.reset(); }
+    } else {
+      this.mistakes++;
+      sfx.bad(); info.reset();
+      if (this.mistakes === 2) {
+        $("plateHolder").classList.add("hint-highlight");
+      } else if (this.mistakes >= 3) {
+        wiggle($("plateHolder"));
+      }
+    }
   },
   land(el) {
     // snap the food into a tidy arc on the plate so the quantity reads clearly

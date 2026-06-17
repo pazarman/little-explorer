@@ -1,8 +1,10 @@
 "use strict";
-/* ================= LEVEL: Who Says That? ================= */
+/* LEVEL: Who Says That?
+   Domain · Scientific thinking · Concept · Age band 2–3 · Success = Child identifies animal by its sound. */
 const whosaysLevel = {
   theme: "theme-whosays", rounds: 5,
   startRound() {
+    this.mistakes = 0;
     const nChoices = [2, 3, 4][state.tier];
     const picks = shuffle(Object.keys(ANIMALS)).slice(0, nChoices);
     this.target = rand(picks);
@@ -25,6 +27,17 @@ const whosaysLevel = {
       btn.classList.add("popped"); miniStar(e.clientX, e.clientY);
       speak(t("yes_it", { animal: theWord(this.target), sound: animalSound(this.target) }) + " " + praise());
       roundComplete();
-    } else { sfx.bad(); wiggle(btn); speakAnimal(this.target); }
+    } else {
+      this.mistakes++;
+      sfx.bad(); wiggle(btn);
+      if (this.mistakes === 2) {
+        const correct = [...document.querySelectorAll(".ws-animal")].find(el => el.textContent === ANIMALS[this.target].e);
+        if (correct) correct.classList.add("hint-highlight");
+      } else if (this.mistakes >= 3) {
+        const correct = [...document.querySelectorAll(".ws-animal")].find(el => el.textContent === ANIMALS[this.target].e);
+        if (correct) wiggle(correct);
+      }
+      speakAnimal(this.target);
+    }
   }
 };

@@ -1,5 +1,6 @@
 "use strict";
-/* ================= LEVEL: Pizza Kitchen (3 round types) ================= */
+/* LEVEL: Pizza Kitchen (3 round types)
+   Domain · Geometry / shapes · Concept · Age band 2–3 · Success = Child matches shapes, colors, and counts toppings. */
 const SHAPES = {
   circle:   `<circle cx="50" cy="50" r="40"/>`,
   square:   `<rect x="12" y="12" width="76" height="76" rx="10"/>`,
@@ -19,7 +20,7 @@ function pizzaBase(extra = "") {
 const pizzaLevel = {
   theme: "theme-pizza", rounds: 5,
   startRound() {
-    // rotate round type for variety; bias toward harder types at higher tiers
+    this.mistakes = 0;
     const types = state.tier === 0 ? ["shape", "count", "color"]
                 : ["shape", "count", "color", "count", "color"];
     this.type = rand(types);
@@ -52,7 +53,16 @@ const pizzaLevel = {
             tone(660, 0, .18, "triangle", .16); floaters(["✨", "🌟"], ev.clientX || innerWidth/2, ev.clientY || innerHeight/2, 4);
             $("pizzaHolder").innerHTML = pizzaBase(`<g transform="translate(75,75) scale(1.5)" fill="${TOPPING_COLORS[this.target]}" class="landed">${SHAPES[this.target]}</g>`);
             speak(t("shape_fits", { x: theWord(shape) }) + " " + praise()); roundComplete();
-          } else { info.reset(); sfx.bad(); wiggle(el); speak(t("thats_look", { x: theWord(shape), y: theWord(this.target) })); }
+          } else {
+            this.mistakes++;
+            info.reset(); sfx.bad(); wiggle(el);
+            if (this.mistakes === 2) {
+              $("pizzaHolder").querySelector("g").classList.add("hint-highlight");
+            } else if (this.mistakes >= 3) {
+              wiggle($("pizzaHolder").querySelector("g"));
+            }
+            speak(t("thats_look", { x: theWord(shape), y: theWord(this.target) }));
+          }
         } else info.reset();
       });
       $("pizChoices").appendChild(b);
@@ -89,7 +99,15 @@ const pizzaLevel = {
           const badge = $("pizCount"); if (badge) { badge.textContent = this.placed; badge.classList.remove("bump"); void badge.offsetWidth; badge.classList.add("bump"); }
           if (this.placed < need) speak(numWord(this.placed) + "!");
           else { speak(t("placed_pizza", { num: numWord(this.placed), count: need, x: tplural }) + " " + praise()); roundComplete(); }
-        } else info.reset();
+        } else {
+          this.mistakes++;
+          info.reset();
+          if (this.mistakes === 2) {
+            $("pizzaHolder").classList.add("hint-highlight");
+          } else if (this.mistakes >= 3) {
+            wiggle($("pizzaHolder"));
+          }
+        }
       });
       $("pizChoices").appendChild(b);
     }
@@ -116,7 +134,16 @@ const pizzaLevel = {
             dot.className = "laid-topping"; dot.style.left = "50%"; dot.style.top = "50%";
             holder.appendChild(dot);
             speak(t("color_excl", { color: colorName(color) }) + " " + praise()); roundComplete();
-          } else { info.reset(); sfx.bad(); wiggle(el); speak(t("thats_find_one", { color: colorName(color), color2: colorAdj(this.target, "m") })); }
+          } else {
+            this.mistakes++;
+            info.reset(); sfx.bad(); wiggle(el);
+            if (this.mistakes === 2) {
+              $("pizzaHolder").classList.add("hint-highlight");
+            } else if (this.mistakes >= 3) {
+              wiggle($("pizzaHolder"));
+            }
+            speak(t("thats_find_one", { color: colorName(color), color2: colorAdj(this.target, "m") }));
+          }
         } else info.reset();
       });
       $("pizChoices").appendChild(b);

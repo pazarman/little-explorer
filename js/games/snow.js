@@ -1,5 +1,6 @@
 "use strict";
-/* ================= LEVEL: Counting Critters (snow) ================= */
+/* LEVEL: Counting Critters (snow)
+   Domain · Number sense · Concept · Age band 2–4 · Success = Child counts 1–5 critters as they hop into a tray. */
 const CRITTERS = [["❄️", "snowflake"], ["⛄", "snowman"], ["🐧", "penguin"], ["🧤", "mitten"], ["🦌", "reindeer"], ["🎁", "present"]];
 const snowLevel = {
   theme: "theme-snow", rounds: 5,

@@ -78,7 +78,8 @@ const petcareLevel = {
   }
 };
 
-/* LEVEL: Feed Pet (counting) */
+/* LEVEL: Feed Pet (counting)
+   Domain · Number sense · Concept · Age band 3–4 · Success = Child counts 1–5 with 1:1 correspondence. */
 const PET_FOODS = [
   { e: "🐶", treat: "🦴", name: "puppy" }, { e: "🐱", treat: "🐟", name: "kitty" },
   { e: "🐰", treat: "🥕", name: "bunny" }, { e: "🐹", treat: "🌰", name: "hamster" }
@@ -86,6 +87,7 @@ const PET_FOODS = [
 const petfeedLevel = {
   theme: "theme-pets", rounds: 5,
   startRound() {
+    this.mistakes = 0;
     if (state.round === 0) this.pet = rand(PET_FOODS);
     const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
     const need = counts[state.round];
@@ -102,7 +104,15 @@ const petfeedLevel = {
   release(el, ev, info) {
     if (state.busy) { info.reset(); return; }
     if (inside(centerOf(el), $("petEl")) || !info.moved) this.feed(el, ev);
-    else { sfx.bad(); info.reset(); }
+    else {
+      this.mistakes++;
+      sfx.bad(); info.reset();
+      if (this.mistakes === 2) {
+        $("petEl").classList.add("hint-highlight");
+      } else if (this.mistakes >= 3) {
+        wiggle($("petEl"));
+      }
+    }
   },
   feed(el, ev) {
     el.style.visibility = "hidden"; el.classList.add("on-plate");
@@ -184,11 +194,6 @@ const bodyLevel = {
       roundComplete();
     } else {
       sfx.bad(); wiggle($("bodyDoll"));
-      speak(t("tap_part", { part: theWord(this.target) }));
-    }
-  }
-};
-wiggle($("bodyDoll"));
       speak(t("tap_part", { part: theWord(this.target) }));
     }
   }
