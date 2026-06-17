@@ -231,7 +231,14 @@ const DICT = {
     sortcolor_say: "Put each thing in the basket that matches its color!",
     sortkind_say: "Put each thing where it belongs!",
     tap_part: "Tap {part}!",
-    yes_part: "Yes! {part}!"
+    yes_part: "Yes! {part}!",
+    hideseek_show: "Put it {rel} {spot}!",
+    hideseek_say: "Put {buddy} {rel} {spot}!",
+    hideseek_retry: "Good try! Put it {rel} {spot}!",
+    rel_in: "in", rel_on: "on", rel_under: "under",
+    basket: { es: "canasta", g: "f" },
+    box: { es: "caja", g: "f" },
+    table: { es: "mesa", g: "f" }
   },
   es: {
     num: ["", "Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"],

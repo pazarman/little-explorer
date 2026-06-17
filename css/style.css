@@ -583,6 +583,18 @@
   .body-overlay { position:absolute; width:clamp(200px, 65vmin, 480px); height:auto; transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: center 15%; }
   .body-overlay.zoom-face { transform: scale(2.2) translateY(5%); }
 
+  /* ----- hide and seek ----- */
+  .hideseek-wrap { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5vmin; z-index:5; }
+  .hideseek-spots { display:flex; gap:6vmin; justify-content:center; align-items:flex-end; width:100%; height:40vh; }
+  .hide-spot-container { position:relative; width:clamp(120px, 30vmin, 240px); height:100%; display:flex; align-items:flex-end; }
+  .hide-spot-container svg { width:100%; height:auto; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+  .rel-zone { position:absolute; left:50%; transform:translateX(-50%); width:80%; height:30%; z-index:6; }
+  .zone-in { bottom:15%; height:40%; border-radius:50%; }
+  .zone-on { bottom:85%; border-radius:10px; }
+  .zone-under { bottom:-10%; background:rgba(0,0,0,0.05); border-radius:50%; }
+  .hideseek-buddy { z-index:10; filter:drop-shadow(0 4px 5px rgba(0,0,0,0.4)); transition: transform 0.2s ease; }
+  .hideseek-buddy.on-plate { animation:bounceIn 0.4s; }
+
   /* ----- dino eggs ----- */
   .dino-egg { position:absolute; border:none; background:none; font-size:clamp(46px,11vmin,86px); z-index:5;
               animation:floaty 3s ease-in-out infinite; filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)); line-height:1; }
