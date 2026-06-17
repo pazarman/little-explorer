@@ -11,7 +11,10 @@
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent;
       user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
   html, body { height:100%; overflow:hidden; }
+  /* position:fixed anchors to the initial viewport on iOS so the address bar
+     showing/hiding doesn't cause a visible layout resize when switching screens */
   body {
+    position:fixed; width:100%;
     font-family:"Comic Sans MS","Segoe UI",system-ui,sans-serif;
     background:linear-gradient(#8fd5f7, #c9efb0 65%, #8fd06a);
     transition:background .5s;
@@ -55,7 +58,7 @@
   #hub { padding:0; overflow:hidden; }
   #hub h1 {
     position:absolute; top:1.2vmin; width:100%; text-align:center; z-index:5;
-    font-size:clamp(22px, 5vmin, 46px); color:#fff;
+    font-size:clamp(22px, 5vmin, 46px); color:#fff; margin:0;
     text-shadow:0 3px 0 rgba(0,0,0,.25); pointer-events:none;
   }
   #map { position:relative; width:100%; height:100%; }
@@ -126,7 +129,7 @@
   #mapNodes.cats { position:absolute; inset:0; display:grid;
                    grid-template-columns:repeat(auto-fit, minmax(clamp(96px,26vmin,150px), 1fr));
                    align-content:center; justify-items:center; gap:3vmin 1.5vmin;
-                   padding:13vmin 4vmin 12vmin; z-index:4; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+                   padding:16vmin 4vmin 12vmin; z-index:4; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   @media (max-width:520px) { #mapNodes.cats { grid-template-columns:repeat(2,1fr); } }
   .node { animation:nodePop .55s cubic-bezier(0.34,1.56,0.64,1) backwards, catFloat 4.6s ease-in-out infinite;
           animation-delay:0s, .55s; }
@@ -454,6 +457,8 @@
   .mem-face.back  { background:#fff; transform:rotateY(180deg); border:3px solid #ffd23e; }
   .mem-card.matched { animation:matchGlow .7s ease; }
   .mem-card.matched .mem-face.back { box-shadow:0 0 18px 4px #ffd23e; }
+  .mem-card.hint-glow .mem-face.front { animation:hintPulse 1s ease-in-out infinite; }
+  @keyframes hintPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,210,62,0);} 50%{box-shadow:0 0 0 8px rgba(255,210,62,.6);} }
   @keyframes matchGlow { 40% { transform:scale(1.18); } }
 
   /* ----- music / animal band ----- */
@@ -802,3 +807,15 @@
   @keyframes rlBlast { 0%{transform:translateY(0) scale(1);} 30%{transform:translateY(-6vh) scale(1.05);} 100%{transform:translateY(-130vh) scale(.4);} }
   .rl-count { color:#ffd23e; font-weight:bold; font-size:clamp(40px,12vmin,110px); z-index:2;
     text-shadow:0 3px 0 rgba(0,0,0,.4); min-height:1.1em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Disable bouncy/spinning game animations; keep instant opacity changes for feedback */
+    .dragon.chomp, .care-pet.happy { animation: none !important; }
+    .mem-inner { transition: none !important; }
+    .mem-card.matched { animation: none !important; }
+    .popped { animation: none !important; opacity: 0 !important; }
+    .landed { animation: none !important; }
+    .floater { animation: none !important; opacity: 0 !important; }
+    .count-badge.bump, .yum-badge.bump, .count-num.bump { animation: none !important; }
+    .mkey.glow, .numkey.glow { animation: none !important; background: #ffeeaa !important; }
+  }
