@@ -5,10 +5,12 @@ const PETS = [
   { e: "🐦", name: "birdie" }, { e: "🐠", name: "fishy" }, { e: "🐢", name: "turtle" }, { e: "🐴", name: "pony" }
 ];
 
-/* LEVEL: Find Pet (vocabulary / identification) */
+/* LEVEL: Find Pet (vocabulary / identification)
+   Domain · Sorting / classification / data · Concept · Age band 2–3 · Success = Child identifies animal by name. */
 const petmatchLevel = {
   theme: "theme-pets", rounds: 5,
   startRound() {
+    this.mistakes = 0;
     const n = [2, 3, 4][state.tier];
     const picks = shuffle(PETS).slice(0, n);
     this.target = rand(picks);
@@ -17,6 +19,7 @@ const petmatchLevel = {
     picks.forEach(p => {
       const b = document.createElement("button");
       b.className = "pet-choice"; b.textContent = p.e;
+      b.dataset.name = p.name;
       b.onclick = e => this.tap(p, b, e);
       $("petChoices").appendChild(b);
     });
@@ -26,11 +29,25 @@ const petmatchLevel = {
     if (p.name === this.target.name) {
       btn.classList.add("popped"); miniStar(e.clientX, e.clientY);
       speak(t("yes_pet", { x: theWord(this.target.name) }) + " " + praise()); roundComplete();
-    } else { sfx.bad(); wiggle(btn); speak(t("lookfor_pet", { x: theWord(this.target.name) })); }
+    } else {
+      this.mistakes++;
+      sfx.bad(); wiggle(btn);
+      if (this.mistakes === 2) {
+        // Visual cue: highlight the correct target
+        const correctBtn = Array.from(document.querySelectorAll(".pet-choice")).find(b => b.dataset.name === this.target.name);
+        if (correctBtn) correctBtn.classList.add("hint-highlight");
+      } else if (this.mistakes >= 3) {
+        // Guided assist: wiggle the correct target
+        const correctBtn = Array.from(document.querySelectorAll(".pet-choice")).find(b => b.dataset.name === this.target.name);
+        if (correctBtn) wiggle(correctBtn);
+      }
+      speak(t("lookfor_pet", { x: theWord(this.target.name) }));
+    }
   }
 };
 
-/* LEVEL: Pet Care (nurture / cause-effect) */
+/* LEVEL: Pet Care (nurture / cause-effect)
+   Domain · Logic / cause–effect · Concept · Age band 2–3 · Success = Child associates tool with pet need. */
 const petcareLevel = {
   theme: "theme-pets", rounds: 3,
   startRound() {
@@ -85,7 +102,7 @@ const petfeedLevel = {
   release(el, ev, info) {
     if (state.busy) { info.reset(); return; }
     if (inside(centerOf(el), $("petEl")) || !info.moved) this.feed(el, ev);
-    else info.reset();
+    else { sfx.bad(); info.reset(); }
   },
   feed(el, ev) {
     el.style.visibility = "hidden"; el.classList.add("on-plate");
@@ -167,6 +184,11 @@ const bodyLevel = {
       roundComplete();
     } else {
       sfx.bad(); wiggle($("bodyDoll"));
+      speak(t("tap_part", { part: theWord(this.target) }));
+    }
+  }
+};
+wiggle($("bodyDoll"));
       speak(t("tap_part", { part: theWord(this.target) }));
     }
   }

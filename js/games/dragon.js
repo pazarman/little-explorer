@@ -40,7 +40,7 @@ const dragonLevel = {
   release(el, ev, info) {
     if (state.busy) { info.reset(); return; }
     if (inside(centerOf(el), $("dragonEl")) || !info.moved) this.feed(el, ev);
-    else info.reset();
+    else { sfx.bad(); info.reset(); }
   },
   feed(el, ev) {
     el.style.visibility = "hidden"; el.classList.add("on-plate");

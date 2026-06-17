@@ -78,11 +78,11 @@ const pizzaLevel = {
           const r = holder.getBoundingClientRect();
           const i = this.placed, cx = r.width / 2, cy = r.height / 2, rad = Math.min(r.width, r.height) * 0.3;
           const ang = (-90 + i * (360 / need)) * Math.PI / 180;            // tidy ring so the count reads clearly
-          const t = document.createElement("div");
-          t.className = "laid-topping"; t.textContent = temoji;
-          t.style.left = (cx + Math.cos(ang) * rad) + "px";
-          t.style.top = (cy + Math.sin(ang) * rad) + "px";
-          holder.appendChild(t);
+          const dot = document.createElement("div");
+          dot.className = "laid-topping"; dot.textContent = temoji;
+          dot.style.left = (cx + Math.cos(ang) * rad) + "px";
+          dot.style.top = (cy + Math.sin(ang) * rad) + "px";
+          holder.appendChild(dot);
           sfx.tap(); tone(440 + i * 60, 0, .14, "sine", .14);
           floaters(["✨"], ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2, 3);
           this.placed++;
@@ -111,10 +111,10 @@ const pizzaLevel = {
             el.classList.add("popped"); miniStar(ev.clientX || innerWidth/2, ev.clientY || innerHeight/2);
             tone(660, 0, .18, "triangle", .16); floaters(["✨", "🌟"], ev.clientX || innerWidth/2, ev.clientY || innerHeight/2, 4);
             const holder = $("pizzaHolder"), r = holder.getBoundingClientRect();
-            const t = document.createElement("div");
-            t.innerHTML = `<svg width="60" height="60"><circle cx="30" cy="30" r="26" fill="${COLORS[color]}"/></svg>`;
-            t.className = "laid-topping"; t.style.left = "50%"; t.style.top = "50%";
-            holder.appendChild(t);
+            const dot = document.createElement("div");
+            dot.innerHTML = `<svg width="60" height="60"><circle cx="30" cy="30" r="26" fill="${COLORS[color]}"/></svg>`;
+            dot.className = "laid-topping"; dot.style.left = "50%"; dot.style.top = "50%";
+            holder.appendChild(dot);
             speak(t("color_excl", { color: colorName(color) }) + " " + praise()); roundComplete();
           } else { info.reset(); sfx.bad(); wiggle(el); speak(t("thats_find_one", { color: colorName(color), color2: colorAdj(this.target, "m") })); }
         } else info.reset();

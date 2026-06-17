@@ -10,7 +10,7 @@ const memoryLevel = {
   theme: "theme-memory", rounds: 3,
   startRound() {
     const pairs = [3, 4, 6][state.tier];
-    this.remaining = pairs; this.first = null; this.locked = false;
+    this.remaining = pairs; this.first = null; this.locked = false; this.misses = 0;
     const themeName = rand(Object.keys(MEM_THEMES));
     setInstruction("🃏 " + t("matching_show"), t("matching_say", { x: t("theme_" + themeName) }));
     const picks = shuffle(MEM_THEMES[themeName]).slice(0, pairs);
@@ -47,6 +47,7 @@ const memoryLevel = {
     if (state.busy || this.locked) return;
     if (card.classList.contains("flipped") || card.classList.contains("matched")) return;
     sfx.tick(); card.classList.add("flipped");
+    document.querySelectorAll(".mem-card.hint-glow").forEach(c => c.classList.remove("hint-glow"));
     if (!this.first) { this.first = card; return; }
     const a = this.first, b = card; this.first = null;
     if (a.dataset.emoji === b.dataset.emoji) {
@@ -59,7 +60,21 @@ const memoryLevel = {
         else { speak(t("found_all") + " " + praise()); roundComplete(); }
       }, 550);
     } else {
-      this.locked = true; sfx.bad();
+      this.locked = true; sfx.bad(); speak(t("try_again"));
+      this.misses++;
+      const unmatched = () => [...document.querySelectorAll(".mem-card:not(.matched):not(.flipped)")];
+      if (this.misses >= 3) {
+        // briefly reveal one unmatched card as guided assist
+        const cards = unmatched();
+        if (cards.length >= 2) {
+          const hint = cards[0]; hint.classList.add("flipped");
+          core.wait(() => hint.classList.remove("flipped"), 1500);
+        }
+      } else if (this.misses >= 2) {
+        // pulse two unmatched cards to draw attention
+        const cards = unmatched();
+        if (cards.length >= 2) { cards[0].classList.add("hint-glow"); cards[1].classList.add("hint-glow"); }
+      }
       core.wait(() => { a.classList.remove("flipped"); b.classList.remove("flipped"); this.locked = false; }, 1000);
     }
   }

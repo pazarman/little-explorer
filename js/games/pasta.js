@@ -57,14 +57,14 @@ const pastaLevel = {
       el.style.left = (r.left + r.width * randBetween(.3, .62)) + "px";
       el.style.top = (r.top + r.height * randBetween(.25, .5)) + "px";
       this.land(el);
-    } else info.reset();
+    } else { sfx.bad(); info.reset(); }
   },
   land(el) {
     // snap the food into a tidy arc on the plate so the quantity reads clearly
     const plate = $("plateHolder").getBoundingClientRect();
-    const i = this.on, n = this.need, t = n === 1 ? 0.5 : i / (n - 1);
-    const px = plate.left + plate.width * (0.2 + 0.6 * t);
-    const py = plate.top + plate.height * 0.46 - Math.sin(t * Math.PI) * plate.height * 0.12;
+    const i = this.on, n = this.need, frac = n === 1 ? 0.5 : i / (n - 1);
+    const px = plate.left + plate.width * (0.2 + 0.6 * frac);
+    const py = plate.top + plate.height * 0.46 - Math.sin(frac * Math.PI) * plate.height * 0.12;
     const r = el.getBoundingClientRect();
     el.classList.remove("on-plate"); void el.offsetWidth;
     el.style.position = "fixed"; el.style.zIndex = 12;
