@@ -87,6 +87,17 @@ const DICT = {
     well_done: "You did it, {n}!",
     hi_let_play: "Hi {n}! Let's play!",
     hi_star_sparks: "Hi {n}! Let's find shiny Star Sparks to fix the rocket ship! Tap a world to play!",
+    narrator_back: "Welcome back, {n}! 🌈",
+    narrator_ready: "Where to today, {n}? 🗺️",
+    narrator_postgame: "Amazing! What's next, {n}? ⭐",
+    narrator_cat_num: "Let's count! 🔢",
+    narrator_cat_shape: "Colors and shapes! 🎨",
+    narrator_cat_brain: "Brain power time! 🧩",
+    narrator_cat_animal: "Animal friends! 🐾",
+    narrator_cat_pets: "Pets need us! 🐶",
+    narrator_cat_space: "3, 2, 1... Blast off! 🚀",
+    narrator_cat_fantasy: "Into make-believe! 🐉",
+    narrator_cat_create: "Let's create! ✨",
     quest_fixed: "The rocket is all fixed! Get ready to blast off!",
     quest_fixed_praise: "Hooray {n}! You found the last Star Spark! The rocket is all fixed! Let's blast off!",
     quest_collect: "Hooray! You earned a Star Spark, {n}! {left} more to fix the rocket!",
@@ -254,6 +265,17 @@ const DICT = {
     well_done: "¡Lo hiciste, {n}!",
     hi_let_play: "¡Hola {n}! ¡Vamos a jugar!",
     hi_star_sparks: "¡Hola {n}! ¡Busquemos Chispas de Estrella para arreglar el cohete! ¡Toca un mundo!",
+    narrator_back: "¡Bienvenido de nuevo, {n}! 🌈",
+    narrator_ready: "¿A dónde hoy, {n}? 🗺️",
+    narrator_postgame: "¡Genial! ¿Qué sigue, {n}? ⭐",
+    narrator_cat_num: "¡A contar! 🔢",
+    narrator_cat_shape: "¡Colores y figuras! 🎨",
+    narrator_cat_brain: "¡A pensar! 🧩",
+    narrator_cat_animal: "¡Amigos animales! 🐾",
+    narrator_cat_pets: "¡Las mascotas nos necesitan! 🐶",
+    narrator_cat_space: "¡3, 2, 1... Despegue! 🚀",
+    narrator_cat_fantasy: "¡Al mundo de fantasía! 🐉",
+    narrator_cat_create: "¡Vamos a crear! ✨",
     quest_fixed: "¡El cohete está arreglado! ¡Prepárate para el despegue!",
     quest_fixed_praise: "¡Hurra {n}! ¡Encontraste la última Chispa de Estrella! ¡El cohete está listo!",
     quest_collect: "¡Hurra! ¡Ganaste una Chispa de Estrella, {n}! ¡Faltan {left} para arreglarlo!",
@@ -941,6 +963,7 @@ function levelComplete() { core.cleanup(); celebrateWith(state.level); }
 function celebrateWith(levelId, opts = {}) {
   completions[levelId] = (completions[levelId] || 0) + 1;
   saveCompletions();
+  localStorage.setItem("fionaLastGame", levelId);
   const sticker = rand(STICKER_POOL);
   stickers.push({ e: sticker });           // position assigned by the sticker book's grid
   saveStickers();

@@ -261,6 +261,13 @@
   .mascot .armR { transform-box:fill-box; transform-origin:0% 100%; animation:wave 3.4s ease-in-out infinite; }
   @keyframes wave { 0%,68%,100% { transform:rotate(0);} 78% { transform:rotate(-24deg);} 88% { transform:rotate(6deg);} }
   #hubMascot   { position:absolute; left:1%; bottom:3%; width:clamp(74px,15vmin,140px); font-size:clamp(64px,13vmin,124px); z-index:4; }
+  #buddySpeech { position:absolute; left:clamp(76px,18vmin,152px); bottom:clamp(18px,4.5%,56px);
+                 max-width:min(58vmin,320px); background:#fff; border-radius:16px 16px 16px 4px;
+                 padding:1.8vmin 2.6vmin; font-size:clamp(13px,3.2vmin,21px); font-weight:600;
+                 color:#333; box-shadow:0 4px 14px rgba(0,0,0,.18); line-height:1.4;
+                 pointer-events:none; z-index:10; transition:opacity .38s, transform .38s; }
+  #buddySpeech.narrator-out { opacity:0; transform:translateY(5px); }
+  #buddySpeech.hidden { display:none; }
   #gameMascot  { position:fixed; left:1vmin; bottom:1vmin; width:clamp(58px,11.5vmin,100px); font-size:clamp(50px,10vmin,90px); z-index:30; }
   #celebMascot { width:clamp(95px,21vmin,180px); font-size:clamp(84px,19vmin,164px); }
   .mascot .buddy { display:block; line-height:1; text-align:center; filter:drop-shadow(0 4px 4px rgba(0,0,0,.25));
