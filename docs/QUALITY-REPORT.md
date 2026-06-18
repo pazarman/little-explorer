@@ -41,12 +41,13 @@ Axes: (1) Learning Efficacy · (2) Vocabulary · (3) Active Construction · (4) 
 | **Paint Studio** | 2 | 2 | 2 | 0 | 1 | 1 | 1 | 2 | 2 | 1 | 2 | 2 | **20** | PASS |
 | **Bike (Numbers)** | 2 | 2 | 1 | 0 | 0 | 2 | 2 | 2 | 1 | 1 | 2 | 2 | **19** | PASS |
 | **Ice Cream Shop** | 2 | 2 | 1 | 0 | 0 | 2 | 1 | 2 | 2 | 2 | 1 | 2 | **19** | PASS |
-| **Pet Care** | 2 | 1 | 1 | 1 | 2 | 1 | 1 | 2 | 2 | 2 | 1 | 2 | **19** | PASS |
+| **Pet Care** | 2 | 2 | 1 | 2 | 2 | 2 | 2 | 2 | 2 | 2 | 2 | 2 | **23** | PASS |
 | **Body Match** | 2 | 2 | 0 | 0 | 1 | 2 | 1 | 2 | 1 | 2 | 2 | 2 | **19** | PASS |
 | **Memory** | 1 | 1 | 1 | 0 | 0 | 2 | 2 | 2 | 2 | 2 | 1 | 2 | **18** | PASS ⚠️ |
 
 > Note: Ocean appears twice in the raw list — it was the reference game for both the old and new rubric.
-> All 24 distinct games pass. Memory is the weakest at exactly the threshold.
+> All 24 distinct games pass. Memory is the weakest at exactly the threshold (18/24).
+> Pet Care upgraded to 23/24 in v16 (SEL rewrite — emotion naming, mood indicator, tier-based needs).
 
 ---
 
@@ -60,10 +61,11 @@ Every game was re-scored cold against 5 new axes. Three structural patterns emer
 
 | Score | Games |
 |---|---|
-| 1 | Dress-Up (creative affirmation), Pet Care (nurturing mechanic), Story (narrative emotion) |
-| 0 | All 21 others |
+| 2 | Pet Care (emotion named at start, per-action, and on completion) |
+| 1 | Dress-Up (creative affirmation), Story (narrative emotion) |
+| 0 | All 22 others |
 
-Pet Care is the closest thing to an SEL game: the pet shows status icons (🫧 🍖 🎾 → 💖) that model basic needs, but emotions are never *named*. No game says "the puppy is sad — let's help!" or "you were so kind!" All top competitors (KAK, Sago Mini, PBS Kids / Daniel Tiger, Noggin) treat SEL as a first-class domain.
+Pet Care now names emotions explicitly: the pet "looks sad 😢" at the start, each care action triggers a named emotional response ("feels fresh!", "feels loved!"), and the round ends with "so happy now! 💖 You were so kind!" — the first game in the library to name cause, response, and outcome. All top competitors (KAK, Sago Mini, PBS Kids / Daniel Tiger, Noggin) treat SEL as a first-class domain.
 
 #### 2. Active Construction (axis 3): a nearly flat floor
 
@@ -111,7 +113,7 @@ Snow, Dragon Feed, Pasta, Pet Feed, and Dino Eggs all score 0 because they cover
 - [ ] **Counting games: STEM Coverage (axis 5 = 0)** — Snow, Dragon, Pasta, Pet Feed, Dino all duplicate the Strong number-sense domain. No action needed *now* (they pass) but each new counting game is a STEM Coverage 0 by default. Evaluate before adding more.
 - [ ] **Body Match: hint ladder** — wrong taps repeat the instruction but no progressive hint (highlight → wiggle) like other games. Also, small body parts (tongue r=8, knee r=15) are below 44px at typical phone sizes. Fix both to raise score from 19 → 21+.
 - [ ] **Ice Cream: adaptivity depth** — pacing scores 1 (backlog from v1). Tier 2/3 logic incomplete. Add dynamic color set + speed ramp to raise from 19 → 21.
-- [ ] **Pet Care: SEL upgrade** — this game is one step away from being the library's SEL anchor. Add explicit emotion naming: "The puppy looks sad 😢 — let's help!" before tools appear, and "The puppy is happy now! 💖" on completion. Would raise SEL from 1→2 and score from 19→20.
+- [x] **Pet Care: SEL upgrade** — ✅ Done (v16). Emotion named at start (sad 😢), per action, and on completion (happy + "you were so kind!"). Tier-based needs (2/3/4 actions), mood indicator (😢→😐→🙂→😊→💖), 4th cuddle action at tier 2. Score raised 19→23.
 - [ ] **Pizza: Learning Efficacy** — mixing shapes + colors + counting in one game dilutes the concept per round. Consider either (a) splitting into three focused games or (b) making the mode explicit at the start of each round so the concept is always clear. Would raise score from 20→22.
 
 ### 🔵 Low Priority
