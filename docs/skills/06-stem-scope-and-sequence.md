@@ -3,6 +3,10 @@
 Use this to (a) ensure every game has a real STEM objective, (b) plan new games against coverage gaps,
 and (c) sequence difficulty tiers by child development, not by arbitrary counts.
 
+> **Linked to Skill 01 rubric axis 5 (STEM Coverage Value).** A new game that duplicates a Strong domain
+> scores 0 on that axis; one that extends an existing domain scores 1; one that addresses a Gap domain
+> at the right developmental tier scores 2. Check this table before proposing or reviewing any new game.
+
 ## Domains, developmental ladder, and current coverage
 
 | Domain | 2–3 | 3–4 | 4–5 | Covered by | Status |
@@ -15,6 +19,8 @@ and (c) sequence difficulty tiers by child development, not by arbitrary counts.
 | Spatial reasoning | in / on / under | here/there, simple fit | positional language | — | **Gap** (none) |
 | Logic / cause–effect | tap → reaction | sequence / order | simple if–then | implicit only | **Gap**: explicit ordering/sequencing |
 | Scientific thinking | name + observe | living/nonliving, weather/seasons | predict | Animal games, Body Match | **Gap** (weather/seasons on roadmap) |
+| Phonological awareness / literacy | rhyme, syllable clap | letter sounds (phonemes), letter names | onset-rime, simple blending | — | **Gap** (zero coverage; highest-ROI for ages 3–5) |
+| Social-emotional learning (SEL) | name emotions (happy/sad) | cause of feelings, self-regulation | empathy, perspective-taking | Incidental only | **Gap**: no explicit SEL game; strong in all top competitors |
 
 ## Sequencing rule
 
@@ -24,11 +30,13 @@ tier 2 = count to 10 with the written numeral.
 
 ## Highest-ROI gaps to build next (learning value first)
 
-1. **Sort / classify by color, shape, or kind** (not just size) — core early math; today only size exists.
-2. **Pattern depth** — extend and create patterns; more pattern types.
-3. **Spatial / positional language** (in / on / under) — zero coverage.
-4. **More / less and ordering** (compare sets, seriation) — zero coverage.
-5. **Measurement** (tall/short, long/short).
+1. **Phonological awareness** — rhyme, syllable clap, letter sounds. Zero coverage; every top competitor (Homer, Duolingo ABC, Sago Mini, Starfall) has an explicit literacy track. Highest single ROI for ages 3–5.
+2. **SEL / emotion naming** — name + cause of feelings, simple self-regulation. Zero explicit coverage; KAK, PBS Kids (Daniel Tiger), Sago Mini all treat this as a first-class domain.
+3. **Sort / classify by color, shape, or kind** (not just size) — core early math; today only size exists.
+4. **Spatial / positional language** (in / on / under) — zero coverage.
+5. **More / less and ordering** (compare sets, seriation) — zero coverage.
+6. **Pattern depth** — extend and create patterns; more pattern types.
+7. **Measurement** (tall/short, long/short).
 
 ## Required objective tag for every game
 
