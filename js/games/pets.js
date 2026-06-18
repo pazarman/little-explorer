@@ -46,35 +46,58 @@ const petmatchLevel = {
   }
 };
 
-/* LEVEL: Pet Care (nurture / cause-effect)
-   Domain · Logic / cause–effect · Concept · Age band 2–3 · Success = Child associates tool with pet need. */
+/* LEVEL: Pet Care (nurture / cause-effect / SEL)
+   Domain · Logic / cause–effect · SEL · Concept · Age band 2–3 · Success = Child associates tool with pet need
+   and hears emotion named at start, after each action, and on completion. */
+const CARE_ICONS = { wash: "🧼", feed: "🍖", play: "🎾", cuddle: "🫂" };
+const CARE_NEED_ICONS = { wash: "🫧", feed: "🍖", play: "🎾", cuddle: "💞" };
+const CARE_MOODS = ["😢", "😐", "🙂", "😊", "💖"];
 const petcareLevel = {
   theme: "theme-pets", rounds: 3,
   startRound() {
     this.pet = rand(PETS.slice(0, 6));
-    this.needs = new Set(["wash", "feed", "play"]);
-    setInstruction("🛁 " + t("takecare_show", { x: theWord(this.pet.name) }), t("takecare_say", { x: theWord(this.pet.name) }));
+    // tier 0 → 2 needs, tier 1 → 3 needs, tier 2 → 4 needs (adds cuddle)
+    const needSets = [["wash", "feed"], ["wash", "feed", "play"], ["wash", "feed", "play", "cuddle"]];
+    this.needs = new Set(needSets[state.tier]);
+    this.total = this.needs.size;
+    this.done = 0;
+    setInstruction("🛁 " + t("takecare_show", { x: theWord(this.pet.name) }), t("takecare_sad", { animal: theWord(this.pet.name) }));
+    const toolBtns = [...this.needs].map(act =>
+      `<button class="care-tool" data-act="${act}">${CARE_ICONS[act]}</button>`
+    ).join("");
     $("playArea").innerHTML = `<div class="petcare-wrap">
+        <div class="care-mood" id="careMood">${CARE_MOODS[0]}</div>
         <div class="care-pet" id="carePet">${this.pet.e}</div>
-        <div class="care-status" id="careStatus">🫧 🍖 🎾</div>
-        <div class="care-tools">
-          <button class="care-tool" data-act="wash">🧼</button>
-          <button class="care-tool" data-act="feed">🍖</button>
-          <button class="care-tool" data-act="play">🎾</button>
-        </div></div>`;
-    document.querySelectorAll(".care-tool").forEach(t => t.onclick = e => this.use(t.dataset.act, e));
+        <div class="care-status" id="careStatus">${[...this.needs].map(n => CARE_NEED_ICONS[n]).join(" ")}</div>
+        <div class="care-tools" id="careTools">${toolBtns}</div></div>`;
+    document.querySelectorAll(".care-tool").forEach(btn => btn.onclick = ev => this.use(btn.dataset.act, btn, ev));
+    core.wait(() => speak(t("pet_sad", { animal: theWord(this.pet.name) })), 600);
   },
-  use(act, e) {
+  use(act, btn, ev) {
     if (state.busy || !this.needs.has(act)) return;
     this.needs.delete(act);
+    this.done++;
+    // dim used button
+    btn.classList.add("care-used");
+    btn.disabled = true;
     const pet = $("carePet"); pet.classList.remove("happy"); void pet.offsetWidth; pet.classList.add("happy");
     const c = centerOf(pet);
-    if (act === "wash") { floaters(["🫧", "✨", "💧"], c.x, c.y, 9); tone(700, 0, .2, "sine"); speak(t("pet_clean")); }
-    else if (act === "feed") { floaters(["😋", "❤️", "🍖"], c.x, c.y, 6); tone(400, 0, .2, "square"); speak(t("pet_yum")); }
-    else { floaters(["🎾", "⭐", "🐾"], c.x, c.y, 7); tone(600, 0, .2, "triangle"); speak(t("pet_whee")); }
-    const icons = { wash: "🫧", feed: "🍖", play: "🎾" };
-    $("careStatus").textContent = [...this.needs].map(n => icons[n]).join(" ") || "💖";
-    if (this.needs.size === 0) { floaters(["💖", "⭐", "🐾", "✨"], c.x, c.y, 12); speak(t("pet_happy", { animal: theWord(this.pet.name) }) + " " + praise()); roundComplete(); }
+    // update mood indicator with bounce
+    const moodIdx = Math.min(this.done, CARE_MOODS.length - 1);
+    const moodEl = $("careMood");
+    moodEl.textContent = CARE_MOODS[moodIdx];
+    moodEl.classList.remove("bump"); void moodEl.offsetWidth; moodEl.classList.add("bump");
+    if (act === "wash")   { floaters(["🫧", "✨", "💧"], c.x, c.y, 9);       tone(700, 0, .2, "sine");     speak(t("pet_feels_clean",   { animal: theWord(this.pet.name) })); }
+    else if (act === "feed")   { floaters(["😋", "❤️", "🍖"], c.x, c.y, 6);  tone(400, 0, .2, "square");   speak(t("pet_feels_fed",     { animal: theWord(this.pet.name) })); }
+    else if (act === "play")   { floaters(["🎾", "⭐", "🐾"], c.x, c.y, 7);  tone(600, 0, .2, "triangle"); speak(t("pet_feels_played",  { animal: theWord(this.pet.name) })); }
+    else                       { floaters(["💞", "💖", "✨"], c.x, c.y, 8);   tone(550, 0, .25, "sine");    speak(t("pet_feels_cuddled", { animal: theWord(this.pet.name) })); }
+    // update needs strip
+    $("careStatus").textContent = [...this.needs].map(n => CARE_NEED_ICONS[n]).join(" ") || "💖";
+    if (this.needs.size === 0) {
+      floaters(["💖", "⭐", "🐾", "✨"], c.x, c.y, 12);
+      speak(t("pet_kind", { animal: theWord(this.pet.name) }) + " " + praise());
+      roundComplete();
+    }
   }
 };
 
