@@ -618,7 +618,7 @@ function speak(text, opts = {}) {
   if (!opts.queue) speechSynthesis.cancel();
   lastSpeakEnd = performance.now() + Math.min(7000, 500 + text.length * 72);   // estimated finish time
   const u = new SpeechSynthesisUtterance(text + " ");   // trailing space: stops Chrome clipping the last word
-  u.lang = settings.lang === "es" ? "es-ES" : "en-US";
+  u.lang = settings.lang === "es" ? "es-MX" : "en-US";
   u.rate = opts.rate || 0.95;
   u.pitch = opts.pitch || 1.25;
   

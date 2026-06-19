@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "20";
+const APP_VERSION = "21";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
