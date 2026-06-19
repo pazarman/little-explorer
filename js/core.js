@@ -255,9 +255,8 @@ const DICT = {
     hideseek_show: "Put it {rel} the {spot}!",
     hideseek_say: "Put {buddy} {rel} the {spot}!",
     hideseek_retry: "Good try! Put it {rel} the {spot}!",
-    hideseek_win: "Yes! {rel} the {spot}!",
+    hideseek_win: "{rel} the {spot}!",
     hideseek_next: "Now put it {rel} the {spot}!",
-    hideseek_again: "Great! Now try a different spot!",
     rel_in: "in", rel_on: "on", rel_under: "under",
     basket: { es: "canasta", g: "f" },
     box: { es: "caja", g: "f" },
@@ -438,10 +437,9 @@ const DICT = {
     hideseek_show: "¡Ponlo {rel} {spot}!",
     hideseek_say: "¡Pon {buddy} {rel} {spot}!",
     hideseek_retry: "¡Buen intento! ¡Ponlo {rel} {spot}!",
-    hideseek_win: "¡Sí! ¡{rel} {spot}!",
+    hideseek_win: "¡{rel} {spot}!",
     hideseek_next: "¡Ahora ponlo {rel} {spot}!",
-    hideseek_again: "¡Muy bien! ¡Ahora prueba un lugar diferente!",
-    rel_in: "dentro de", rel_on: "encima de", rel_under: "debajo de"
+    rel_in: "dentro de la", rel_on: "encima de la", rel_under: "debajo de la"
   }
 };
 

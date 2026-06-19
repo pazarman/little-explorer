@@ -44,8 +44,6 @@ const HIDE_SPOTS = {
   }
 };
 
-const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-
 const hideseekLevel = {
   theme: "theme-pets",
   rounds: 5,
@@ -94,12 +92,12 @@ const hideseekLevel = {
 
   setPrompt(rel, isNext) {
     const relW = t("rel_" + rel);
-    const spotW = theWord(this.spot);
+    const spotW = word(this.spot);   // templates already include "the", so bare noun here
     setInstruction(
       "🐾 " + t(isNext ? "hideseek_next" : "hideseek_show", { rel: relW, spot: spotW }),
       isNext
         ? t("hideseek_next", { rel: relW, spot: spotW })
-        : t("hideseek_say", { buddy: cap(theWord(BUDDY)), rel: relW, spot: spotW })
+        : t("hideseek_say", { buddy: word(BUDDY), rel: relW, spot: spotW })
     );
   },
 
@@ -134,11 +132,12 @@ const hideseekLevel = {
     // tier 2: a contrasting second placement before the round completes.
     if (state.tier === 2 && this.step === 0 && this.second) {
       this.step = 1;
-      speak(t("hideseek_again"));
-      core.wait(() => this.beginSecond(this.second), 1200);
+      const nextRelW = t("rel_" + this.second);
+      speak(praise() + " " + t("hideseek_next", { rel: nextRelW, spot: word(this.spot) }));
+      core.wait(() => this.beginSecond(this.second), 1400);
       return;
     }
-    speak(t("hideseek_win") + " " + praise());
+    speak(praise() + " " + t("hideseek_win", { rel: t("rel_" + this.relation), spot: word(this.spot) }));
     roundComplete();
   },
 
