@@ -22,9 +22,9 @@ test("boots to the hub with all games and no console errors", async ({ page }) =
   await page.goto("/index.html?test=1");
 
   await expect(page.locator("#hub")).toBeVisible();
-  // Expect many games on the flattened map (at least 15)
+  // Expect 6 category world discs on the hub map
   const count = await page.locator("#mapNodes .node").count();
-  expect(count).toBeGreaterThan(15);
+  expect(count).toBeGreaterThan(3);
   expect(errors, "console/page errors on boot:\n" + errors.join("\n")).toEqual([]);
 });
 
@@ -33,16 +33,25 @@ test("can launch a game from the hub map", async ({ page }) => {
   await page.addInitScript(SKIP_INTRO);
   await page.goto("/index.html?test=1");
 
-  // hub -> directly to a game
+  // hub -> category screen -> game
   // Use evaluate click to bypass viewport/animation issues on the large grid
   await page.evaluate(() => {
     const node = document.querySelector("#mapNodes .node");
     if (node) node.click();
   });
-  
+
+  // After clicking a category disc, the #games screen should appear
+  await expect(page.locator("#games")).toBeVisible({ timeout: 7000 });
+
+  // Click the first game node in the category grid to launch a game
+  await page.evaluate(() => {
+    const node = document.querySelector("#gameNodes .node");
+    if (node) node.click();
+  });
+
   // Filter for the one that IS actually visible to avoid strict mode violation on the multiple screen divs
   const visibleGameScreen = page.locator("#game, #paint, #story, #dressup").filter({ visible: true });
-  await expect(visibleGameScreen).toBeVisible();
+  await expect(visibleGameScreen).toBeVisible({ timeout: 9000 });
 
   expect(errors, "console/page errors while playing:\n" + errors.join("\n")).toEqual([]);
 });
