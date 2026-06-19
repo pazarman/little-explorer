@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "19";
+const APP_VERSION = "20";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -75,20 +75,17 @@ function launchGame(id) {
 function buildHub() {
   $("mapPath").setAttribute("points", "");
   const wrap = $("mapNodes"); wrap.className = "cats"; wrap.innerHTML = "";
-  const seen = new Set();
   CATEGORIES.forEach(cat => {
-    visibleGames(cat).forEach(gid => {
-      if (seen.has(gid)) return;
-      seen.add(gid);
-      const g = GAMES[gid];
-      const b = document.createElement("button");
-      b.className = "node";
-      b.innerHTML = `<div class="node-disc b-${gid}"><span>${g.icon}</span></div>
-                     <div class="node-label">${locName(g)}</div>
-                     <div class="node-stars">${"⭐".repeat(Math.min(3, completions[gid] || 0))}</div>`;
-      b.onclick = () => { sfx.tap(); launchGame(gid); };
-      wrap.appendChild(b);
-    });
+    const games = visibleGames(cat);
+    if (!games.length) return;
+    const earned = games.reduce((s, gid) => s + Math.min(3, completions[gid] || 0), 0);
+    const b = document.createElement("button");
+    b.className = "node";
+    b.innerHTML = `<div class="node-disc ${cat.cls}"><span>${cat.icon}</span></div>
+                   <div class="node-label">${locName(cat)}</div>
+                   <div class="node-stars">${"⭐".repeat(Math.min(3, Math.round(earned / games.length)))}</div>`;
+    b.onclick = () => { sfx.tap(); openCategory(cat.id); };
+    wrap.appendChild(b);
   });
   renderQuest();
 }
@@ -115,7 +112,7 @@ function openCategory(id) {
 
 /* ================= Story mode ================= */
 const STORY = [
-  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. “I'm going on an adventure!” she said, and rode into the magical park.", es: "Una mañana soleada, {n} se subió a su bici. «¡Voy de aventura!», dijo, y entró al parque mágico.", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle"), task: "🚲" },
+  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. “I’m going on an adventure!” she said, and rode into the magical park.", es: "Una mañana soleada, {n} se subió a su bici. «¡Voy de aventura!», dijo, y entró al parque mágico.", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle"), task: "🚲" },
   { theme: "theme-snow",  art: "🏔️⛄❄️", text: "First she climbed a sparkly snow mountain. A friendly snowman waved hello. Together they counted the snowflakes: one, two, three!", es: "Primero subió una montaña de nieve brillante. Un muñeco de nieve la saludó. ¡Juntos contaron los copos de nieve: uno, dos, tres!", tapEmoji: ["❄️", "✨", "⛄"], tapSound: () => tone(880, 0, .2, "sine"), task: "⛄" },
   { theme: "theme-ocean", art: "🌊🐠🐬", text: "Next, {n} sailed across the bright blue ocean. Red, yellow, and green fish swam all around, and a dolphin did a happy flip!", es: "Después, {n} navegó por el océano azul. Peces rojos, amarillos y verdes nadaban alrededor, ¡y un delfín dio un saltito feliz!", tapEmoji: ["🐠", "💦", "🐬"], tapSound: () => tone(523, 0, .25, "sine"), task: "🐬" },
   { theme: "theme-pizza", art: "🍕🍝🧆", text: "All that adventuring made {n} hungry! She stopped in Yummy Town for a slice of pizza and spaghetti with three little meatballs.", es: "¡Tanta aventura le dio hambre a {n}! Paró en Pueblo Rico por una rebanada de pizza y espagueti con tres albóndigas.", tapEmoji: ["🍕", "😋", "🍝"], tapSound: () => tone(440, 0, .2, "triangle"), task: "🍕" },
