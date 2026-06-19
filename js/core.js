@@ -263,6 +263,11 @@ const DICT = {
     hideseek_retry: "Good try! Put it {rel} the {spot}!",
     hideseek_win: "{rel} the {spot}!",
     hideseek_next: "Now put it {rel} the {spot}!",
+    cups_watch: "Watch the ball! Where does it go?",
+    cups_find: "Where is the ball? Tap the cup!",
+    cups_nope: "Not there! Peek under another cup!",
+    cups_retry: "Keep looking! Find the ball!",
+    cups_win: "You found it! 🎉",
     rel_in: "in", rel_on: "on", rel_under: "under",
     basket: { es: "canasta", g: "f" },
     box: { es: "caja", g: "f" },
@@ -450,6 +455,11 @@ const DICT = {
     hideseek_retry: "¡Buen intento! ¡Ponlo {rel} {spot}!",
     hideseek_win: "¡{rel} {spot}!",
     hideseek_next: "¡Ahora ponlo {rel} {spot}!",
+    cups_watch: "¡Mira la pelota! ¿A dónde va?",
+    cups_find: "¿Dónde está la pelota? ¡Toca el vaso!",
+    cups_nope: "¡Ahí no! ¡Mira debajo de otro vaso!",
+    cups_retry: "¡Sigue buscando! ¡Encuentra la pelota!",
+    cups_win: "¡La encontraste! 🎉",
     rel_in: "dentro de la", rel_on: "encima de la", rel_under: "debajo de la"
   }
 };
