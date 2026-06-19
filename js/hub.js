@@ -1,4 +1,5 @@
 "use strict";
+const APP_VERSION = "18";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -285,6 +286,7 @@ function openSettings() {
   document.querySelectorAll("#segDiff button").forEach(b => b.classList.toggle("sel", b.dataset.d === settings.diff));
   document.querySelectorAll("#segVoice button").forEach(b => b.classList.toggle("sel", String(settings.voice) === b.dataset.v));
   document.querySelectorAll("#segMusic button").forEach(b => b.classList.toggle("sel", b.dataset.m === settings.music));
+  const vEl = $("settingsVersion"); if (vEl) vEl.textContent = "v" + APP_VERSION;
 }
 function showCharScreen(returnTo) {
   hideAllScreens();
@@ -401,6 +403,9 @@ $("setReset").onclick = () => {
     stickers.length = 0; sparks = 0; trips = 0; questShown = 0;
     saveCompletions(); saveStickers(); saveQuest(); buildHub();
   }
+};
+$("setRestart").onclick = () => {
+  if (confirm(t("settings_restart_confirm"))) { localStorage.clear(); location.reload(); }
 };
 $("setName").onclick = () => { $("settings").classList.add("hidden"); showNameScreen(NAME); };
 document.querySelectorAll("#segLang button").forEach(b => b.onclick = () => {

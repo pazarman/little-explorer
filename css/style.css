@@ -766,6 +766,8 @@
     font-size:clamp(16px,3.4vmin,24px); font-weight:bold; box-shadow:0 4px 0 rgba(0,0,0,.18); }
   #setDone { background:#ffd23e; color:#5b3c00; }
   #setReset { background:#f0a0a0; color:#7a1f1f; }
+  #setRestart { background:#f0c8a0; color:#7a3c00; }
+  .settings-version { font-size:clamp(11px,2.2vmin,15px); color:#bbb; text-align:center; margin:1.5vmin 0 0; letter-spacing:.04em; }
 
   /* ================= CELEBRATE ================= */
   #celebrate {
