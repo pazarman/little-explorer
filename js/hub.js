@@ -40,11 +40,38 @@ const CATEGORIES = [
   { id: "fantasy",icon: "🐉", name: "Make-Believe",    es: "Fantasía",          cls: "c-fantasy", games: ["dragon", "dino", "icecream"] },
   { id: "create", icon: "✏️", name: "Create",          es: "Crear",             cls: "c-create", games: ["paint", "story", "dressup"] }
 ];
+/* ── Narrator speech bubble ── */
+let _narratorTimer = null;
+function narratorSay(line) {
+  const el = $("buddySpeech"); if (!el) return;
+  if (_narratorTimer) { clearTimeout(_narratorTimer); _narratorTimer = null; }
+  el.textContent = line;
+  el.classList.remove("hidden", "narrator-out");
+  void el.offsetWidth;
+  speak(line);
+  _narratorTimer = setTimeout(() => {
+    el.classList.add("narrator-out");
+    setTimeout(() => el.classList.add("hidden"), 380);
+  }, 4200);
+}
+function gameCategory(gid) {
+  for (const cat of CATEGORIES) { if (cat.games.includes(gid)) return cat.id; }
+  return "create";
+}
+function hubGreeting() {
+  const last = localStorage.getItem("fionaLastGame");
+  if (last) { localStorage.removeItem("fionaLastGame"); return t("narrator_postgame"); }
+  return rand([t("narrator_back"), t("narrator_ready")]);
+}
+
 function launchGame(id) {
-  if (id === "paint") paint.show();
-  else if (id === "story") showStory();
-  else if (id === "dressup") dressup.show();
-  else startLevel(id);
+  narratorSay(t("narrator_cat_" + gameCategory(id)));
+  core.wait(() => {
+    if (id === "paint") paint.show();
+    else if (id === "story") showStory();
+    else if (id === "dressup") dressup.show();
+    else startLevel(id);
+  }, 900);
 }
 function buildHub() {
   $("mapPath").setAttribute("points", "");
@@ -310,6 +337,7 @@ function showHub() {
   applyName();
   buildHub();
   if (!questGreeted && settings.voice) { questGreeted = true; core.wait(questIntro, 800); }
+  else core.wait(() => narratorSay(hubGreeting()), 700);
 }
 function startLevel(name) {
   audio(); cleanupLevel();
