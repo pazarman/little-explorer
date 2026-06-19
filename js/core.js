@@ -629,8 +629,10 @@ let lastSpeakEnd = 0;
 function speak(text, opts = {}) {
   if (!settings.voice || !("speechSynthesis" in window)) { lastSpeakEnd = performance.now(); return; }
   if (!opts.queue) speechSynthesis.cancel();
-  lastSpeakEnd = performance.now() + Math.min(7000, 500 + text.length * 72);   // estimated finish time
-  const u = new SpeechSynthesisUtterance(text + " ");   // trailing space: stops Chrome clipping the last word
+  // Strip emoji before speaking — TTS reads them as "rainbow", "star", etc.
+  const spoken = text.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").replace(/\s{2,}/g, " ").trim();
+  lastSpeakEnd = performance.now() + Math.min(7000, 500 + spoken.length * 72);
+  const u = new SpeechSynthesisUtterance(spoken + " ");  // trailing space: stops Chrome clipping the last word
   u.lang = settings.lang === "es" ? "es-MX" : "en-US";
   u.rate = opts.rate || 0.95;
   u.pitch = opts.pitch || 1.25;
