@@ -49,8 +49,8 @@ const petmatchLevel = {
 /* LEVEL: Pet Care (nurture / cause-effect / SEL)
    Domain · Logic / cause–effect · SEL · Concept · Age band 2–3 · Success = Child associates tool with pet need
    and hears emotion named at start, after each action, and on completion. */
-const CARE_ICONS = { wash: "🧼", feed: "🦴", play: "🎾", cuddle: "🫲" };
-const CARE_NEED_ICONS = { wash: "🪷", feed: "🦴", play: "🎾", cuddle: "💞" };
+const CARE_ICONS = { wash: "🧼", feed: "🍖", play: "🎾", cuddle: "🫂" };
+const CARE_NEED_ICONS = { wash: "🫧", feed: "🍖", play: "🎾", cuddle: "💞" };
 const CARE_MOODS = ["😢", "😐", "🙂", "😊", "💖"];
 const petcareLevel = {
   theme: "theme-pets", rounds: 3,
@@ -87,8 +87,8 @@ const petcareLevel = {
     const moodEl = $("careMood");
     moodEl.textContent = CARE_MOODS[moodIdx];
     moodEl.classList.remove("bump"); void moodEl.offsetWidth; moodEl.classList.add("bump");
-    if (act === "wash")   { floaters(["🪷", "✨", "💧"], c.x, c.y, 9);       tone(700, 0, .2, "sine");     speak(t("pet_feels_clean",   { animal: theWord(this.pet.name) })); }
-    else if (act === "feed")   { floaters(["😋", "❤️", "🦴"], c.x, c.y, 6);  tone(400, 0, .2, "square");   speak(t("pet_feels_fed",     { animal: theWord(this.pet.name) })); }
+    if (act === "wash")   { floaters(["🫧", "✨", "💧"], c.x, c.y, 9);       tone(700, 0, .2, "sine");     speak(t("pet_feels_clean",   { animal: theWord(this.pet.name) })); }
+    else if (act === "feed")   { floaters(["😋", "❤️", "🍖"], c.x, c.y, 6);  tone(400, 0, .2, "square");   speak(t("pet_feels_fed",     { animal: theWord(this.pet.name) })); }
     else if (act === "play")   { floaters(["🎾", "⭐", "🐾"], c.x, c.y, 7);  tone(600, 0, .2, "triangle"); speak(t("pet_feels_played",  { animal: theWord(this.pet.name) })); }
     else                       { floaters(["💞", "💖", "✨"], c.x, c.y, 8);   tone(550, 0, .25, "sine");    speak(t("pet_feels_cuddled", { animal: theWord(this.pet.name) })); }
     // update needs strip
@@ -101,49 +101,94 @@ const petcareLevel = {
   }
 };
 
-/* LEVEL: Feed Pet (counting)
-   Domain · Number sense · Concept · Age band 3–4 · Success = Child counts 1–5 with 1:1 correspondence. */
+/**
+ * STEM Objective: Mathematics · One-to-One Correspondence / Equality · Age band 2–3 ·
+ * Success = Child drags treats to a second pet's bowl until it matches the first pet's count.
+ * The number is never stated — child must look and match, discovering what "same" means.
+ *
+ * Tier 2 adds extra treats in the pile (child must stop at the right count, not just drain it).
+ */
+
+/* ================= LEVEL: Pet Match (Give them the same) ================= */
+
 const PET_FOODS = [
   { e: "🐶", treat: "🦴", name: "puppy" }, { e: "🐱", treat: "🐟", name: "kitty" },
   { e: "🐰", treat: "🥕", name: "bunny" }, { e: "🐹", treat: "🌰", name: "hamster" }
 ];
+
 const petfeedLevel = {
   theme: "theme-pets", rounds: 5,
+
   startRound() {
     this.mistakes = 0;
-    if (state.round === 0) this.pet = rand(PET_FOODS);
-    const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
-    const need = counts[state.round];
-    this.need = need; this.fed = 0;
-    setInstruction(t("give_pet_show", { animal: theWord(this.pet.name), count: need, x: words("treat", need) }), t("give_pet_show", { animal: theWord(this.pet.name), count: need, x: words("treat", need) }));
-    $("playArea").innerHTML = `<div class="dragon-wrap"><div class="dragon" id="petEl">${this.pet.e}</div><div class="treat-row" id="treatRow"></div></div>`;
-    for (let i = 0; i < need; i++) {
-      const t = document.createElement("button");
-      t.className = "treat"; t.textContent = this.pet.treat;
-      makeDraggable(t, (el, ev, info) => this.release(el, ev, info));
-      $("treatRow").appendChild(t);
+    this.fed = 0;
+    if (state.round === 0) {
+      const shuffled = shuffle([...PET_FOODS]);
+      this.leftPet = shuffled[0]; this.rightPet = shuffled[1];
+    }
+    const counts = [[1,2,2,3,3],[2,3,4,4,5],[3,4,5,6,7]][state.tier];
+    this.need = counts[state.round];
+    const pileSize = state.tier < 2 ? this.need : this.need + 2;
+
+    setInstruction(
+      t("same_pet_show", { left: theWord(this.leftPet.name), right: theWord(this.rightPet.name) }),
+      t("same_pet_say",  { left: theWord(this.leftPet.name), right: theWord(this.rightPet.name) })
+    );
+
+    const leftTreats = Array(this.need).fill(null)
+      .map(() => `<span class="bowl-treat">${this.leftPet.treat}</span>`).join("");
+
+    $("playArea").innerHTML = `<div class="match-wrap">
+      <div class="match-sides">
+        <div class="match-side">
+          <div class="match-pet-icon">${this.leftPet.e}</div>
+          <div class="match-bowl" id="leftBowl">${leftTreats}</div>
+        </div>
+        <div class="match-side">
+          <div class="match-pet-icon">${this.rightPet.e}</div>
+          <div class="match-bowl match-drop" id="rightBowl"></div>
+        </div>
+      </div>
+      <div class="treat-row" id="treatPile"></div>
+    </div>`;
+
+    for (let i = 0; i < pileSize; i++) {
+      const tr = document.createElement("button");
+      tr.className = "treat"; tr.textContent = this.rightPet.treat;
+      makeDraggable(tr, (el, ev, info) => this.release(el, ev, info));
+      $("treatPile").appendChild(tr);
     }
   },
+
   release(el, ev, info) {
     if (state.busy) { info.reset(); return; }
-    if (inside(centerOf(el), $("petEl")) || !info.moved) this.feed(el, ev);
+    if (this.fed >= this.need) { info.reset(); return; }
+    if (inside(centerOf(el), $("rightBowl")) || !info.moved) this.feed(el, ev);
     else {
       this.mistakes++;
       sfx.bad(); info.reset();
-      if (this.mistakes === 2) {
-        $("petEl").classList.add("hint-highlight");
-      } else if (this.mistakes >= 3) {
-        wiggle($("petEl"));
-      }
+      if (this.mistakes >= 2) $("rightBowl").classList.add("hint-highlight");
+      if (this.mistakes >= 3) wiggle($("rightBowl"));
     }
   },
+
   feed(el, ev) {
     el.style.visibility = "hidden"; el.classList.add("on-plate");
-    const d = $("petEl"); d.classList.remove("chomp"); void d.offsetWidth; d.classList.add("chomp");
-    sfx.tap(); tone(300, 0, .15, "square", .14); miniStar(ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2);
+    const bowl = $("rightBowl");
+    const sp = document.createElement("span");
+    sp.className = "bowl-treat"; sp.textContent = this.rightPet.treat;
+    bowl.appendChild(sp);
+    sfx.tap(); tone(300 + this.fed * 30, 0, .15, "square", .14);
+    miniStar(ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2);
     this.fed++;
-    if (this.fed < this.need) speak(numWord(this.fed) + "!");
-    else { floaters(["❤️", "✨", "🐾"], innerWidth / 2, innerHeight / 2.5, 8); speak(t("count_x", { count: this.need, x: words("treat", this.need) }) + " " + praise()); roundComplete(); }
+    if (this.fed < this.need) {
+      speak(numWord(this.fed) + "!");
+    } else {
+      bowl.classList.add("match-done");
+      floaters(["❤️", "✨", "🐾"], innerWidth / 2, innerHeight / 2.5, 8);
+      speak(t("same_pet_win", { count: this.need }) + " " + praise());
+      roundComplete();
+    }
   }
 };
 
