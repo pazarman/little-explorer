@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "22";
+const APP_VERSION = "23";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -112,13 +112,13 @@ function openCategory(id) {
 
 /* ================= Story mode ================= */
 const STORY = [
-  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. \"I'm going on an adventure!\" she said, and rode into the magical park.", es: "Una mañana soleada, {n} se subió a su bici. «¡Voy de aventura!», dijo, y entró al parque mágico.", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle"), task: "🚲" },
+  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. “I'm going on an adventure!” she said, and rode into the magical park.", es: "Una mañana soleada, {n} se subió a su bici. «¡Voy de aventura!», dijo, y entró al parque mágico.", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle"), task: "🚲" },
   { theme: "theme-snow",  art: "🏔️⛄❄️", text: "First she climbed a sparkly snow mountain. A friendly snowman waved hello. Together they counted the snowflakes: one, two, three!", es: "Primero subió una montaña de nieve brillante. Un muñeco de nieve la saludó. ¡Juntos contaron los copos de nieve: uno, dos, tres!", tapEmoji: ["❄️", "✨", "⛄"], tapSound: () => tone(880, 0, .2, "sine"), task: "⛄" },
   { theme: "theme-ocean", art: "🌊🐠🐬", text: "Next, {n} sailed across the bright blue ocean. Red, yellow, and green fish swam all around, and a dolphin did a happy flip!", es: "Después, {n} navegó por el océano azul. Peces rojos, amarillos y verdes nadaban alrededor, ¡y un delfín dio un saltito feliz!", tapEmoji: ["🐠", "💦", "🐬"], tapSound: () => tone(523, 0, .25, "sine"), task: "🐬" },
   { theme: "theme-pizza", art: "🍕🍝🧆", text: "All that adventuring made {n} hungry! She stopped in Yummy Town for a slice of pizza and spaghetti with three little meatballs.", es: "¡Tanta aventura le dio hambre a {n}! Paró en Pueblo Rico por una rebanada de pizza y espagueti con tres albóndigas.", tapEmoji: ["🍕", "😋", "🍝"], tapSound: () => tone(440, 0, .2, "triangle"), task: "🍕" },
   { theme: "theme-music", art: "🐸🐱🐮", text: "In the meadow, the animal band was playing! The frog went ribbit, the cat went meow, and the cow went moo. {n} danced and danced.", es: "En el prado, ¡la banda de animales tocaba! La rana hacía croac, el gato miau y la vaca muu. {n} bailó y bailó.", tapEmoji: ["🎵", "🎶", "💃"], tapSound: () => speakAnimal(rand(["frog", "cat", "cow", "duck"]), { queue: true }), task: "🐱" },
   { theme: "theme-space", art: "🚀🌙⭐", text: "Then {n} put on a shiny space helmet and zoomed to the moon in a rocket! Five, four, three, two, one... blast off! She counted the twinkly stars up high.", es: "Luego {n} se puso un casco espacial brillante y voló a la luna en un cohete. ¡Cinco, cuatro, tres, dos, uno... despegue! Contó las estrellas brillantes en lo alto.", tapEmoji: ["⭐", "🚀", "🪐"], tapSound: () => tone(130, 0, .5, "sawtooth", .15), task: "🚀" },
-  { theme: "theme-story", art: "🌈⭐💖", text: "As the sun set, {n} flew home, happy and sleepy. \"What a wonderful day!\" she yawned. Goodnight, {n}. The End. 💖", es: "Cuando el sol se ocultó, {n} voló a casa, feliz y con sueño. «¡Qué día tan maravilloso!», bostezó. Buenas noches, {n}. Fin. 💖", tapEmoji: ["⭐", "🌙", "💖"], tapSound: () => sfx.good(), last: true }
+  { theme: "theme-story", art: "🌈⭐💖", text: "As the sun set, {n} flew home, happy and sleepy. “What a wonderful day!” she yawned. Goodnight, {n}. The End. 💖", es: "Cuando el sol se ocultó, {n} voló a casa, feliz y con sueño. «¡Qué día tan maravilloso!», bostezó. Buenas noches, {n}. Fin. 💖", tapEmoji: ["⭐", "🌙", "💖"], tapSound: () => sfx.good(), last: true }
 ];
 const storyText = p => fillName(curLang() === "es" ? p.es : p.text);
 let storyPage = 0, storySolved = false;

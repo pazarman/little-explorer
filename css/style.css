@@ -605,10 +605,41 @@
                     filter:drop-shadow(0 4px 5px rgba(0,0,0,0.4)); transition:transform 0.2s ease; }
   .hideseek-buddy.on-plate { animation:bounceIn 0.4s; }
 
-  /* ----- dino eggs ----- */
+  /* ----- dino eggs (flash count / subitizing) ----- */
   .dino-egg { position:absolute; border:none; background:none; font-size:clamp(46px,11vmin,86px); z-index:5;
               animation:floaty 3s ease-in-out infinite; filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)); line-height:1; }
   .dino-egg.hatched { animation:bounceIn .5s; }
+  .flash-wrap { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+                justify-content:center; gap:5vmin; z-index:5; }
+  .flash-nest { position:relative; width:clamp(200px,46vmin,340px); height:clamp(200px,46vmin,340px); }
+  .flash-eggs { position:absolute; inset:0; }
+  .flash-egg { position:absolute; font-size:clamp(42px,11vmin,78px); line-height:1;
+               transform:translate(-50%,-50%); filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
+  .flash-egg.hatched { animation:bounceIn .5s; }
+  .flash-cover { position:absolute; inset:0; border-radius:50% 50% 45% 45%;
+                 background:radial-gradient(circle at 42% 36%, #c49558, #7a4e20);
+                 box-shadow:inset 0 6px 0 rgba(255,255,255,.12), 0 6px 14px rgba(0,0,0,.4);
+                 opacity:0; transition:opacity 0.45s ease; pointer-events:none; }
+  .flash-cover.visible { opacity:1; pointer-events:auto; }
+  .flash-cards { display:flex; gap:4vmin; justify-content:center; }
+  .flash-card { border:none; border-radius:22px; background:#fff; box-shadow:0 6px 0 rgba(0,0,0,.26);
+                width:clamp(72px,17vmin,122px); height:clamp(72px,17vmin,122px);
+                font-size:clamp(38px,10vmin,72px); font-weight:bold; color:#333; }
+  .flash-card:active { transform:scale(.91); box-shadow:0 3px 0 rgba(0,0,0,.26); }
+
+  /* ----- pet match (give them the same) ----- */
+  .match-wrap { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+                justify-content:center; gap:4vmin; z-index:5; }
+  .match-sides { display:flex; gap:5vmin; align-items:flex-start; justify-content:center; }
+  .match-side { display:flex; flex-direction:column; align-items:center; gap:2vmin; }
+  .match-pet-icon { font-size:clamp(60px,15vmin,110px); line-height:1; filter:drop-shadow(0 4px 5px rgba(0,0,0,.3)); }
+  .match-bowl { display:flex; flex-wrap:wrap; gap:1.2vmin; justify-content:center; align-items:center;
+                min-width:clamp(80px,20vmin,160px); min-height:clamp(50px,13vmin,96px);
+                background:rgba(255,255,255,.28); border-radius:16px; padding:1.6vmin 2vmin; }
+  .bowl-treat { font-size:clamp(26px,7vmin,50px); line-height:1.1; }
+  .match-bowl.match-drop { border:3px dashed rgba(255,255,255,.7); }
+  .match-bowl.match-done { border-color:#ffd64d; background:rgba(255,214,77,.32); animation:bowlPop .4s ease; }
+  @keyframes bowlPop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
 
   /* ----- ice cream (stacking toy) ----- */
   .ice-stage { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
