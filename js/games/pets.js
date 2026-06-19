@@ -153,34 +153,34 @@ const bodyLevel = {
   theme: "theme-trace", rounds: 5,
   parts: [
     { name: "head",     x: 100, y: 96,  r: 58 },
-    { name: "hand",     x: 46,  y: 98,  r: 15 },
-    { name: "hand",     x: 154, y: 98,  r: 15 },
-    { name: "foot",     x: 74,  y: 380, r: 20 },
-    { name: "foot",     x: 126, y: 380, r: 20 },
-    { name: "tummy",    x: 100, y: 230, r: 35 },
+    { name: "hand",     x: 18,  y: 278, r: 22 },
+    { name: "hand",     x: 182, y: 278, r: 22 },
+    { name: "foot",     x: 83,  y: 385, r: 18 },
+    { name: "foot",     x: 117, y: 385, r: 18 },
+    { name: "tummy",    x: 100, y: 235, r: 35 },
     { name: "eye",      x: 80,  y: 98,  r: 12 },
     { name: "eye",      x: 120, y: 98,  r: 12 },
     { name: "nose",     x: 100, y: 110, r: 10 },
-    { name: "mouth",    x: 100, y: 128, r: 15 },
+    { name: "mouth",    x: 100, y: 129, r: 14 },
     { name: "ear",      x: 42,  y: 96,  r: 14 },
     { name: "ear",      x: 158, y: 96,  r: 14 },
     { name: "hair",     x: 100, y: 45,  r: 35 },
-    { name: "arm",      x: 65,  y: 160, r: 20 },
-    { name: "arm",      x: 135, y: 160, r: 20 },
-    { name: "leg",      x: 80,  y: 320, r: 25 },
-    { name: "leg",      x: 120, y: 320, r: 25 },
-    { name: "knee",     x: 80,  y: 320, r: 15 },
-    { name: "knee",     x: 120, y: 320, r: 15 },
-    { name: "shoulder", x: 70,  y: 175, r: 18 },
-    { name: "shoulder", x: 130, y: 175, r: 18 },
-    { name: "toe",      x: 74,  y: 380, r: 10 },
-    { name: "toe",      x: 126, y: 380, r: 10 },
-    { name: "teeth",    x: 100, y: 128, r: 10 },
-    { name: "neck",     x: 100, y: 165, r: 12 },
-    { name: "tongue",   x: 100, y: 135, r: 8 },
-    { name: "chin",     x: 100, y: 145, r: 12 },
-    { name: "cheek",    x: 72,  y: 116, r: 12 },
-    { name: "cheek",    x: 128, y: 116, r: 12 }
+    { name: "arm",      x: 34,  y: 235, r: 25 },
+    { name: "arm",      x: 166, y: 235, r: 25 },
+    { name: "leg",      x: 75,  y: 320, r: 25 },
+    { name: "leg",      x: 125, y: 320, r: 25 },
+    { name: "knee",     x: 75,  y: 328, r: 14 },
+    { name: "knee",     x: 125, y: 328, r: 14 },
+    { name: "shoulder", x: 56,  y: 188, r: 18 },
+    { name: "shoulder", x: 144, y: 188, r: 18 },
+    { name: "toe",      x: 83,  y: 387, r: 13 },
+    { name: "toe",      x: 117, y: 387, r: 13 },
+    { name: "teeth",    x: 100, y: 122, r: 10 },
+    { name: "neck",     x: 100, y: 163, r: 12 },
+    { name: "tongue",   x: 100, y: 137, r: 9 },
+    { name: "chin",     x: 100, y: 150, r: 11 },
+    { name: "cheek",    x: 68,  y: 116, r: 13 },
+    { name: "cheek",    x: 132, y: 116, r: 13 }
   ],
   tiers: [
     ["head", "hand", "tummy", "foot", "leg"],
@@ -192,8 +192,8 @@ const bodyLevel = {
     this.target = rand(pool);
     const isFace = ["eye", "nose", "mouth", "ear", "teeth", "neck", "tongue", "chin", "cheek", "hair"].includes(this.target);
     setInstruction("📍 " + t("tap_part", { part: theWord(this.target) }), t("tap_part", { part: theWord(this.target) }));
-    
-    const idx = { skin: 0, face: 0, hair: 1, hat: 0, glasses: 0, outfit: 3, friend: 0 };
+
+    const idx = { skin: 0, face: 1, hair: 1, hat: 0, glasses: 0, outfit: 3, friend: 0 };
     $("playArea").innerHTML = `<div class="body-wrap">
       <div class="body-doll${isFace ? " zoom-face" : ""}" id="bodyDoll">${dFullBodySVG(idx)}</div>
       <svg class="body-overlay${isFace ? " zoom-face" : ""}" viewBox="0 0 200 400" id="bodyOverlay"></svg>

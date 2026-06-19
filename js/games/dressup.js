@@ -22,7 +22,7 @@ function dEye(cx, kind) {
 const dMouth = {
   smile: `<path d="M84 119 Q100 137 116 119" stroke="#9c3b2a" stroke-width="5" fill="none" stroke-linecap="round"/>`,
   small: `<path d="M90 122 Q100 130 110 122" stroke="#9c3b2a" stroke-width="4.5" fill="none" stroke-linecap="round"/>`,
-  big: `<path d="M84 117 Q100 121 116 117 Q113 140 100 140 Q87 140 84 117 Z" fill="#9c3b2a"/><path d="M91 133 Q100 143 109 133 Z" fill="#ff7d8a"/>`,
+  big: `<path d="M84 117 Q100 121 116 117 Q113 140 100 140 Q87 140 84 117 Z" fill="#9c3b2a"/><rect x="86" y="118" width="28" height="8" rx="3" fill="#fffef5"/><line x1="100" y1="118" x2="100" y2="126" stroke="#e8d8c8" stroke-width="2"/><path d="M91 133 Q100 143 109 133 Z" fill="#ff7d8a"/>`,
   o: `<ellipse cx="100" cy="125" rx="7" ry="9" fill="#9c3b2a"/>`,
   tongue: `<path d="M84 119 Q100 133 116 119" stroke="#9c3b2a" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M96 125 Q100 138 104 125 Z" fill="#ff7d8a"/>`
 };
@@ -103,11 +103,19 @@ function dSlotSVG(cat, opt, skin) {
 function dFullBodySVG(idx) {
   const skin = DRESS.skin.opts[idx.skin], outfit = DRESS.outfit.opts[idx.outfit];
   return `<svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="100" cy="390" rx="40" ry="6" fill="rgba(0,0,0,.1)"/>
+    <ellipse cx="100" cy="392" rx="40" ry="6" fill="rgba(0,0,0,.1)"/>
     <path d="M60 280 L70 380 L90 380 L80 280 Z" fill="${skin}"/>
     <path d="M140 280 L130 380 L110 380 L120 280 Z" fill="${skin}"/>
+    <ellipse cx="75" cy="328" rx="10" ry="7" fill="rgba(0,0,0,.07)"/>
+    <ellipse cx="125" cy="328" rx="10" ry="7" fill="rgba(0,0,0,.07)"/>
     <path d="M75 380 L95 380 A5 5 0 0 1 95 390 L75 390 Z" fill="${skin}"/>
     <path d="M125 380 L105 380 A5 5 0 0 0 105 390 L125 390 Z" fill="${skin}"/>
+    <circle cx="78" cy="384" r="3" fill="rgba(0,0,0,.12)"/><circle cx="83" cy="382" r="3" fill="rgba(0,0,0,.12)"/><circle cx="88" cy="382" r="2.5" fill="rgba(0,0,0,.12)"/><circle cx="93" cy="383" r="2.5" fill="rgba(0,0,0,.12)"/>
+    <circle cx="122" cy="384" r="3" fill="rgba(0,0,0,.12)"/><circle cx="117" cy="382" r="3" fill="rgba(0,0,0,.12)"/><circle cx="112" cy="382" r="2.5" fill="rgba(0,0,0,.12)"/><circle cx="107" cy="383" r="2.5" fill="rgba(0,0,0,.12)"/>
+    <path d="M56 195 Q30 238 20 270" stroke="${skin}" stroke-width="22" fill="none" stroke-linecap="round"/>
+    <path d="M144 195 Q170 238 180 270" stroke="${skin}" stroke-width="22" fill="none" stroke-linecap="round"/>
+    <circle cx="18" cy="278" r="16" fill="${skin}"/>
+    <circle cx="182" cy="278" r="16" fill="${skin}"/>
     <g class="L-outfit"><path d="M56 292 Q52 182 100 176 Q148 182 144 292 Z" fill="${outfit}" stroke="rgba(0,0,0,.14)" stroke-width="2"/><path d="M84 178 Q100 191 116 178" fill="none" stroke="rgba(0,0,0,.13)" stroke-width="3"/></g>
     <g class="L-skin"><rect x="91" y="150" width="18" height="26" rx="9" fill="${skin}"/><circle cx="46" cy="98" r="12" fill="${skin}"/><circle cx="154" cy="98" r="12" fill="${skin}"/><ellipse cx="100" cy="96" rx="58" ry="60" fill="${skin}"/></g>
     <g class="L-hair">${dHairSVG(DRESS.hair.opts[idx.hair])}</g>
