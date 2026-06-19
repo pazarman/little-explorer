@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "23";
+const APP_VERSION = "24";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -20,8 +20,8 @@ const GAMES = {
   sort:    { icon: "🪐", name: "Big & Small", es: "Grande y Pequeño", lvl: 0 }, pattern: { icon: "🔮", name: "Patterns", es: "Patrones", lvl: 2 },
   sortkind:{ icon: "🧺", name: "Sort It", es: "A Ordenar", lvl: 1 },
   paint:   { icon: "🎨", name: "Paint", es: "Pintar", lvl: 0 },     story:   { icon: "📖", name: "Story", es: "Cuento", lvl: 0 },
-  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón", lvl: 0 }, dino:  { icon: "🦕", name: "Dino Eggs", es: "Huevos de Dino", lvl: 0 },
-  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado", lvl: 0 },  petfeed: { icon: "🦴", name: "Feed Pet", es: "Alimenta", lvl: 1 },
+  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón", lvl: 0 }, dino:  { icon: "🦕", name: "Flash Count", es: "Cuenta Rápida", lvl: 0 },
+  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado", lvl: 0 },  petfeed: { icon: "🦴", name: "Same Treats", es: "Mismos Premios", lvl: 1 },
   petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca", lvl: 0 },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida", lvl: 0 },
   body:    { icon: "😊", name: "Body Match", es: "El Cuerpo", lvl: 0 },
   dressup: { icon: "👗", name: "Dress Up", es: "Vestir", lvl: 0 },
