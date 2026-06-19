@@ -591,15 +591,18 @@
   .body-overlay.zoom-face { transform: scale(2.2) translateY(5%); }
 
   /* ----- hide and seek ----- */
-  .hideseek-wrap { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5vmin; z-index:5; }
-  .hideseek-spots { display:flex; gap:6vmin; justify-content:center; align-items:flex-end; width:100%; height:40vh; }
-  .hide-spot-container { position:relative; width:clamp(120px, 30vmin, 240px); height:100%; display:flex; align-items:flex-end; }
-  .hide-spot-container svg { width:100%; height:auto; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
-  .rel-zone { position:absolute; left:50%; transform:translateX(-50%); width:80%; height:30%; z-index:6; }
-  .zone-in { bottom:15%; height:40%; border-radius:50%; }
-  .zone-on { bottom:85%; border-radius:10px; }
-  .zone-under { bottom:-10%; background:rgba(0,0,0,0.05); border-radius:50%; }
-  .hideseek-buddy { z-index:10; filter:drop-shadow(0 4px 5px rgba(0,0,0,0.4)); transition: transform 0.2s ease; }
+  .hideseek-wrap { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6vmin; z-index:5; }
+  .hideseek-stage { position:relative; }
+  .hide-spot { position:relative; width:clamp(170px, 42vmin, 320px); height:clamp(170px, 42vmin, 320px); }
+  .hide-spot svg { position:absolute; inset:0; width:100%; height:100%; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+  /* Soft, visible drop ghosts at the real in/on/under positions. Generous (~38% of the box). */
+  .hs-zone { position:absolute; width:38%; height:38%; transform:translate(-50%,-50%); border-radius:50%;
+             border:3px dashed rgba(255,255,255,0.9); background:rgba(255,255,255,0.16);
+             box-shadow:inset 0 0 0 4px rgba(0,0,0,0.04); z-index:6; pointer-events:none; }
+  .hs-zone.correct-hint { animation:hsPulse 1s ease-in-out infinite; border-color:#ffd64d; background:rgba(255,214,77,0.32); }
+  @keyframes hsPulse { 0%,100% { transform:translate(-50%,-50%) scale(1); } 50% { transform:translate(-50%,-50%) scale(1.12); } }
+  .hideseek-buddy { z-index:10; font-size:clamp(56px, 14vmin, 88px); line-height:1; cursor:pointer;
+                    filter:drop-shadow(0 4px 5px rgba(0,0,0,0.4)); transition:transform 0.2s ease; }
   .hideseek-buddy.on-plate { animation:bounceIn 0.4s; }
 
   /* ----- dino eggs ----- */
@@ -842,4 +845,5 @@
     .floater { animation: none !important; opacity: 0 !important; }
     .count-badge.bump, .yum-badge.bump, .count-num.bump { animation: none !important; }
     .mkey.glow, .numkey.glow { animation: none !important; background: #ffeeaa !important; }
+    .hs-zone.correct-hint { animation: none !important; border-color:#ffd64d !important; background:rgba(255,214,77,0.32) !important; }
   }

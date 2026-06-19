@@ -252,9 +252,12 @@ const DICT = {
     sortkind_say: "Put each thing where it belongs!",
     tap_part: "Tap {part}!",
     yes_part: "Yes! {part}!",
-    hideseek_show: "Put it {rel} {spot}!",
-    hideseek_say: "Put {buddy} {rel} {spot}!",
-    hideseek_retry: "Good try! Put it {rel} {spot}!",
+    hideseek_show: "Put it {rel} the {spot}!",
+    hideseek_say: "Put {buddy} {rel} the {spot}!",
+    hideseek_retry: "Good try! Put it {rel} the {spot}!",
+    hideseek_win: "Yes! {rel} the {spot}!",
+    hideseek_next: "Now put it {rel} the {spot}!",
+    hideseek_again: "Great! Now try a different spot!",
     rel_in: "in", rel_on: "on", rel_under: "under",
     basket: { es: "canasta", g: "f" },
     box: { es: "caja", g: "f" },
@@ -431,7 +434,14 @@ const DICT = {
     sortcolor_say: "¡Pon cada cosa en la canasta de su color!",
     sortkind_say: "¡Pon cada cosa donde va!",
     tap_part: "¡Toca {part}!",
-    yes_part: "¡Sí! ¡{part}!"
+    yes_part: "¡Sí! ¡{part}!",
+    hideseek_show: "¡Ponlo {rel} {spot}!",
+    hideseek_say: "¡Pon {buddy} {rel} {spot}!",
+    hideseek_retry: "¡Buen intento! ¡Ponlo {rel} {spot}!",
+    hideseek_win: "¡Sí! ¡{rel} {spot}!",
+    hideseek_next: "¡Ahora ponlo {rel} {spot}!",
+    hideseek_again: "¡Muy bien! ¡Ahora prueba un lugar diferente!",
+    rel_in: "dentro de", rel_on: "encima de", rel_under: "debajo de"
   }
 };
 
@@ -485,7 +495,10 @@ const VOC = {
   toe:{es:"dedo del pie",g:"m"}, teeth:{es:"dientes",g:"m"}, neck:{es:"cuello",g:"m"},
   tongue:{es:"lengua",g:"f"}, chin:{es:"barbilla",g:"f"}, cheek:{es:"mejilla",g:"f"},
   // misc
-  treat:{es:"premio",g:"m"}, scoop:{es:"bola",g:"f"}, flower:{es:"flor",g:"f"}, dino:{es:"dino",g:"m"}
+  treat:{es:"premio",g:"m"}, scoop:{es:"bola",g:"f"}, flower:{es:"flor",g:"f"}, dino:{es:"dino",g:"m"},
+  // buddies (used in hide & seek "put {buddy} …")
+  snowman:{es:"muñeco de nieve",g:"m"}, princess:{es:"princesa",g:"f"}, unicorn:{es:"unicornio",g:"m"},
+  robot:{es:"robot",g:"m"}, bear:{es:"oso",g:"m"}, dragon:{es:"dragón",g:"m"}
 };
 const COLOR_ES = { red:"rojo", blue:"azul", yellow:"amarillo", green:"verde", orange:"naranja",
   purple:"morado", pink:"rosa", brown:"marrón", gray:"gris", black:"negro", white:"blanco" };
