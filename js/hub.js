@@ -1,4 +1,5 @@
 "use strict";
+const APP_VERSION = "19";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -31,13 +32,11 @@ const diffLevel = () => settings.diff === "easy" ? 0 : settings.diff === "med" ?
 const gameVisible = gid => (GAMES[gid].lvl || 0) <= diffLevel();
 const visibleGames = cat => cat.games.filter(gameVisible);
 const CATEGORIES = [
-  { id: "num",    icon: "🔢", name: "Numbers",        es: "Números",          cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
+  { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",          cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
   { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
-  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   cls: "c-brain",  games: ["memory", "pattern", "sort", "sortkind", "hideseek"] },
+  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   cls: "c-brain",  games: ["memory", "pattern", "sort", "sortkind"] },
   { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          cls: "c-animal", games: ["music", "whosays", "dino", "body"] },
   { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
-  { id: "space",  icon: "🚀", name: "Space",           es: "Espacio",           cls: "c-space",  games: ["rocket", "sort", "pattern"] },
-  { id: "fantasy",icon: "🐉", name: "Make-Believe",    es: "Fantasía",          cls: "c-fantasy", games: ["dragon", "dino", "icecream"] },
   { id: "create", icon: "✏️", name: "Create",          es: "Crear",             cls: "c-create", games: ["paint", "story", "dressup"] }
 ];
 /* ── Narrator speech bubble ── */
@@ -285,6 +284,7 @@ function openSettings() {
   document.querySelectorAll("#segDiff button").forEach(b => b.classList.toggle("sel", b.dataset.d === settings.diff));
   document.querySelectorAll("#segVoice button").forEach(b => b.classList.toggle("sel", String(settings.voice) === b.dataset.v));
   document.querySelectorAll("#segMusic button").forEach(b => b.classList.toggle("sel", b.dataset.m === settings.music));
+  const vEl = $("settingsVersion"); if (vEl) vEl.textContent = "v" + APP_VERSION;
 }
 function showCharScreen(returnTo) {
   hideAllScreens();
@@ -401,6 +401,9 @@ $("setReset").onclick = () => {
     stickers.length = 0; sparks = 0; trips = 0; questShown = 0;
     saveCompletions(); saveStickers(); saveQuest(); buildHub();
   }
+};
+$("setRestart").onclick = () => {
+  if (confirm(t("settings_restart_confirm"))) { localStorage.clear(); location.reload(); }
 };
 $("setName").onclick = () => { $("settings").classList.add("hidden"); showNameScreen(NAME); };
 document.querySelectorAll("#segLang button").forEach(b => b.onclick = () => {
