@@ -36,7 +36,8 @@
   body.theme-pets   { background:linear-gradient(#ffe6a8, #ffd2e0 55%, #b8e6c0); }
   body.theme-dressup { background:linear-gradient(#ffe0f2, #e2e6ff 60%, #d8f0e0); }
   body.theme-sort   { background:linear-gradient(#5aa9d6, #9fd0e8 55%, #dff0f8); }
-  body.theme-cups   { background:linear-gradient(#ffd98a, #f7b267 55%, #e07a5f); }
+  body.theme-cups     { background:linear-gradient(#ffd98a, #f7b267 55%, #e07a5f); }
+  body.theme-nightday { background:linear-gradient(165deg, #87ceeb 0%, #4a7fbf 40%, #1a3366 100%); }
 
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
             align-items:center; justify-content:center; padding:2vmin;
@@ -114,7 +115,8 @@
   .b-petmatch{ background:linear-gradient(#ffb38f,#e06a3a); }
   .b-petcare { background:linear-gradient(#7fd0e0,#2f8ea0); }
   .b-dressup { background:linear-gradient(#ff9ed6,#c84398); }
-  .b-sortkind{ background:linear-gradient(#ffc87a,#e08a30); }
+  .b-sortkind { background:linear-gradient(#ffc87a,#e08a30); }
+  .b-nightday { background:linear-gradient(#4ab3e8,#1a3366); }
   /* .b-body is also used as a balloon shape in bike.js; override to circle+color for hub disc */
   .node-disc.b-body { border-radius:50%; background:linear-gradient(#7fd4c0,#2f9e8a); }
   .c-fantasy{ background:linear-gradient(#b57fe0,#6a3a9a); }

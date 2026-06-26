@@ -117,7 +117,7 @@ This file is the shared state between three agents and you:
 - **File:** `js/games/bubbles.js`
 - **Fun factor:** Bubbles float around the screen, pop with a gentle sound and sparkle — pure toddler joy
 
-### [READY] Night & Day Sort
+### [IN_REVIEW] Night & Day Sort
 - **STEM:** Scientific thinking · day/night cycle · sorting by time context · age 2–4
 - **Success:** Child can sort objects and activities (sun, pajamas, moon, toothbrush, breakfast) into a Day basket and a Night basket
 - **Fills gap:** Scientific thinking (observation of natural patterns) — concrete, age-appropriate entry point

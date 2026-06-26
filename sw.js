@@ -1,5 +1,5 @@
 // Bump CACHE whenever you ship an update (forces old caches to clear).
-const CACHE = "little-explorer-v26";
+const CACHE = "little-explorer-v27";
 const ASSETS = [
   "./", "./index.html", "./manifest.json", "./icon.svg",
   "./css/style.css",
@@ -11,7 +11,7 @@ const ASSETS = [
   "./js/games/rocket.js", "./js/games/sort.js", "./js/games/dragon.js",
   "./js/games/dino.js", "./js/games/icecream.js", "./js/games/pets.js",
   "./js/games/paint.js", "./js/games/dressup.js", "./js/games/hideseek.js",
-  "./js/games/cups.js"
+  "./js/games/cups.js", "./js/games/nightday.js"
 ];
 
 self.addEventListener("install", e => {
