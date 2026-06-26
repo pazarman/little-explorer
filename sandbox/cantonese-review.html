@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#8fd5f7">
+<title>Cantonese Glued-Sentence Review · 廣東話組合句子評估</title>
+<style>
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; font-family:system-ui,-apple-system,"PingFang HK","Noto Sans HK","Microsoft JhengHei",sans-serif;
+         background:linear-gradient(#ffe6a8,#ffd2e0 60%,#b8e6c0); color:#2c2c3a; padding:14px; }
+  h1 { font-size:clamp(19px,5vw,26px); margin:.2em 0; }
+  .sub { font-size:13px; opacity:.75; margin-bottom:10px; line-height:1.5; }
+  .panel { background:#fff; border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:0 3px 10px rgba(0,0,0,.08); }
+  #status { font-weight:bold; font-size:15px; }
+  .badge { display:inline-block; padding:2px 10px; border-radius:999px; color:#fff; font-size:13px; }
+  .badge.ok { background:#2f9e6e; } .badge.warn { background:#d98a1f; }
+  label { display:block; font-size:13px; font-weight:bold; margin:10px 0 4px; }
+  select, input[type=text] { width:100%; padding:10px; font-size:16px; border:2px solid #ddd; border-radius:10px; background:#fff; }
+  .sliders { display:flex; gap:12px; } .sliders > div { flex:1; }
+  input[type=range] { width:100%; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  button { font-family:inherit; cursor:pointer; border:none; border-radius:12px; padding:12px 14px; font-size:16px;
+           background:#e2584b; color:#fff; font-weight:bold; min-height:48px; }
+  button.ghost { background:#eee; color:#2c2c3a; }
+  .sec { font-size:17px; font-weight:bold; margin:18px 0 6px; color:#b8453a; border-bottom:2px solid #f0d0c8; padding-bottom:4px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; }
+  .card { background:#fff; border:3px solid transparent; border-radius:14px; padding:11px 12px; box-shadow:0 2px 6px rgba(0,0,0,.07); cursor:pointer; }
+  .card:active { transform:scale(.98); }
+  .card.speaking { border-color:#e2584b; background:#fff3f0; }
+  .zh { font-size:clamp(19px,4.5vw,24px); line-height:1.3; }
+  .en { font-size:12px; opacity:.6; margin-top:4px; }
+  .note { font-size:12px; opacity:.7; line-height:1.5; }
+  details { margin-top:8px; } summary { cursor:pointer; font-weight:bold; font-size:14px; }
+  code { background:#f0ead8; padding:1px 5px; border-radius:5px; }
+</style>
+</head>
+<body>
+
+<h1>🥤 廣東話 — Glued-Sentence Review</h1>
+<div class="sub">These are the app's real sentence <b>templates filled with example values</b> (the dynamic “glue”: number + classifier + noun, colours, etc.). Several nouns are shown per template so you can hear the <b>classifier</b> behaviour (粒 / 條 / 隻 / 嚿 …). Numbers stay as Arabic digits — zh-HK TTS reads “3” as 三, and the on-screen numeral helps number learning. ⚠️ <b>DRAFT — these composed outputs are the spec your partner is approving.</b></div>
+
+<div class="panel">
+  <div id="status">Checking voices…</div>
+  <details><summary>No Cantonese voice? How to install one</summary>
+    <p class="note">
+      <b>iPhone/iPad:</b> Settings → Accessibility → Spoken Content → Voices → Chinese → <b>Cantonese (Hong Kong)</b> (e.g. “Sinji”), then reload.<br>
+      <b>Android:</b> Settings → System → Languages &amp; input → Text-to-speech output → <b>Google Text-to-Speech</b> → Install voice data → <b>Chinese (Hong Kong) / 粵語</b>, then reload.<br>
+      <b>Mac:</b> System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → Chinese (Hong Kong).
+    </p>
+  </details>
+  <label for="voiceSel">Voice</label>
+  <select id="voiceSel"></select>
+  <label for="langSel">Language tag (<code>utterance.lang</code>)</label>
+  <select id="langSel">
+    <option value="zh-HK">zh-HK</option>
+    <option value="yue-Hant-HK">yue-Hant-HK</option>
+    <option value="zh-Hant-HK">zh-Hant-HK</option>
+  </select>
+  <div class="sliders">
+    <div><label>Rate <span id="rateV">0.9</span></label><input type="range" id="rate" min="0.5" max="1.3" step="0.05" value="0.9"></div>
+    <div><label>Pitch <span id="pitchV">1.2</span></label><input type="range" id="pitch" min="0.6" max="1.8" step="0.05" value="1.2"></div>
+  </div>
+  <div class="row" style="margin-top:12px;">
+    <button id="speakAll" class="ghost">🔊 Play all</button>
+    <button id="stop" class="ghost">⏹ Stop</button>
+    <button id="refresh" class="ghost">↻ Refresh voices</button>
+  </div>
+</div>
+
+<div id="out"></div>
+
+<script>
+"use strict";
+// Draft colloquial Cantonese (廣東話). Each line: en = English source string (with example values),
+// yue = composed Cantonese (string, or array of variants to hear the classifier across nouns).
+// These hand-composed outputs are the acceptance spec the in-app grammar engine will reproduce.
+const GROUPS = [
+  { sec: "打招呼 / 旁白 · Greetings & narrator", lines: [
+    { en: "Hi {n}! Let's play!",            yue: "你好呀，小朋友！我哋一齊玩啦！" },
+    { en: "Welcome back, {n}!",             yue: "歡迎返嚟，小朋友！" },
+    { en: "Where to today, {n}?",           yue: "今日想去邊度玩呀，小朋友？" },
+    { en: "Let's count!",                   yue: "我哋嚟數數啦！" },
+    { en: "Colors and shapes!",             yue: "顏色同形狀！" },
+    { en: "Brain power time!",              yue: "動下腦筋啦！" },
+    { en: "Animal friends!",                yue: "動物朋友！" },
+    { en: "Pets need us!",                  yue: "小寵物要我哋幫手喇！" },
+  ]},
+  { sec: "讚賞 · Praise", lines: [
+    { en: "Great job, {n}!",                yue: "做得好好呀，小朋友！" },
+    { en: "Wonderful! / Amazing!",          yue: ["太正喇！", "好犀利呀！"] },
+    { en: "Hooray! / You did it, {n}!",     yue: ["好嘢！", "你做到喇，小朋友！"] },
+    { en: "Super! / Fantastic!",            yue: ["超級叻！", "正呀！"] },
+  ]},
+  { sec: "數數 · Counting — Tap {count} {x}!", lines: [
+    { en: "Tap {count} {x}!  (star / fish / egg)", yue: ["撳3粒星星！", "撳1條魚！", "撳5隻蛋！"] },
+    { en: "{num}! You counted {count}!",    yue: "三！你數到3喇！" },
+    { en: "Put {count} {x} on {base}!  (meatballs on spaghetti)", yue: "放2粒丸喺意粉上面！" },
+    { en: "{num}! {count} {x}! Yummy!",     yue: "三！3粒丸！好味呀！" },
+  ]},
+  { sec: "顏色 · Colors", lines: [
+    { en: "Tap the {x} fish!  (red / blue)", yue: ["撳紅色嗰條魚！", "撳藍色嗰條魚！"] },
+    { en: "{color}!",                        yue: ["黃色！", "綠色！"] },
+    { en: "That's {color}! Find the {color2} one!", yue: "嗰個係紅色！搵綠色嗰個！" },
+  ]},
+  { sec: "披薩 · Pizza — shapes & toppings", lines: [
+    { en: "Find {x}, drag it onto the pizza!  (triangle)", yue: "搵個三角形，拖去個薄餅度！" },
+    { en: "Yummy! {x} fits!",               yue: "好味！三角形啱啱好！" },
+    { en: "Put {count} {x} on the pizza!  (olives)", yue: "放4粒橄欖喺個薄餅度！" },
+    { en: "Drag the {color} topping onto the pizza!", yue: "將紅色嘅配料拖去個薄餅度！" },
+  ]},
+  { sec: "數字 · Numbers / balloons", lines: [
+    { en: "Pop the balloon with the number {target}!", yue: "撳爆5號氣球！" },
+    { en: "{num}! That's {target}!",        yue: "五！嗰個係5！" },
+    { en: "Find number {next}!",            yue: "搵3號！" },
+  ]},
+  { sec: "描畫 · Tracing", lines: [
+    { en: "Trace the number {x}!",          yue: "描下3字！" },
+    { en: "Trace {x}!  (circle)",           yue: "描下圓形！" },
+    { en: "You traced it!",                 yue: "你描好喇！" },
+  ]},
+  { sec: "記憶 · Memory", lines: [
+    { en: "Find the matching {x}! Tap a card to flip it!", yue: "搵相同嘅動物！撳張卡反開佢！" },
+    { en: "A match! Two {item}!  (puppies)", yue: "啱一對！兩隻小狗！" },
+    { en: "You found them all!",            yue: "你全部搵晒喇！" },
+  ]},
+  { sec: "動物樂隊 / 邊個 · Music & Who Says", lines: [
+    { en: "Your turn! Press the glowing animals!", yue: "到你喇！撳啲發光嘅動物！" },
+    { en: "Beautiful music!",               yue: "好好聽嘅音樂！" },
+    { en: "Listen! Who makes this sound?",  yue: "聽下！邊個發出呢個聲呀？" },
+    { en: "Yes! {animal} says {sound}!  (dog/woof)", yue: "啱喇！隻狗會汪汪叫！" },
+  ]},
+  { sec: "倒數 · Countdown", lines: [
+    { en: "Let's count down to blast off! Tap number {next}!", yue: "我哋倒數準備發射！撳3號！" },
+    { en: "Blast off!",                     yue: "發射喇！" },
+  ]},
+  { sec: "分類 · Sorting (size / colour / kind)", lines: [
+    { en: "Big to the big planet, small to the small!", yue: "大嘅放去大星球，細嘅放去細星球！" },
+    { en: "That one is big! Put it on the big planet!", yue: "嗰個係大嘅！放去大星球！" },
+    { en: "Put each thing in the basket that matches its color!", yue: "將每樣嘢放入同顏色嘅籃度！" },
+    { en: "That one is {x}. Find the {x} basket!  (red)", yue: "嗰個係紅色。搵紅色個籃！" },
+    { en: "That goes with {x}!  (the animals)", yue: "嗰個同啲動物一齊！" },
+  ]},
+  { sec: "規律 · Patterns", lines: [
+    { en: "Look at the pattern! What comes next?", yue: "睇下個規律！下一個係咩呀？" },
+    { en: "Try again! Look at the pattern!", yue: "再試多次！睇下個規律！" },
+  ]},
+  { sec: "餵龍 · Dragon Feed", lines: [
+    { en: "Feed the dragon {count} {x}!  (cookies)", yue: "餵3嚿曲奇俾條龍食！" },
+    { en: "{count} {item}! Yum yum!",       yue: "3嚿曲奇！好好食！" },
+  ]},
+  { sec: "恐龍蛋 · Dino Eggs / Flash Count", lines: [
+    { en: "Tap {count} {x} to hatch the baby dinos!", yue: "撳3隻蛋，孵出恐龍BB！" },
+    { en: "How many eggs?",                 yue: "有幾多隻蛋呀？" },
+    { en: "{count} eggs! You remembered!",  yue: "4隻蛋！你記得喇！" },
+  ]},
+  { sec: "雪糕 · Ice Cream", lines: [
+    { en: "Add a {x} scoop on top!  (strawberry)", yue: "加一球士多啤梨雪糕！" },
+    { en: "{color}! {num} {x}!  (pink, 3 scoops)", yue: "粉紅色！3球！" },
+    { en: "Now tap the cherry to finish your ice cream!", yue: "撳粒車厘子，整好個雪糕！" },
+  ]},
+  { sec: "寵物 · Pets (find / care / feed)", lines: [
+    { en: "Tap {x}!  (the puppy)",          yue: "撳隻小狗！" },
+    { en: "Take care of {x}! Bath, food, toy!", yue: "照顧隻小貓！沖涼、餵食、玩玩具！" },
+    { en: "Give {animal} {count} {x}!  (puppy, 3 treats)", yue: "俾3件零食隻小狗食！" },
+    { en: "They both have {count}! They match!", yue: "兩邊都係3！一樣咁多！" },
+    { en: "Yum! {animal} is not hungry anymore!", yue: "好味！小狗唔肚餓喇！" },
+  ]},
+  { sec: "身體 · Body Match", lines: [
+    { en: "Tap {part}!  (nose / eye)",      yue: ["撳個鼻！", "撳隻眼！"] },
+    { en: "Yes! {part}!",                   yue: "啱喇！個鼻！" },
+  ]},
+  { sec: "捉迷藏 · Hide & Seek (in / on / under)", lines: [
+    { en: "Put the puppy under the table!", yue: "將小狗放喺枱下面！" },
+    { en: "Put the bear in the box!",       yue: "將小熊放喺個箱入面！" },
+    { en: "Put it on the table!",           yue: "放喺枱上面！" },
+  ]},
+  { sec: "三個杯 · Three Cups", lines: [
+    { en: "Watch the ball! Where does it go?", yue: "睇住個波呀！個波去咗邊？" },
+    { en: "Where is the ball? Tap the cup!", yue: "個波喺邊呀？撳個杯啦！" },
+    { en: "Not there! Peek under another cup!", yue: "唔喺度！睇下另一個杯！" },
+    { en: "You found it!",                  yue: "你搵到喇！" },
+  ]},
+  { sec: "畫畫 / 換衫 / 故事 · Paint / Dress-up / Story", lines: [
+    { en: "Let's paint! Pick a color and draw with your finger, {n}!", yue: "我哋嚟畫畫啦！揀個顏色，用手指畫，小朋友！" },
+    { en: "Can you paint with {color}?  (blue)", yue: "你可唔可以用藍色畫呀？" },
+    { en: "What a cool look!",              yue: "好有型呀！" },
+    { en: "Can you find the {x}? Tap it!  (dolphin)", yue: "搵唔搵到隻海豚呀？撳佢啦！" },
+    { en: "The end! Goodnight, {n}!",       yue: "故事完喇！小朋友，晚安！" },
+  ]},
+  { sec: "回應 · Feedback", lines: [
+    { en: "Try again!",                     yue: "再試多次啦！" },
+    { en: "Yes! You found {item}!  (the fish)", yue: "啱喇！你搵到條魚喇！" },
+    { en: "All sorted!",                    yue: "全部分好喇！" },
+    { en: "Yummy!",                         yue: "好味呀！" },
+    { en: "Big! / Small!",                  yue: ["大！", "細！"] },
+  ]},
+  { sec: "火箭任務 · Rocket Quest", lines: [
+    { en: "Hooray! Star Spark earned, {n}! {left} more to fix the rocket!", yue: "好嘢，小朋友！你儲到一粒星星火花！仲差2粒就整好火箭！" },
+    { en: "Rocket ready!",                  yue: "火箭準備好喇！" },
+  ]},
+];
+
+const $ = id => document.getElementById(id);
+const synth = window.speechSynthesis;
+let voices = [];
+
+function isCanto(v) {
+  const l = (v.lang || "").toLowerCase().replace("_", "-");
+  return l.includes("yue") || l === "zh-hk" || l.startsWith("zh-hant-hk") || /cantonese|廣東|粵|sin-?ji/i.test(v.name);
+}
+function loadVoices() {
+  voices = synth.getVoices();
+  const sel = $("voiceSel"); sel.innerHTML = "";
+  const canto = voices.filter(isCanto);
+  const auto = document.createElement("option"); auto.value = "__auto__"; auto.textContent = "Auto (browser picks from language tag)";
+  sel.appendChild(auto);
+  [...canto, ...voices.filter(v => !isCanto(v))].forEach(v => {
+    const o = document.createElement("option"); o.value = v.name;
+    o.textContent = (isCanto(v) ? "🟢 " : "") + v.name + "  —  " + v.lang + (v.localService ? " (device)" : " (network)");
+    sel.appendChild(o);
+  });
+  if (canto.length) sel.value = canto[0].name;
+  $("status").innerHTML = canto.length
+    ? `<span class="badge ok">✓ ${canto.length} Cantonese voice${canto.length > 1 ? "s" : ""}</span> — ` + canto.map(v => v.name + " (" + v.lang + ")").join(", ")
+    : `<span class="badge warn">⚠ No Cantonese voice on this device</span> — install one (see above), then ↻ Refresh.`;
+}
+
+let playable = [];
+function render() {
+  const out = $("out"); out.innerHTML = ""; playable = [];
+  GROUPS.forEach(g => {
+    const h = document.createElement("div"); h.className = "sec"; h.textContent = g.sec; out.appendChild(h);
+    const grid = document.createElement("div"); grid.className = "grid"; out.appendChild(grid);
+    g.lines.forEach(l => {
+      const variants = Array.isArray(l.yue) ? l.yue : [l.yue];
+      variants.forEach(v => {
+        const c = document.createElement("div"); c.className = "card";
+        c.innerHTML = `<div class="zh">${v}</div><div class="en">${l.en}</div>`;
+        c.onclick = () => speak(v, c);
+        grid.appendChild(c); playable.push({ text: v, card: c });
+      });
+    });
+  });
+}
+const clearSpeaking = () => playable.forEach(x => x.card.classList.remove("speaking"));
+
+function speak(text, cardEl) {
+  if (!("speechSynthesis" in window)) { alert("This browser has no speechSynthesis."); return; }
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text + " ");
+  u.lang = $("langSel").value;
+  u.rate = parseFloat($("rate").value);
+  u.pitch = parseFloat($("pitch").value);
+  const chosen = $("voiceSel").value;
+  if (chosen !== "__auto__") { const v = voices.find(v => v.name === chosen); if (v) u.voice = v; }
+  clearSpeaking(); if (cardEl) cardEl.classList.add("speaking");
+  u.onend = u.onerror = () => { if (cardEl) cardEl.classList.remove("speaking"); };
+  synth.speak(u);
+}
+
+let allTimer = null;
+function speakAll() {
+  let i = 0;
+  const next = () => {
+    if (i >= playable.length) return;
+    const { text, card } = playable[i]; i++;
+    card.scrollIntoView({ block: "center", behavior: "smooth" });
+    speak(text, card);
+    allTimer = setInterval(() => {
+      if (!synth.speaking && !synth.pending) { clearInterval(allTimer); setTimeout(next, 420); }
+    }, 200);
+  };
+  next();
+}
+
+$("rate").oninput = e => $("rateV").textContent = e.target.value;
+$("pitch").oninput = e => $("pitchV").textContent = e.target.value;
+$("speakAll").onclick = speakAll;
+$("stop").onclick = () => { if (allTimer) clearInterval(allTimer); synth.cancel(); clearSpeaking(); };
+$("refresh").onclick = loadVoices;
+
+render();
+loadVoices();
+if ("onvoiceschanged" in synth) synth.onvoiceschanged = loadVoices;
+setTimeout(loadVoices, 500);
+setTimeout(loadVoices, 1500);
+</script>
+</body>
+</html>
