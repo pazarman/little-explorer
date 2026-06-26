@@ -24,12 +24,13 @@
            background:#e2584b; color:#fff; font-weight:bold; min-height:48px; }
   button.ghost { background:#eee; color:#2c2c3a; }
   .sec { font-size:17px; font-weight:bold; margin:18px 0 6px; color:#b8453a; border-bottom:2px solid #f0d0c8; padding-bottom:4px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
   .card { background:#fff; border:3px solid transparent; border-radius:14px; padding:11px 12px; box-shadow:0 2px 6px rgba(0,0,0,.07); cursor:pointer; }
   .card:active { transform:scale(.98); }
   .card.speaking { border-color:#e2584b; background:#fff3f0; }
   .zh { font-size:clamp(19px,4.5vw,24px); line-height:1.3; }
-  .en { font-size:12px; opacity:.6; margin-top:4px; }
+  .jp { font-size:13px; color:#2a8a5f; font-weight:bold; margin-top:3px; line-height:1.35; }
+  .en { font-size:12px; opacity:.6; margin-top:3px; }
   .note { font-size:12px; opacity:.7; line-height:1.5; }
   details { margin-top:8px; } summary { cursor:pointer; font-weight:bold; font-size:14px; }
   code { background:#f0ead8; padding:1px 5px; border-radius:5px; }
@@ -38,7 +39,7 @@
 <body>
 
 <h1>🥤 廣東話 — Glued-Sentence Review</h1>
-<div class="sub">These are the app's real sentence <b>templates filled with example values</b> (the dynamic “glue”: number + classifier + noun, colours, etc.). Several nouns are shown per template so you can hear the <b>classifier</b> behaviour (粒 / 條 / 隻 / 嚿 …). Numbers stay as Arabic digits — zh-HK TTS reads “3” as 三, and the on-screen numeral helps number learning. ⚠️ <b>DRAFT — these composed outputs are the spec your partner is approving.</b></div>
+<div class="sub">Each card shows the composed Cantonese, the <b>Jyutping (romanization + tone number 1–6)</b> in green, and the English source. The dynamic “glue” (number + classifier + noun, colours) is filled with example values; several nouns per template let you hear the <b>classifier</b> behaviour (粒 / 條 / 隻 / 嚿 …). Numbers stay as Arabic digits — zh-HK TTS reads “3” as 三. ⚠️ <b>DRAFT — these composed outputs are the spec your partner is approving.</b></div>
 
 <div class="panel">
   <div id="status">Checking voices…</div>
@@ -57,7 +58,7 @@
     <option value="yue-Hant-HK">yue-Hant-HK</option>
     <option value="zh-Hant-HK">zh-Hant-HK</option>
   </select>
-  <label for="nameInput">Child's name — replaces <code>{n}</code> (blank = 小朋友)</label>
+  <label for="nameInput">Child's name — replaces <code>{n}</code> (blank = 小朋友 / siu2 pang4 jau5)</label>
   <input type="text" id="nameInput" placeholder="例如：Fiona / 小明" autocomplete="off" autocorrect="off" spellcheck="false">
   <div class="sliders">
     <div><label>Rate <span id="rateV">0.9</span></label><input type="range" id="rate" min="0.5" max="1.3" step="0.05" value="0.9"></div>
@@ -74,132 +75,132 @@
 
 <script>
 "use strict";
-// Draft colloquial Cantonese (廣東話). Each line: en = English source string (with example values),
-// yue = composed Cantonese (string, or array of variants to hear the classifier across nouns).
+// Each line: en = English source, yue = composed Cantonese, jp = Jyutping (romanization + tone number).
+// yue/jp may be parallel arrays (variants to hear the classifier across nouns).
 // These hand-composed outputs are the acceptance spec the in-app grammar engine will reproduce.
 const GROUPS = [
   { sec: "打招呼 / 旁白 · Greetings & narrator", lines: [
-    { en: "Hi {n}! Let's play!",            yue: "你好呀，{n}！我哋一齊玩啦！" },
-    { en: "Welcome back, {n}!",             yue: "歡迎返嚟，{n}！" },
-    { en: "Where to today, {n}?",           yue: "今日想去邊度玩呀，{n}？" },
-    { en: "Let's count!",                   yue: "我哋嚟數數啦！" },
-    { en: "Colors and shapes!",             yue: "顏色同形狀！" },
-    { en: "Brain power time!",              yue: "動下腦筋啦！" },
-    { en: "Animal friends!",                yue: "動物朋友！" },
-    { en: "Pets need us!",                  yue: "小寵物要我哋幫手喇！" },
+    { en: "Hi {n}! Let's play!",        yue: "你好呀，{n}！我哋一齊玩啦！", jp: "nei5 hou2 aa3, {n}! ngo5 dei6 jat1 cai4 waan2 laa1!" },
+    { en: "Welcome back, {n}!",         yue: "歡迎返嚟，{n}！",          jp: "fun1 jing4 faan1 lei4, {n}!" },
+    { en: "Where to today, {n}?",       yue: "今日想去邊度玩呀，{n}？",   jp: "gam1 jat6 soeng2 heoi3 bin1 dou6 waan2 aa3, {n}?" },
+    { en: "Let's count!",               yue: "我哋嚟數數啦！",           jp: "ngo5 dei6 lei4 sou2 sou3 laa1!" },
+    { en: "Colors and shapes!",         yue: "顏色同形狀！",             jp: "ngaan4 sik1 tung4 jing4 zong6!" },
+    { en: "Brain power time!",          yue: "動下腦筋啦！",             jp: "dung6 haa5 nou5 gan1 laa1!" },
+    { en: "Animal friends!",            yue: "動物朋友！",               jp: "dung6 mat6 pang4 jau5!" },
+    { en: "Pets need us!",              yue: "小寵物要我哋幫手喇！",       jp: "siu2 cung2 mat6 jiu3 ngo5 dei6 bong1 sau2 laa3!" },
   ]},
   { sec: "讚賞 · Praise", lines: [
-    { en: "Great job, {n}!",                yue: "做得好好呀，{n}！" },
-    { en: "Wonderful! / Amazing!",          yue: ["太正喇！", "好犀利呀！"] },
-    { en: "Hooray! / You did it, {n}!",     yue: ["好嘢！", "你做到喇，{n}！"] },
-    { en: "Super! / Fantastic!",            yue: ["超級叻！", "正呀！"] },
+    { en: "Great job, {n}!",            yue: "做得好好呀，{n}！",         jp: "zou6 dak1 hou2 hou2 aa3, {n}!" },
+    { en: "Wonderful! / Amazing!",      yue: ["太正喇！", "好犀利呀！"],  jp: ["taai3 zeng3 laa3!", "hou2 sai1 lei6 aa3!"] },
+    { en: "Hooray! / You did it, {n}!", yue: ["好嘢！", "你做到喇，{n}！"], jp: ["hou2 je5!", "nei5 zou6 dou2 laa3, {n}!"] },
+    { en: "Super! / Fantastic!",        yue: ["超級叻！", "正呀！"],       jp: ["ciu1 kap1 lek1!", "zeng3 aa3!"] },
   ]},
   { sec: "數數 · Counting — Tap {count} {x}!", lines: [
-    { en: "Tap {count} {x}!  (star / fish / egg)", yue: ["撳3粒星星！", "撳1條魚！", "撳5隻蛋！"] },
-    { en: "{num}! You counted {count}!",    yue: "三！你數到3喇！" },
-    { en: "Put {count} {x} on {base}!  (meatballs on spaghetti)", yue: "放2粒丸喺意粉上面！" },
-    { en: "{num}! {count} {x}! Yummy!",     yue: "三！3粒丸！好味呀！" },
+    { en: "Tap {count} {x}!  (star / fish / egg)", yue: ["撳3粒星星！", "撳1條魚！", "撳5隻蛋！"], jp: ["gam6 saam1 nap1 sing1 sing1!", "gam6 jat1 tiu4 jyu2!", "gam6 ng5 zek3 daan2!"] },
+    { en: "{num}! You counted {count}!", yue: "三！你數到3喇！",          jp: "saam1! nei5 sou2 dou2 saam1 laa3!" },
+    { en: "Put {count} {x} on {base}!  (meatballs on spaghetti)", yue: "放2粒丸喺意粉上面！", jp: "fong3 loeng5 nap1 jyun2 hai2 ji3 fan2 soeng6 min6!" },
+    { en: "{num}! {count} {x}! Yummy!", yue: "三！3粒丸！好味呀！",        jp: "saam1! saam1 nap1 jyun2! hou2 mei6 aa3!" },
   ]},
   { sec: "顏色 · Colors", lines: [
-    { en: "Tap the {x} fish!  (red / blue)", yue: ["撳紅色嗰條魚！", "撳藍色嗰條魚！"] },
-    { en: "{color}!",                        yue: ["黃色！", "綠色！"] },
-    { en: "That's {color}! Find the {color2} one!", yue: "嗰個係紅色！搵綠色嗰個！" },
+    { en: "Tap the {x} fish!  (red / blue)", yue: ["撳紅色嗰條魚！", "撳藍色嗰條魚！"], jp: ["gam6 hung4 sik1 go2 tiu4 jyu2!", "gam6 laam4 sik1 go2 tiu4 jyu2!"] },
+    { en: "{color}!",                   yue: ["黃色！", "綠色！"],         jp: ["wong4 sik1!", "luk6 sik1!"] },
+    { en: "That's {color}! Find the {color2} one!", yue: "嗰個係紅色！搵綠色嗰個！", jp: "go2 go3 hai6 hung4 sik1! wan2 luk6 sik1 go2 go3!" },
   ]},
   { sec: "披薩 · Pizza — shapes & toppings", lines: [
-    { en: "Find {x}, drag it onto the pizza!  (triangle)", yue: "搵個三角形，拖去個薄餅度！" },
-    { en: "Yummy! {x} fits!",               yue: "好味！三角形啱啱好！" },
-    { en: "Put {count} {x} on the pizza!  (olives)", yue: "放4粒橄欖喺個薄餅度！" },
-    { en: "Drag the {color} topping onto the pizza!", yue: "將紅色嘅配料拖去個薄餅度！" },
+    { en: "Find {x}, drag it onto the pizza!  (triangle)", yue: "搵個三角形，拖去個薄餅度！", jp: "wan2 go3 saam1 gok3 jing4, to1 heoi3 go3 bok6 beng2 dou6!" },
+    { en: "Yummy! {x} fits!",           yue: "好味！三角形啱啱好！",       jp: "hou2 mei6! saam1 gok3 jing4 aam1 aam1 hou2!" },
+    { en: "Put {count} {x} on the pizza!  (olives)", yue: "放4粒橄欖喺個薄餅度！", jp: "fong3 sei3 nap1 gaam2 laam5 hai2 go3 bok6 beng2 dou6!" },
+    { en: "Drag the {color} topping onto the pizza!", yue: "將紅色嘅配料拖去個薄餅度！", jp: "zoeng1 hung4 sik1 ge3 pui3 liu2 to1 heoi3 go3 bok6 beng2 dou6!" },
   ]},
   { sec: "數字 · Numbers / balloons", lines: [
-    { en: "Pop the balloon with the number {target}!", yue: "撳爆5號氣球！" },
-    { en: "{num}! That's {target}!",        yue: "五！嗰個係5！" },
-    { en: "Find number {next}!",            yue: "搵3號！" },
+    { en: "Pop the balloon with the number {target}!", yue: "撳爆5號氣球！", jp: "gam6 baau3 ng5 hou6 hei3 kau4!" },
+    { en: "{num}! That's {target}!",    yue: "五！嗰個係5！",             jp: "ng5! go2 go3 hai6 ng5!" },
+    { en: "Find number {next}!",        yue: "搵3號！",                  jp: "wan2 saam1 hou6!" },
   ]},
   { sec: "描畫 · Tracing", lines: [
-    { en: "Trace the number {x}!",          yue: "描下3字！" },
-    { en: "Trace {x}!  (circle)",           yue: "描下圓形！" },
-    { en: "You traced it!",                 yue: "你描好喇！" },
+    { en: "Trace the number {x}!",      yue: "描下3字！",                jp: "miu4 haa5 saam1 zi6!" },
+    { en: "Trace {x}!  (circle)",       yue: "描下圓形！",               jp: "miu4 haa5 jyun4 jing4!" },
+    { en: "You traced it!",             yue: "你描好喇！",               jp: "nei5 miu4 hou2 laa3!" },
   ]},
   { sec: "記憶 · Memory", lines: [
-    { en: "Find the matching {x}! Tap a card to flip it!", yue: "搵相同嘅動物！撳張卡反開佢！" },
-    { en: "A match! Two {item}!  (puppies)", yue: "啱一對！兩隻小狗！" },
-    { en: "You found them all!",            yue: "你全部搵晒喇！" },
+    { en: "Find the matching {x}! Tap a card to flip it!", yue: "搵相同嘅動物！撳張卡反開佢！", jp: "wan2 soeng1 tung4 ge3 dung6 mat6! gam6 zoeng1 kaat1 faan2 hoi1 keoi5!" },
+    { en: "A match! Two {item}!  (puppies)", yue: "啱一對！兩隻小狗！",    jp: "aam1 jat1 deoi3! loeng5 zek3 siu2 gau2!" },
+    { en: "You found them all!",        yue: "你全部搵晒喇！",           jp: "nei5 cyun4 bou6 wan2 saai3 laa3!" },
   ]},
   { sec: "動物樂隊 / 邊個 · Music & Who Says", lines: [
-    { en: "Your turn! Press the glowing animals!", yue: "到你喇！撳啲發光嘅動物！" },
-    { en: "Beautiful music!",               yue: "好好聽嘅音樂！" },
-    { en: "Listen! Who makes this sound?",  yue: "聽下！邊個發出呢個聲呀？" },
-    { en: "Yes! {animal} says {sound}!  (dog/woof)", yue: "啱喇！隻狗會汪汪叫！" },
+    { en: "Your turn! Press the glowing animals!", yue: "到你喇！撳啲發光嘅動物！", jp: "dou3 nei5 laa3! gam6 di1 faat3 gwong1 ge3 dung6 mat6!" },
+    { en: "Beautiful music!",           yue: "好好聽嘅音樂！",           jp: "hou2 hou2 teng1 ge3 jam1 ngok6!" },
+    { en: "Listen! Who makes this sound?", yue: "聽下！邊個發出呢個聲呀？", jp: "teng1 haa5! bin1 go3 faat3 ceot1 ni1 go3 sing1 aa3?" },
+    { en: "Yes! {animal} says {sound}!  (dog/woof)", yue: "啱喇！隻狗會汪汪叫！", jp: "aam1 laa3! zek3 gau2 wui5 wong1 wong1 giu3!" },
   ]},
   { sec: "倒數 · Countdown", lines: [
-    { en: "Let's count down to blast off! Tap number {next}!", yue: "我哋倒數準備發射！撳3號！" },
-    { en: "Blast off!",                     yue: "發射喇！" },
+    { en: "Let's count down to blast off! Tap number {next}!", yue: "我哋倒數準備發射！撳3號！", jp: "ngo5 dei6 dou3 sou2 zeon2 bei6 faat3 se6! gam6 saam1 hou6!" },
+    { en: "Blast off!",                 yue: "發射喇！",                 jp: "faat3 se6 laa3!" },
   ]},
   { sec: "分類 · Sorting (size / colour / kind)", lines: [
-    { en: "Big to the big planet, small to the small!", yue: "大嘅放去大星球，細嘅放去細星球！" },
-    { en: "That one is big! Put it on the big planet!", yue: "嗰個係大嘅！放去大星球！" },
-    { en: "Put each thing in the basket that matches its color!", yue: "將每樣嘢放入同顏色嘅籃度！" },
-    { en: "That one is {x}. Find the {x} basket!  (red)", yue: "嗰個係紅色。搵紅色個籃！" },
-    { en: "That goes with {x}!  (the animals)", yue: "嗰個同啲動物一齊！" },
+    { en: "Big to the big planet, small to the small!", yue: "大嘅放去大星球，細嘅放去細星球！", jp: "daai6 ge3 fong3 heoi3 daai6 sing1 kau4, sai3 ge3 fong3 heoi3 sai3 sing1 kau4!" },
+    { en: "That one is big! Put it on the big planet!", yue: "嗰個係大嘅！放去大星球！", jp: "go2 go3 hai6 daai6 ge3! fong3 heoi3 daai6 sing1 kau4!" },
+    { en: "Put each thing in the basket that matches its color!", yue: "將每樣嘢放入同顏色嘅籃度！", jp: "zoeng1 mui5 joeng6 je5 fong3 jap6 tung4 ngaan4 sik1 ge3 laam4 dou6!" },
+    { en: "That one is {x}. Find the {x} basket!  (red)", yue: "嗰個係紅色。搵紅色個籃！", jp: "go2 go3 hai6 hung4 sik1. wan2 hung4 sik1 go3 laam4!" },
+    { en: "That goes with {x}!  (the animals)", yue: "嗰個同啲動物一齊！", jp: "go2 go3 tung4 di1 dung6 mat6 jat1 cai4!" },
   ]},
   { sec: "規律 · Patterns", lines: [
-    { en: "Look at the pattern! What comes next?", yue: "睇下個規律！下一個係咩呀？" },
-    { en: "Try again! Look at the pattern!", yue: "再試多次！睇下個規律！" },
+    { en: "Look at the pattern! What comes next?", yue: "睇下個規律！下一個係咩呀？", jp: "tai2 haa5 go3 kwai1 leot6! haa6 jat1 go3 hai6 me1 aa3?" },
+    { en: "Try again! Look at the pattern!", yue: "再試多次！睇下個規律！", jp: "zoi3 si3 do1 ci3! tai2 haa5 go3 kwai1 leot6!" },
   ]},
   { sec: "餵龍 · Dragon Feed", lines: [
-    { en: "Feed the dragon {count} {x}!  (cookies)", yue: "餵3嚿曲奇俾條龍食！" },
-    { en: "{count} {item}! Yum yum!",       yue: "3嚿曲奇！好好食！" },
+    { en: "Feed the dragon {count} {x}!  (cookies)", yue: "餵3嚿曲奇俾條龍食！", jp: "wai3 saam1 gau6 kuk1 kei4 bei2 tiu4 lung4 sik6!" },
+    { en: "{count} {item}! Yum yum!",   yue: "3嚿曲奇！好好食！",         jp: "saam1 gau6 kuk1 kei4! hou2 hou2 sik6!" },
   ]},
   { sec: "恐龍蛋 · Dino Eggs / Flash Count", lines: [
-    { en: "Tap {count} {x} to hatch the baby dinos!", yue: "撳3隻蛋，孵出恐龍BB！" },
-    { en: "How many eggs?",                 yue: "有幾多隻蛋呀？" },
-    { en: "{count} eggs! You remembered!",  yue: "4隻蛋！你記得喇！" },
+    { en: "Tap {count} {x} to hatch the baby dinos!", yue: "撳3隻蛋，孵出恐龍BB！", jp: "gam6 saam1 zek3 daan2, fu1 ceot1 hung2 lung4 bi4 bi1!" },
+    { en: "How many eggs?",             yue: "有幾多隻蛋呀？",            jp: "jau5 gei2 do1 zek3 daan2 aa3?" },
+    { en: "{count} eggs! You remembered!", yue: "4隻蛋！你記得喇！",      jp: "sei3 zek3 daan2! nei5 gei3 dak1 laa3!" },
   ]},
   { sec: "雪糕 · Ice Cream", lines: [
-    { en: "Add a {x} scoop on top!  (strawberry)", yue: "加一球士多啤梨雪糕！" },
-    { en: "{color}! {num} {x}!  (pink, 3 scoops)", yue: "粉紅色！3球！" },
-    { en: "Now tap the cherry to finish your ice cream!", yue: "撳粒車厘子，整好個雪糕！" },
+    { en: "Add a {x} scoop on top!  (strawberry)", yue: "加一球士多啤梨雪糕！", jp: "gaa1 jat1 kau4 si6 do1 be1 lei2 syut3 gou1!" },
+    { en: "{color}! {num} {x}!  (pink, 3 scoops)", yue: "粉紅色！3球！", jp: "fan2 hung4 sik1! saam1 kau4!" },
+    { en: "Now tap the cherry to finish your ice cream!", yue: "撳粒車厘子，整好個雪糕！", jp: "gam6 nap1 ce1 lei4 zi2, zing2 hou2 go3 syut3 gou1!" },
   ]},
   { sec: "寵物 · Pets (find / care / feed)", lines: [
-    { en: "Tap {x}!  (the puppy)",          yue: "撳隻小狗！" },
-    { en: "Take care of {x}! Bath, food, toy!", yue: "照顧隻小貓！沖涼、餵食、玩玩具！" },
-    { en: "Give {animal} {count} {x}!  (puppy, 3 treats)", yue: "俾3件零食隻小狗食！" },
-    { en: "They both have {count}! They match!", yue: "兩邊都係3！一樣咁多！" },
-    { en: "Yum! {animal} is not hungry anymore!", yue: "好味！小狗唔肚餓喇！" },
+    { en: "Tap {x}!  (the puppy)",      yue: "撳隻小狗！",               jp: "gam6 zek3 siu2 gau2!" },
+    { en: "Take care of {x}! Bath, food, toy!", yue: "照顧隻小貓！沖涼、餵食、玩玩具！", jp: "ziu3 gu3 zek3 siu2 maau1! cung1 loeng4, wai3 sik6, waan2 wun6 geoi6!" },
+    { en: "Give {animal} {count} {x}!  (puppy, 3 treats)", yue: "俾3件零食隻小狗食！", jp: "bei2 saam1 gin6 ling4 sik6 zek3 siu2 gau2 sik6!" },
+    { en: "They both have {count}! They match!", yue: "兩邊都係3！一樣咁多！", jp: "loeng5 bin1 dou1 hai6 saam1! jat1 joeng6 gam3 do1!" },
+    { en: "Yum! {animal} is not hungry anymore!", yue: "好味！小狗唔肚餓喇！", jp: "hou2 mei6! siu2 gau2 m4 tou5 ngo6 laa3!" },
   ]},
   { sec: "身體 · Body Match", lines: [
-    { en: "Tap {part}!  (nose / eye)",      yue: ["撳個鼻！", "撳隻眼！"] },
-    { en: "Yes! {part}!",                   yue: "啱喇！個鼻！" },
+    { en: "Tap {part}!  (nose / eye)",  yue: ["撳個鼻！", "撳隻眼！"],     jp: ["gam6 go3 bei6!", "gam6 zek3 ngaan5!"] },
+    { en: "Yes! {part}!",               yue: "啱喇！個鼻！",             jp: "aam1 laa3! go3 bei6!" },
   ]},
   { sec: "捉迷藏 · Hide & Seek (in / on / under)", lines: [
-    { en: "Put the puppy under the table!", yue: "將小狗放喺枱下面！" },
-    { en: "Put the bear in the box!",       yue: "將小熊放喺個箱入面！" },
-    { en: "Put it on the table!",           yue: "放喺枱上面！" },
+    { en: "Put the puppy under the table!", yue: "將小狗放喺枱下面！",     jp: "zoeng1 siu2 gau2 fong3 hai2 toi2 haa6 min6!" },
+    { en: "Put the bear in the box!",   yue: "將小熊放喺個箱入面！",       jp: "zoeng1 siu2 hung4 fong3 hai2 go3 soeng1 jap6 min6!" },
+    { en: "Put it on the table!",       yue: "放喺枱上面！",             jp: "fong3 hai2 toi2 soeng6 min6!" },
   ]},
   { sec: "三個杯 · Three Cups", lines: [
-    { en: "Watch the ball! Where does it go?", yue: "睇住個波呀！個波去咗邊？" },
-    { en: "Where is the ball? Tap the cup!", yue: "個波喺邊呀？撳個杯啦！" },
-    { en: "Not there! Peek under another cup!", yue: "唔喺度！睇下另一個杯！" },
-    { en: "You found it!",                  yue: "你搵到喇！" },
+    { en: "Watch the ball! Where does it go?", yue: "睇住個波呀！個波去咗邊？", jp: "tai2 zyu6 go3 bo1 aa3! go3 bo1 heoi3 zo2 bin1?" },
+    { en: "Where is the ball? Tap the cup!", yue: "個波喺邊呀？撳個杯啦！", jp: "go3 bo1 hai2 bin1 aa3? gam6 go3 bui1 laa1!" },
+    { en: "Not there! Peek under another cup!", yue: "唔喺度！睇下另一個杯！", jp: "m4 hai2 dou6! tai2 haa5 ling6 jat1 go3 bui1!" },
+    { en: "You found it!",              yue: "你搵到喇！",               jp: "nei5 wan2 dou2 laa3!" },
   ]},
   { sec: "畫畫 / 換衫 / 故事 · Paint / Dress-up / Story", lines: [
-    { en: "Let's paint! Pick a color and draw with your finger, {n}!", yue: "我哋嚟畫畫啦！揀個顏色，用手指畫，{n}！" },
-    { en: "Can you paint with {color}?  (blue)", yue: "你可唔可以用藍色畫呀？" },
-    { en: "What a cool look!",              yue: "好有型呀！" },
-    { en: "Can you find the {x}? Tap it!  (dolphin)", yue: "搵唔搵到隻海豚呀？撳佢啦！" },
-    { en: "The end! Goodnight, {n}!",       yue: "故事完喇！{n}，晚安！" },
+    { en: "Let's paint! Pick a color and draw with your finger, {n}!", yue: "我哋嚟畫畫啦！揀個顏色，用手指畫，{n}！", jp: "ngo5 dei6 lei4 waak6 waak2 laa1! gaan2 go3 ngaan4 sik1, jung6 sau2 zi2 waak6, {n}!" },
+    { en: "Can you paint with {color}?  (blue)", yue: "你可唔可以用藍色畫呀？", jp: "nei5 ho2 m4 ho2 ji5 jung6 laam4 sik1 waak6 aa3?" },
+    { en: "What a cool look!",          yue: "好有型呀！",               jp: "hou2 jau5 jing4 aa3!" },
+    { en: "Can you find the {x}? Tap it!  (dolphin)", yue: "搵唔搵到隻海豚呀？撳佢啦！", jp: "wan2 m4 wan2 dou2 zek3 hoi2 tyun4 aa3? gam6 keoi5 laa1!" },
+    { en: "The end! Goodnight, {n}!",   yue: "故事完喇！{n}，晚安！",     jp: "gu3 si6 jyun4 laa3! {n}, maan5 on1!" },
   ]},
   { sec: "回應 · Feedback", lines: [
-    { en: "Try again!",                     yue: "再試多次啦！" },
-    { en: "Yes! You found {item}!  (the fish)", yue: "啱喇！你搵到條魚喇！" },
-    { en: "All sorted!",                    yue: "全部分好喇！" },
-    { en: "Yummy!",                         yue: "好味呀！" },
-    { en: "Big! / Small!",                  yue: ["大！", "細！"] },
+    { en: "Try again!",                 yue: "再試多次啦！",             jp: "zoi3 si3 do1 ci3 laa1!" },
+    { en: "Yes! You found {item}!  (the fish)", yue: "啱喇！你搵到條魚喇！", jp: "aam1 laa3! nei5 wan2 dou2 tiu4 jyu2 laa3!" },
+    { en: "All sorted!",                yue: "全部分好喇！",             jp: "cyun4 bou6 fan1 hou2 laa3!" },
+    { en: "Yummy!",                     yue: "好味呀！",                 jp: "hou2 mei6 aa3!" },
+    { en: "Big! / Small!",              yue: ["大！", "細！"],            jp: ["daai6!", "sai3!"] },
   ]},
   { sec: "火箭任務 · Rocket Quest", lines: [
-    { en: "Hooray! Star Spark earned, {n}! {left} more to fix the rocket!", yue: "好嘢，{n}！你儲到一粒星星火花！仲差2粒就整好火箭！" },
-    { en: "Rocket ready!",                  yue: "火箭準備好喇！" },
+    { en: "Hooray! Star Spark earned, {n}! {left} more to fix the rocket!", yue: "好嘢，{n}！你儲到一粒星星火花！仲差2粒就整好火箭！", jp: "hou2 je5, {n}! nei5 cou5 dou2 jat1 nap1 sing1 sing1 fo2 faa1! zung6 caa1 loeng5 nap1 zau6 zing2 hou2 fo2 zin3!" },
+    { en: "Rocket ready!",              yue: "火箭準備好喇！",           jp: "fo2 zin3 zeon2 bei6 hou2 laa3!" },
   ]},
 ];
 
@@ -228,8 +229,12 @@ function loadVoices() {
     : `<span class="badge warn">⚠ No Cantonese voice on this device</span> — install one (see above), then ↻ Refresh.`;
 }
 
-const nameVal = () => ($("nameInput").value.trim() || "小朋友");
-const sub = t => t.split("{n}").join(nameVal());   // swap the name placeholder
+// name placeholder: spoken/displayed Chinese default = 小朋友; Jyutping default = siu2 pang4 jau5
+const nameZh = () => ($("nameInput").value.trim() || "小朋友");
+const nameJp = () => ($("nameInput").value.trim() || "siu2 pang4 jau5");
+const subZh = t => t.split("{n}").join(nameZh());
+const subJp = t => t.split("{n}").join(nameJp());
+
 let playable = [];
 function render() {
   const out = $("out"); out.innerHTML = ""; playable = [];
@@ -237,13 +242,14 @@ function render() {
     const h = document.createElement("div"); h.className = "sec"; h.textContent = g.sec; out.appendChild(h);
     const grid = document.createElement("div"); grid.className = "grid"; out.appendChild(grid);
     g.lines.forEach(l => {
-      const variants = Array.isArray(l.yue) ? l.yue : [l.yue];
-      variants.forEach(raw => {
-        const v = sub(raw);
+      const yues = Array.isArray(l.yue) ? l.yue : [l.yue];
+      const jps  = Array.isArray(l.jp)  ? l.jp  : [l.jp];
+      yues.forEach((rawYue, i) => {
+        const zh = subZh(rawYue), jp = subJp(jps[i] || "");
         const c = document.createElement("div"); c.className = "card";
-        c.innerHTML = `<div class="zh">${v}</div><div class="en">${l.en}</div>`;
-        c.onclick = () => speak(v, c);
-        grid.appendChild(c); playable.push({ text: v, card: c });
+        c.innerHTML = `<div class="zh">${zh}</div><div class="jp">${jp}</div><div class="en">${l.en}</div>`;
+        c.onclick = () => speak(zh, c);
+        grid.appendChild(c); playable.push({ text: zh, card: c });
       });
     });
   });
@@ -281,7 +287,7 @@ function speakAll() {
 
 $("rate").oninput = e => $("rateV").textContent = e.target.value;
 $("pitch").oninput = e => $("pitchV").textContent = e.target.value;
-$("nameInput").oninput = render;   // re-render cards with the new name
+$("nameInput").oninput = render;   // re-render cards (zh + Jyutping) with the new name
 $("speakAll").onclick = speakAll;
 $("stop").onclick = () => { if (allTimer) clearInterval(allTimer); synth.cancel(); clearSpeaking(); };
 $("refresh").onclick = loadVoices;
