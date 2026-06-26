@@ -1,12 +1,12 @@
 "use strict";
-const APP_VERSION = "26";
+const APP_VERSION = "27";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
   rocket: rocketLevel, sort: sortLevel, pattern: patternLevel, sortkind: sortkindLevel,
   dragon: dragonLevel, dino: dinoLevel, icecream: icecreamLevel,
   petmatch: petmatchLevel, petcare: petcareLevel, petfeed: petfeedLevel, body: bodyLevel,
-  hideseek: hideseekLevel, cups: cupsLevel
+  hideseek: hideseekLevel, cups: cupsLevel, nightday: nightdayLevel
 };
 
 /* ================= Categories & games ================= */
@@ -25,8 +25,9 @@ const GAMES = {
   petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca", lvl: 0 },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida", lvl: 0 },
   body:    { icon: "😊", name: "Body Match", es: "El Cuerpo", lvl: 0 },
   dressup: { icon: "👗", name: "Dress Up", es: "Vestir", lvl: 0 },
-  hideseek:{ icon: "🐾", name: "Hide & Seek", es: "Escondite", lvl: 0 },
-  cups:    { icon: "🥤", name: "Three Cups", es: "Tres Vasos", lvl: 1 }
+  hideseek: { icon: "🐾", name: "Hide & Seek", es: "Escondite", lvl: 0 },
+  cups:     { icon: "🥤", name: "Three Cups",  es: "Tres Vasos", lvl: 1 },
+  nightday: { icon: "🌙", name: "Day & Night", es: "Día y Noche", lvl: 0 }
 };
 // chosen difficulty → max game level shown (auto/hard show everything)
 const diffLevel = () => settings.diff === "easy" ? 0 : settings.diff === "med" ? 1 : 2;
@@ -35,7 +36,7 @@ const visibleGames = cat => cat.games.filter(gameVisible);
 const CATEGORIES = [
   { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",          cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
   { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
-  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind"] },
+  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind", "nightday"] },
   { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          cls: "c-animal", games: ["music", "whosays", "dino", "body"] },
   { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
   { id: "create", icon: "✏️", name: "Create",          es: "Crear",             cls: "c-create", games: ["paint", "story", "dressup"] }
