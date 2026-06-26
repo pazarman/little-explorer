@@ -31,6 +31,8 @@
           box-shadow:0 2px 6px rgba(0,0,0,.08); cursor:pointer; transition:transform .08s, border-color .15s; }
   .card:active { transform:scale(.97); }
   .card.speaking { border-color:var(--accent); background:#fff3f0; }
+  .sec { grid-column:1/-1; font-size:16px; font-weight:bold; margin:14px 0 2px; color:#b8453a;
+         border-bottom:2px solid #f0d0c8; padding-bottom:4px; }
   .zh { font-size:clamp(22px,6vw,30px); line-height:1.25; margin-bottom:4px; }
   .jp { font-size:13px; color:#7a5; font-weight:bold; }
   .en { font-size:12px; opacity:.65; }
@@ -87,8 +89,8 @@
   </div>
 </div>
 
-<h1 style="font-size:18px;">Draft toddler phrases</h1>
-<div class="sub">⚠️ <b>DRAFT — pending native review.</b> Tap a card to hear it. The Chinese text is what gets spoken; Jyutping + English are for review.</div>
+<h1 style="font-size:18px;">Draft toddler phrases — most of the app's spoken lines</h1>
+<div class="sub">⚠️ <b>DRAFT — pending native review.</b> Grouped by section. Tap a card to hear it (or “Play all”). The Chinese text is what gets spoken; Jyutping + English are for review. Game prompts have example values filled in (e.g. “3 stars”, “red fish”).</div>
 <div class="grid" id="grid"></div>
 
 <div class="panel" style="margin-top:14px;">
@@ -97,24 +99,99 @@
 
 <script>
 "use strict";
-// Draft colloquial Cantonese (廣東話) for real app moments. Native review pending.
+// Draft colloquial Cantonese (廣東話) covering most of what a child hears in the app.
+// Placeholders ({name}/{count}/colours/items) are filled with concrete examples so the
+// utterance is a full natural sentence. Native review pending. sec = section heading.
 const PHRASES = [
-  { zh: "你好呀！",            jp: "nei5 hou2 aa3",                  en: "Hello!" },
-  { zh: "我哋一齊玩啦！",       jp: "ngo5 dei6 jat1 cai4 waan2 laa1", en: "Let's play together!" },
-  { zh: "叻叻豬！",            jp: "lek1 lek1 zyu1",                 en: "Clever! (praise)" },
-  { zh: "做得好好！",          jp: "zou6 dak1 hou2 hou2",            en: "Well done!" },
-  { zh: "再試多次啦！",        jp: "zoi3 si3 do1 ci3 laa1",          en: "Try again!" },
-  { zh: "一、二、三！",        jp: "jat1, ji6, saam1",               en: "One, two, three!" },
-  { zh: "紅色",               jp: "hung4 sik1",                     en: "Red" },
-  { zh: "藍色",               jp: "laam4 sik1",                     en: "Blue" },
-  { zh: "黃色",               jp: "wong4 sik1",                     en: "Yellow" },
-  { zh: "綠色",               jp: "luk6 sik1",                      en: "Green" },
-  { zh: "睇住個波呀！",        jp: "tai2 zyu6 go3 bo1 aa3",          en: "Watch the ball!" },
-  { zh: "個波喺邊個杯下面呀？", jp: "go3 bo1 hai2 bin1 go3 bui1 haa6 min6 aa3", en: "Which cup is the ball under?" },
-  { zh: "撳一下個杯啦！",      jp: "gam6 jat1 haa5 go3 bui1 laa1",   en: "Tap the cup!" },
-  { zh: "搵到喇！好叻呀！",     jp: "wan2 dou2 laa3! hou2 lek1 aa3",  en: "Found it! Very clever!" },
-  { zh: "你叫咩名呀？",        jp: "nei5 giu3 me1 meng2 aa3",        en: "What's your name?" },
-  { zh: "拜拜！",             jp: "baai1 baai3",                    en: "Bye-bye!" }
+  { sec: "打招呼 · Greetings & narrator" },
+  { zh: "你好呀！我哋一齊玩啦！",      jp: "nei5 hou2 aa3! ngo5 dei6 jat1 cai4 waan2 laa1", en: "Hi! Let's play!" },
+  { zh: "歡迎返嚟！",                jp: "fun1 jing4 faan1 lei4",                 en: "Welcome back!" },
+  { zh: "今日想去邊度玩呀？",         jp: "gam1 jat6 soeng2 heoi3 bin1 dou6 waan2 aa3", en: "Where to today?" },
+  { zh: "我哋嚟數數啦！",            jp: "ngo5 dei6 lei4 sou2 sou3 laa1",         en: "Let's count!" },
+  { zh: "顏色同形狀！",              jp: "ngaan4 sik1 tung4 jing4 zong6",         en: "Colors and shapes!" },
+  { zh: "動下腦筋啦！",              jp: "dung6 haa5 nou5 gan1 laa1",            en: "Brain power time!" },
+  { zh: "動物朋友！",                jp: "dung6 mat6 pang4 jau5",                en: "Animal friends!" },
+  { zh: "小寵物要我哋幫手喇！",       jp: "siu2 cung2 mat6 jiu3 ngo5 dei6 bong1 sau2 laa3", en: "Pets need us!" },
+
+  { sec: "讚賞 · Praise" },
+  { zh: "做得好好呀！",              jp: "zou6 dak1 hou2 hou2 aa3",              en: "Great job!" },
+  { zh: "叻叻豬！",                  jp: "lek1 lek1 zyu1",                       en: "Clever!" },
+  { zh: "好犀利呀！",                jp: "hou2 sai1 lei6 aa3",                   en: "Amazing!" },
+  { zh: "好嘢！",                    jp: "hou2 je5",                             en: "Hooray / Yay!" },
+  { zh: "你做到喇！",                jp: "nei5 zou6 dou2 laa3",                  en: "You did it!" },
+  { zh: "超級叻！",                  jp: "ciu1 kap1 lek1",                       en: "Super!" },
+  { zh: "正呀！",                    jp: "zeng3 aa3",                            en: "Fantastic!" },
+
+  { sec: "數字 · Numbers 1–10" },
+  { zh: "一",  jp: "jat1",  en: "1" }, { zh: "二",  jp: "ji6",  en: "2" },
+  { zh: "三",  jp: "saam1", en: "3" }, { zh: "四",  jp: "sei3", en: "4" },
+  { zh: "五",  jp: "ng5",   en: "5" }, { zh: "六",  jp: "luk6", en: "6" },
+  { zh: "七",  jp: "cat1",  en: "7" }, { zh: "八",  jp: "baat3", en: "8" },
+  { zh: "九",  jp: "gau2",  en: "9" }, { zh: "十",  jp: "sap6", en: "10" },
+
+  { sec: "顏色 · Colors" },
+  { zh: "紅色",   jp: "hung4 sik1",      en: "Red" },    { zh: "藍色",   jp: "laam4 sik1", en: "Blue" },
+  { zh: "黃色",   jp: "wong4 sik1",      en: "Yellow" }, { zh: "綠色",   jp: "luk6 sik1",  en: "Green" },
+  { zh: "橙色",   jp: "caang2 sik1",     en: "Orange" }, { zh: "紫色",   jp: "zi2 sik1",   en: "Purple" },
+  { zh: "粉紅色", jp: "fan2 hung4 sik1", en: "Pink" },   { zh: "白色",   jp: "baak6 sik1", en: "White" },
+  { zh: "黑色",   jp: "hak1 sik1",       en: "Black" },
+
+  { sec: "形狀 · Shapes" },
+  { zh: "圓形",   jp: "jyun4 jing4",      en: "Circle" },   { zh: "正方形", jp: "zing3 fong1 jing4", en: "Square" },
+  { zh: "三角形", jp: "saam1 gok3 jing4", en: "Triangle" }, { zh: "星形",   jp: "sing1 jing4",       en: "Star" },
+  { zh: "心形",   jp: "sam1 jing4",       en: "Heart" },
+
+  { sec: "遊戲指示 · Game prompts (examples filled in)" },
+  { zh: "撳三粒星星！",                  jp: "gam6 saam1 nap1 sing1 sing1",                en: "Tap 3 stars!" },
+  { zh: "三！你數到三喇！",              jp: "saam1! nei5 sou2 dou2 saam1 laa3",           en: "Three! You counted 3!" },
+  { zh: "撳紅色嗰條魚！",                jp: "gam6 hung4 sik1 go2 tiu4 jyu2",              en: "Tap the red fish!" },
+  { zh: "將粒星星拖去個薄餅度！",         jp: "zoeng1 nap1 sing1 sing1 to1 heoi3 go3 bok6 beng2 dou6", en: "Drag the star onto the pizza!" },
+  { zh: "撳爆五號氣球！",                jp: "gam6 baau3 ng5 hou6 hei3 kau4",              en: "Pop balloon number 5!" },
+  { zh: "搵相同嘅一對！撳張卡反開佢！",    jp: "wan2 soeng1 tung4 ge3 jat1 deoi3! gam6 zoeng1 kaat1 faan2 hoi1 keoi5", en: "Find the matching pair! Tap a card to flip it!" },
+  { zh: "聽下動物樂隊啦！",              jp: "teng1 haa5 dung6 mat6 ngok6 deoi6 laa1",     en: "Listen to the animal band!" },
+  { zh: "到你喇！撳啲發光嘅動物！",       jp: "dou3 nei5 laa3! gam6 di1 faat3 gwong1 ge3 dung6 mat6", en: "Your turn! Press the glowing animals!" },
+  { zh: "聽下！邊個發出呢個聲呀？",       jp: "teng1 haa5! bin1 go3 faat3 ceot1 ni1 go3 sing1 aa3", en: "Listen! Who makes this sound?" },
+  { zh: "倒數啦！撳三號！",              jp: "dou3 sou2 laa1! gam6 saam1 hou6",            en: "Count down! Tap number 3!" },
+  { zh: "大嘅放去大星球，細嘅放去細星球！", jp: "daai6 ge3 fong3 heoi3 daai6 sing1 kau4, sai3 ge3 fong3 heoi3 sai3 sing1 kau4", en: "Big ones to the big planet, small to the small!" },
+  { zh: "將每樣嘢放入同顏色嘅籃度！",     jp: "zoeng1 mui5 joeng6 je5 fong3 jap6 tung4 ngaan4 sik1 ge3 laam4 dou6", en: "Put each thing in the basket that matches its color!" },
+  { zh: "睇下個規律！下一個係咩呀？",     jp: "tai2 haa5 go3 kwai1 leot6! haa6 jat1 go3 hai6 me1 aa3", en: "Look at the pattern! What comes next?" },
+  { zh: "餵三嚿曲奇俾條龍食！",          jp: "wai3 saam1 gau6 kuk1 kei4 bei2 tiu4 lung4 sik6", en: "Feed the dragon 3 cookies!" },
+  { zh: "撳三隻蛋，孵出恐龍BB！",         jp: "gam6 saam1 zek3 daan2, fu1 ceot1 hung2 lung4 bi4 bi1", en: "Tap 3 eggs to hatch the baby dinos!" },
+  { zh: "睇清楚！數下啲蛋！",            jp: "tai2 cing1 co2! sou2 haa5 di1 daan2",        en: "Watch carefully! Count the eggs!" },
+  { zh: "有幾多隻蛋呀？",                jp: "jau5 gei2 do1 zek3 daan2 aa3",               en: "How many eggs?" },
+  { zh: "加一球士多啤梨雪糕！",          jp: "gaa1 jat1 kau4 si6 do1 be1 lei2 syut3 gou1", en: "Add a strawberry scoop!" },
+  { zh: "撳隻小狗！",                    jp: "gam6 zek3 siu2 gau2",                        en: "Tap the puppy!" },
+  { zh: "照顧隻小貓！沖涼、餵食、玩玩具！", jp: "ziu3 gu3 zek3 siu2 maau1! cung1 loeng4, wai3 sik6, waan2 wun6 geoi6", en: "Take care of the kitten! Bath, food, toy!" },
+  { zh: "撳個鼻！",                      jp: "gam6 go3 bei6",                              en: "Tap the nose!" },
+  { zh: "將小狗放喺枱下面！",            jp: "zoeng1 siu2 gau2 fong3 hai2 toi2 haa6 min6", en: "Put the puppy under the table!" },
+  { zh: "睇住個波呀！",                  jp: "tai2 zyu6 go3 bo1 aa3",                      en: "Watch the ball!" },
+  { zh: "個波喺邊個杯下面呀？撳個杯啦！",  jp: "go3 bo1 hai2 bin1 go3 bui1 haa6 min6 aa3? gam6 go3 bui1 laa1", en: "Which cup is the ball under? Tap it!" },
+  { zh: "搵唔搵到隻海豚呀？撳佢啦！",      jp: "wan2 m4 wan2 dou2 zek3 hoi2 tyun4 aa3? gam6 keoi5 laa1", en: "Can you find the dolphin? Tap it!" },
+  { zh: "我哋嚟畫畫啦！揀個顏色，用手指畫！", jp: "ngo5 dei6 lei4 waak6 waak2 laa1! gaan2 go3 ngaan4 sik1, jung6 sau2 zi2 waak6", en: "Let's paint! Pick a color and draw with your finger!" },
+  { zh: "我哋嚟換衫啦！喺下面揀件衫！",    jp: "ngo5 dei6 lei4 wun6 saam1 laa1! hai2 haa6 min6 gaan2 gin6 saam1", en: "Let's dress up! Pick a part at the bottom!" },
+
+  { sec: "回應 · Feedback" },
+  { zh: "再試多次啦！",      jp: "zoi3 si3 do1 ci3 laa1",         en: "Try again!" },
+  { zh: "啱喇！你搵到喇！",  jp: "aam1 laa3! nei5 wan2 dou2 laa3", en: "Yes! You found it!" },
+  { zh: "全部分好喇！",      jp: "cyun4 bou6 fan1 hou2 laa3",      en: "All sorted!" },
+  { zh: "你全部搵晒喇！",    jp: "nei5 cyun4 bou6 wan2 saai3 laa3", en: "You found them all!" },
+  { zh: "啱一對！兩隻小狗！", jp: "aam1 jat1 deoi3! loeng5 zek3 siu2 gau2", en: "A match! Two puppies!" },
+  { zh: "好好聽嘅音樂！",    jp: "hou2 hou2 teng1 ge3 jam1 ngok6", en: "Beautiful music!" },
+  { zh: "好味呀！",          jp: "hou2 mei6 aa3",                  en: "Yummy!" },
+  { zh: "大！",              jp: "daai6",                          en: "Big!" },
+  { zh: "細！",              jp: "sai3",                           en: "Small!" },
+  { zh: "小狗好開心呀！",    jp: "siu2 gau2 hou2 hoi1 sam1 aa3",   en: "The puppy is so happy!" },
+  { zh: "小貓好似好唔開心，我哋幫下佢啦！", jp: "siu2 maau1 hou2 ci5 hou2 m4 hoi1 sam1, ngo5 dei6 bong1 haa5 keoi5 laa1", en: "The kitten looks sad. Let's help!" },
+
+  { sec: "火箭任務 · Rocket quest" },
+  { zh: "火箭準備好喇！",        jp: "fo2 zin3 zeon2 bei6 hou2 laa3",        en: "Rocket ready!" },
+  { zh: "好嘢！你儲到一粒星星火花！", jp: "hou2 je5! nei5 cou5 dou2 jat1 nap1 sing1 sing1 fo2 faa1", en: "Hooray! You earned a Star Spark!" },
+  { zh: "發射喇！",              jp: "faat3 se6 laa3",                       en: "Blast off!" },
+
+  { sec: "結束 · Goodbye" },
+  { zh: "故事完喇！小朋友，晚安！", jp: "gu3 si6 jyun4 laa3! siu2 pang4 jau5, maan5 on1", en: "The end! Goodnight!" },
+  { zh: "拜拜！",                jp: "baai1 baai3",                          en: "Bye-bye!" },
+  { zh: "你叫咩名呀？",          jp: "nei5 giu3 me1 meng2 aa3",              en: "What's your name?" }
 ];
 
 const $ = id => document.getElementById(id);
@@ -162,17 +239,23 @@ function loadVoices() {
     `All langs seen: ${[...new Set(voices.map(v => v.lang))].sort().join(", ") || "(none yet — tap Refresh)"}`;
 }
 
-let cards = [];
+let playable = [];   // [{ p, card }] — real phrases only (section rows excluded)
 function buildCards() {
-  const g = $("grid"); g.innerHTML = ""; cards = [];
-  PHRASES.forEach((p, i) => {
+  const g = $("grid"); g.innerHTML = ""; playable = [];
+  PHRASES.forEach(p => {
+    if (p.sec) {
+      const h = document.createElement("div");
+      h.className = "sec"; h.textContent = p.sec;
+      g.appendChild(h); return;
+    }
     const c = document.createElement("div");
     c.className = "card";
     c.innerHTML = `<div class="zh">${p.zh}</div><div class="jp">${p.jp}</div><div class="en">${p.en}</div>`;
     c.onclick = () => speak(p.zh, c);
-    g.appendChild(c); cards.push(c);
+    g.appendChild(c); playable.push({ p, card: c });
   });
 }
+const clearSpeaking = () => playable.forEach(x => x.card.classList.remove("speaking"));
 
 function speak(text, cardEl) {
   if (!("speechSynthesis" in window)) { alert("This browser has no speechSynthesis."); return; }
@@ -186,7 +269,7 @@ function speak(text, cardEl) {
     const v = voices.find(v => v.name === chosen);
     if (v) u.voice = v;
   }
-  cards.forEach(c => c.classList.remove("speaking"));
+  clearSpeaking();
   if (cardEl) cardEl.classList.add("speaking");
   u.onend = u.onerror = () => { if (cardEl) cardEl.classList.remove("speaking"); };
   synth.speak(u);
@@ -196,13 +279,12 @@ let allTimer = null;
 function speakAll() {
   let i = 0;
   const next = () => {
-    if (i >= PHRASES.length) return;
-    const p = PHRASES[i], card = cards[i]; i++;
+    if (i >= playable.length) return;
+    const { p, card } = playable[i]; i++;
     speak(p.zh, card);
     // chain on utterance end (plus a small gap)
-    const u = synth; // poll for completion
     allTimer = setInterval(() => {
-      if (!u.speaking && !u.pending) { clearInterval(allTimer); setTimeout(next, 450); }
+      if (!synth.speaking && !synth.pending) { clearInterval(allTimer); setTimeout(next, 450); }
     }, 200);
   };
   next();
@@ -213,7 +295,7 @@ $("pitch").oninput = e => $("pitchV").textContent = e.target.value;
 $("customSpeak").onclick = () => { const t = $("custom").value.trim(); if (t) speak(t, null); };
 $("custom").addEventListener("keydown", e => { if (e.key === "Enter") $("customSpeak").click(); });
 $("speakAll").onclick = speakAll;
-$("stop").onclick = () => { if (allTimer) clearInterval(allTimer); synth.cancel(); cards.forEach(c => c.classList.remove("speaking")); };
+$("stop").onclick = () => { if (allTimer) clearInterval(allTimer); synth.cancel(); clearSpeaking(); };
 $("refresh").onclick = loadVoices;
 
 buildCards();
