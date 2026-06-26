@@ -46,81 +46,149 @@ const petmatchLevel = {
   }
 };
 
-/* LEVEL: Pet Care (nurture / cause-effect)
-   Domain · Logic / cause–effect · Concept · Age band 2–3 · Success = Child associates tool with pet need. */
+/* LEVEL: Pet Care (nurture / cause-effect / SEL)
+   Domain · Logic / cause–effect · SEL · Concept · Age band 2–3 · Success = Child associates tool with pet need
+   and hears emotion named at start, after each action, and on completion. */
+const CARE_ICONS = { wash: "🧼", feed: "🍖", play: "🎾", cuddle: "🫂" };
+const CARE_NEED_ICONS = { wash: "🫧", feed: "🍖", play: "🎾", cuddle: "💞" };
+const CARE_MOODS = ["😢", "😐", "🙂", "😊", "💖"];
 const petcareLevel = {
   theme: "theme-pets", rounds: 3,
   startRound() {
     this.pet = rand(PETS.slice(0, 6));
-    this.needs = new Set(["wash", "feed", "play"]);
-    setInstruction("🛁 " + t("takecare_show", { x: theWord(this.pet.name) }), t("takecare_say", { x: theWord(this.pet.name) }));
+    // tier 0 → 2 needs, tier 1 → 3 needs, tier 2 → 4 needs (adds cuddle)
+    const needSets = [["wash", "feed"], ["wash", "feed", "play"], ["wash", "feed", "play", "cuddle"]];
+    this.needs = new Set(needSets[state.tier]);
+    this.total = this.needs.size;
+    this.done = 0;
+    setInstruction("🛁 " + t("takecare_show", { x: theWord(this.pet.name) }), t("takecare_sad", { animal: theWord(this.pet.name) }));
+    const toolBtns = [...this.needs].map(act =>
+      `<button class="care-tool" data-act="${act}">${CARE_ICONS[act]}</button>`
+    ).join("");
     $("playArea").innerHTML = `<div class="petcare-wrap">
+        <div class="care-mood" id="careMood">${CARE_MOODS[0]}</div>
         <div class="care-pet" id="carePet">${this.pet.e}</div>
-        <div class="care-status" id="careStatus">🫧 🍖 🎾</div>
-        <div class="care-tools">
-          <button class="care-tool" data-act="wash">🧼</button>
-          <button class="care-tool" data-act="feed">🍖</button>
-          <button class="care-tool" data-act="play">🎾</button>
-        </div></div>`;
-    document.querySelectorAll(".care-tool").forEach(t => t.onclick = e => this.use(t.dataset.act, e));
+        <div class="care-status" id="careStatus">${[...this.needs].map(n => CARE_NEED_ICONS[n]).join(" ")}</div>
+        <div class="care-tools" id="careTools">${toolBtns}</div></div>`;
+    document.querySelectorAll(".care-tool").forEach(btn => btn.onclick = ev => this.use(btn.dataset.act, btn, ev));
+    core.wait(() => speak(t("pet_sad", { animal: theWord(this.pet.name) })), 600);
   },
-  use(act, e) {
+  use(act, btn, ev) {
     if (state.busy || !this.needs.has(act)) return;
     this.needs.delete(act);
+    this.done++;
+    // dim used button
+    btn.classList.add("care-used");
+    btn.disabled = true;
     const pet = $("carePet"); pet.classList.remove("happy"); void pet.offsetWidth; pet.classList.add("happy");
     const c = centerOf(pet);
-    if (act === "wash") { floaters(["🫧", "✨", "💧"], c.x, c.y, 9); tone(700, 0, .2, "sine"); speak(t("pet_clean")); }
-    else if (act === "feed") { floaters(["😋", "❤️", "🍖"], c.x, c.y, 6); tone(400, 0, .2, "square"); speak(t("pet_yum")); }
-    else { floaters(["🎾", "⭐", "🐾"], c.x, c.y, 7); tone(600, 0, .2, "triangle"); speak(t("pet_whee")); }
-    const icons = { wash: "🫧", feed: "🍖", play: "🎾" };
-    $("careStatus").textContent = [...this.needs].map(n => icons[n]).join(" ") || "💖";
-    if (this.needs.size === 0) { floaters(["💖", "⭐", "🐾", "✨"], c.x, c.y, 12); speak(t("pet_happy", { animal: theWord(this.pet.name) }) + " " + praise()); roundComplete(); }
+    // update mood indicator with bounce
+    const moodIdx = Math.min(this.done, CARE_MOODS.length - 1);
+    const moodEl = $("careMood");
+    moodEl.textContent = CARE_MOODS[moodIdx];
+    moodEl.classList.remove("bump"); void moodEl.offsetWidth; moodEl.classList.add("bump");
+    if (act === "wash")   { floaters(["🫧", "✨", "💧"], c.x, c.y, 9);       tone(700, 0, .2, "sine");     speak(t("pet_feels_clean",   { animal: theWord(this.pet.name) })); }
+    else if (act === "feed")   { floaters(["😋", "❤️", "🍖"], c.x, c.y, 6);  tone(400, 0, .2, "square");   speak(t("pet_feels_fed",     { animal: theWord(this.pet.name) })); }
+    else if (act === "play")   { floaters(["🎾", "⭐", "🐾"], c.x, c.y, 7);  tone(600, 0, .2, "triangle"); speak(t("pet_feels_played",  { animal: theWord(this.pet.name) })); }
+    else                       { floaters(["💞", "💖", "✨"], c.x, c.y, 8);   tone(550, 0, .25, "sine");    speak(t("pet_feels_cuddled", { animal: theWord(this.pet.name) })); }
+    // update needs strip
+    $("careStatus").textContent = [...this.needs].map(n => CARE_NEED_ICONS[n]).join(" ") || "💖";
+    if (this.needs.size === 0) {
+      floaters(["💖", "⭐", "🐾", "✨"], c.x, c.y, 12);
+      speak(t("pet_kind", { animal: theWord(this.pet.name) }) + " " + praise());
+      roundComplete();
+    }
   }
 };
 
-/* LEVEL: Feed Pet (counting)
-   Domain · Number sense · Concept · Age band 3–4 · Success = Child counts 1–5 with 1:1 correspondence. */
+/**
+ * STEM Objective: Mathematics · One-to-One Correspondence / Equality · Age band 2–3 ·
+ * Success = Child drags treats to a second pet's bowl until it matches the first pet's count.
+ * The number is never stated — child must look and match, discovering what "same" means.
+ *
+ * Tier 2 adds extra treats in the pile (child must stop at the right count, not just drain it).
+ */
+
+/* ================= LEVEL: Pet Match (Give them the same) ================= */
+
 const PET_FOODS = [
   { e: "🐶", treat: "🦴", name: "puppy" }, { e: "🐱", treat: "🐟", name: "kitty" },
   { e: "🐰", treat: "🥕", name: "bunny" }, { e: "🐹", treat: "🌰", name: "hamster" }
 ];
+
 const petfeedLevel = {
   theme: "theme-pets", rounds: 5,
+
   startRound() {
     this.mistakes = 0;
-    if (state.round === 0) this.pet = rand(PET_FOODS);
-    const counts = [[1, 2, 2, 3, 3], [2, 3, 4, 4, 5], [3, 4, 5, 6, 7]][state.tier];
-    const need = counts[state.round];
-    this.need = need; this.fed = 0;
-    setInstruction(t("give_pet_show", { animal: theWord(this.pet.name), count: need, x: words("treat", need) }), t("give_pet_show", { animal: theWord(this.pet.name), count: need, x: words("treat", need) }));
-    $("playArea").innerHTML = `<div class="dragon-wrap"><div class="dragon" id="petEl">${this.pet.e}</div><div class="treat-row" id="treatRow"></div></div>`;
-    for (let i = 0; i < need; i++) {
-      const t = document.createElement("button");
-      t.className = "treat"; t.textContent = this.pet.treat;
-      makeDraggable(t, (el, ev, info) => this.release(el, ev, info));
-      $("treatRow").appendChild(t);
+    this.fed = 0;
+    if (state.round === 0) {
+      const shuffled = shuffle([...PET_FOODS]);
+      this.leftPet = shuffled[0]; this.rightPet = shuffled[1];
+    }
+    const counts = [[1,2,2,3,3],[2,3,4,4,5],[3,4,5,6,7]][state.tier];
+    this.need = counts[state.round];
+    const pileSize = state.tier < 2 ? this.need : this.need + 2;
+
+    setInstruction(
+      t("same_pet_show", { left: theWord(this.leftPet.name), right: theWord(this.rightPet.name) }),
+      t("same_pet_say",  { left: theWord(this.leftPet.name), right: theWord(this.rightPet.name) })
+    );
+
+    const leftTreats = Array(this.need).fill(null)
+      .map(() => `<span class="bowl-treat">${this.leftPet.treat}</span>`).join("");
+
+    $("playArea").innerHTML = `<div class="match-wrap">
+      <div class="match-sides">
+        <div class="match-side">
+          <div class="match-pet-icon">${this.leftPet.e}</div>
+          <div class="match-bowl" id="leftBowl">${leftTreats}</div>
+        </div>
+        <div class="match-side">
+          <div class="match-pet-icon">${this.rightPet.e}</div>
+          <div class="match-bowl match-drop" id="rightBowl"></div>
+        </div>
+      </div>
+      <div class="treat-row" id="treatPile"></div>
+    </div>`;
+
+    for (let i = 0; i < pileSize; i++) {
+      const tr = document.createElement("button");
+      tr.className = "treat"; tr.textContent = this.rightPet.treat;
+      makeDraggable(tr, (el, ev, info) => this.release(el, ev, info));
+      $("treatPile").appendChild(tr);
     }
   },
+
   release(el, ev, info) {
     if (state.busy) { info.reset(); return; }
-    if (inside(centerOf(el), $("petEl")) || !info.moved) this.feed(el, ev);
+    if (this.fed >= this.need) { info.reset(); return; }
+    if (inside(centerOf(el), $("rightBowl")) || !info.moved) this.feed(el, ev);
     else {
       this.mistakes++;
       sfx.bad(); info.reset();
-      if (this.mistakes === 2) {
-        $("petEl").classList.add("hint-highlight");
-      } else if (this.mistakes >= 3) {
-        wiggle($("petEl"));
-      }
+      if (this.mistakes >= 2) $("rightBowl").classList.add("hint-highlight");
+      if (this.mistakes >= 3) wiggle($("rightBowl"));
     }
   },
+
   feed(el, ev) {
     el.style.visibility = "hidden"; el.classList.add("on-plate");
-    const d = $("petEl"); d.classList.remove("chomp"); void d.offsetWidth; d.classList.add("chomp");
-    sfx.tap(); tone(300, 0, .15, "square", .14); miniStar(ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2);
+    const bowl = $("rightBowl");
+    const sp = document.createElement("span");
+    sp.className = "bowl-treat"; sp.textContent = this.rightPet.treat;
+    bowl.appendChild(sp);
+    sfx.tap(); tone(300 + this.fed * 30, 0, .15, "square", .14);
+    miniStar(ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2);
     this.fed++;
-    if (this.fed < this.need) speak(numWord(this.fed) + "!");
-    else { floaters(["❤️", "✨", "🐾"], innerWidth / 2, innerHeight / 2.5, 8); speak(t("count_x", { count: this.need, x: words("treat", this.need) }) + " " + praise()); roundComplete(); }
+    if (this.fed < this.need) {
+      speak(numWord(this.fed) + "!");
+    } else {
+      bowl.classList.add("match-done");
+      floaters(["❤️", "✨", "🐾"], innerWidth / 2, innerHeight / 2.5, 8);
+      speak(t("same_pet_win", { count: this.need }) + " " + praise());
+      roundComplete();
+    }
   }
 };
 
@@ -130,34 +198,34 @@ const bodyLevel = {
   theme: "theme-trace", rounds: 5,
   parts: [
     { name: "head",     x: 100, y: 96,  r: 58 },
-    { name: "hand",     x: 46,  y: 98,  r: 15 },
-    { name: "hand",     x: 154, y: 98,  r: 15 },
-    { name: "foot",     x: 74,  y: 380, r: 20 },
-    { name: "foot",     x: 126, y: 380, r: 20 },
-    { name: "tummy",    x: 100, y: 230, r: 35 },
+    { name: "hand",     x: 18,  y: 278, r: 22 },
+    { name: "hand",     x: 182, y: 278, r: 22 },
+    { name: "foot",     x: 83,  y: 385, r: 18 },
+    { name: "foot",     x: 117, y: 385, r: 18 },
+    { name: "tummy",    x: 100, y: 235, r: 35 },
     { name: "eye",      x: 80,  y: 98,  r: 12 },
     { name: "eye",      x: 120, y: 98,  r: 12 },
     { name: "nose",     x: 100, y: 110, r: 10 },
-    { name: "mouth",    x: 100, y: 128, r: 15 },
+    { name: "mouth",    x: 100, y: 129, r: 14 },
     { name: "ear",      x: 42,  y: 96,  r: 14 },
     { name: "ear",      x: 158, y: 96,  r: 14 },
     { name: "hair",     x: 100, y: 45,  r: 35 },
-    { name: "arm",      x: 65,  y: 160, r: 20 },
-    { name: "arm",      x: 135, y: 160, r: 20 },
-    { name: "leg",      x: 80,  y: 320, r: 25 },
-    { name: "leg",      x: 120, y: 320, r: 25 },
-    { name: "knee",     x: 80,  y: 320, r: 15 },
-    { name: "knee",     x: 120, y: 320, r: 15 },
-    { name: "shoulder", x: 70,  y: 175, r: 18 },
-    { name: "shoulder", x: 130, y: 175, r: 18 },
-    { name: "toe",      x: 74,  y: 380, r: 10 },
-    { name: "toe",      x: 126, y: 380, r: 10 },
-    { name: "teeth",    x: 100, y: 128, r: 10 },
-    { name: "neck",     x: 100, y: 165, r: 12 },
-    { name: "tongue",   x: 100, y: 135, r: 8 },
-    { name: "chin",     x: 100, y: 145, r: 12 },
-    { name: "cheek",    x: 72,  y: 116, r: 12 },
-    { name: "cheek",    x: 128, y: 116, r: 12 }
+    { name: "arm",      x: 34,  y: 235, r: 25 },
+    { name: "arm",      x: 166, y: 235, r: 25 },
+    { name: "leg",      x: 75,  y: 320, r: 25 },
+    { name: "leg",      x: 125, y: 320, r: 25 },
+    { name: "knee",     x: 75,  y: 328, r: 14 },
+    { name: "knee",     x: 125, y: 328, r: 14 },
+    { name: "shoulder", x: 56,  y: 188, r: 18 },
+    { name: "shoulder", x: 144, y: 188, r: 18 },
+    { name: "toe",      x: 83,  y: 387, r: 13 },
+    { name: "toe",      x: 117, y: 387, r: 13 },
+    { name: "teeth",    x: 100, y: 122, r: 10 },
+    { name: "neck",     x: 100, y: 163, r: 12 },
+    { name: "tongue",   x: 100, y: 137, r: 9 },
+    { name: "chin",     x: 100, y: 150, r: 11 },
+    { name: "cheek",    x: 68,  y: 116, r: 13 },
+    { name: "cheek",    x: 132, y: 116, r: 13 }
   ],
   tiers: [
     ["head", "hand", "tummy", "foot", "leg"],
@@ -169,8 +237,8 @@ const bodyLevel = {
     this.target = rand(pool);
     const isFace = ["eye", "nose", "mouth", "ear", "teeth", "neck", "tongue", "chin", "cheek", "hair"].includes(this.target);
     setInstruction("📍 " + t("tap_part", { part: theWord(this.target) }), t("tap_part", { part: theWord(this.target) }));
-    
-    const idx = { skin: 0, face: 0, hair: 1, hat: 0, glasses: 0, outfit: 3, friend: 0 };
+
+    const idx = { skin: 0, face: 1, hair: 1, hat: 0, glasses: 0, outfit: 3, friend: 0 };
     $("playArea").innerHTML = `<div class="body-wrap">
       <div class="body-doll${isFace ? " zoom-face" : ""}" id="bodyDoll">${dFullBodySVG(idx)}</div>
       <svg class="body-overlay${isFace ? " zoom-face" : ""}" viewBox="0 0 200 400" id="bodyOverlay"></svg>

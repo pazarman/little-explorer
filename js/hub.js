@@ -1,11 +1,12 @@
 "use strict";
+const APP_VERSION = "26";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
   rocket: rocketLevel, sort: sortLevel, pattern: patternLevel, sortkind: sortkindLevel,
   dragon: dragonLevel, dino: dinoLevel, icecream: icecreamLevel,
   petmatch: petmatchLevel, petcare: petcareLevel, petfeed: petfeedLevel, body: bodyLevel,
-  hideseek: hideseekLevel
+  hideseek: hideseekLevel, cups: cupsLevel
 };
 
 /* ================= Categories & games ================= */
@@ -19,50 +20,73 @@ const GAMES = {
   sort:    { icon: "🪐", name: "Big & Small", es: "Grande y Pequeño", lvl: 0 }, pattern: { icon: "🔮", name: "Patterns", es: "Patrones", lvl: 2 },
   sortkind:{ icon: "🧺", name: "Sort It", es: "A Ordenar", lvl: 1 },
   paint:   { icon: "🎨", name: "Paint", es: "Pintar", lvl: 0 },     story:   { icon: "📖", name: "Story", es: "Cuento", lvl: 0 },
-  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón", lvl: 0 }, dino:  { icon: "🦕", name: "Dino Eggs", es: "Huevos de Dino", lvl: 0 },
-  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado", lvl: 0 },  petfeed: { icon: "🦴", name: "Feed Pet", es: "Alimenta", lvl: 1 },
+  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón", lvl: 0 }, dino:  { icon: "🦕", name: "Flash Count", es: "Cuenta Rápida", lvl: 0 },
+  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado", lvl: 0 },  petfeed: { icon: "🦴", name: "Same Treats", es: "Mismos Premios", lvl: 1 },
   petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca", lvl: 0 },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida", lvl: 0 },
   body:    { icon: "😊", name: "Body Match", es: "El Cuerpo", lvl: 0 },
   dressup: { icon: "👗", name: "Dress Up", es: "Vestir", lvl: 0 },
-  hideseek:{ icon: "🐾", name: "Hide & Seek", es: "Escondite", lvl: 0 }
+  hideseek:{ icon: "🐾", name: "Hide & Seek", es: "Escondite", lvl: 0 },
+  cups:    { icon: "🥤", name: "Three Cups", es: "Tres Vasos", lvl: 1 }
 };
 // chosen difficulty → max game level shown (auto/hard show everything)
 const diffLevel = () => settings.diff === "easy" ? 0 : settings.diff === "med" ? 1 : 2;
 const gameVisible = gid => (GAMES[gid].lvl || 0) <= diffLevel();
 const visibleGames = cat => cat.games.filter(gameVisible);
 const CATEGORIES = [
-  { id: "num",    icon: "🔢", name: "Numbers",        es: "Números",          cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
+  { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",          cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
   { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
-  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   cls: "c-brain",  games: ["memory", "pattern", "sort", "sortkind", "hideseek"] },
+  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind"] },
   { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          cls: "c-animal", games: ["music", "whosays", "dino", "body"] },
   { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
-  { id: "space",  icon: "🚀", name: "Space",           es: "Espacio",           cls: "c-space",  games: ["rocket", "sort", "pattern"] },
-  { id: "fantasy",icon: "🐉", name: "Make-Believe",    es: "Fantasía",          cls: "c-fantasy", games: ["dragon", "dino", "icecream"] },
   { id: "create", icon: "✏️", name: "Create",          es: "Crear",             cls: "c-create", games: ["paint", "story", "dressup"] }
 ];
+/* ── Narrator speech bubble ── */
+let _narratorTimer = null;
+function narratorSay(line) {
+  const el = $("buddySpeech"); if (!el) return;
+  if (_narratorTimer) { clearTimeout(_narratorTimer); _narratorTimer = null; }
+  el.textContent = line;
+  el.classList.remove("hidden", "narrator-out");
+  void el.offsetWidth;
+  speak(line);
+  _narratorTimer = setTimeout(() => {
+    el.classList.add("narrator-out");
+    setTimeout(() => el.classList.add("hidden"), 380);
+  }, 4200);
+}
+function gameCategory(gid) {
+  for (const cat of CATEGORIES) { if (cat.games.includes(gid)) return cat.id; }
+  return "create";
+}
+function hubGreeting() {
+  const last = localStorage.getItem("fionaLastGame");
+  if (last) { localStorage.removeItem("fionaLastGame"); return t("narrator_postgame"); }
+  return rand([t("narrator_back"), t("narrator_ready")]);
+}
+
 function launchGame(id) {
-  if (id === "paint") paint.show();
-  else if (id === "story") showStory();
-  else if (id === "dressup") dressup.show();
-  else startLevel(id);
+  narratorSay(t("narrator_cat_" + gameCategory(id)));
+  core.wait(() => {
+    if (id === "paint") paint.show();
+    else if (id === "story") showStory();
+    else if (id === "dressup") dressup.show();
+    else startLevel(id);
+  }, 900);
 }
 function buildHub() {
   $("mapPath").setAttribute("points", "");
   const wrap = $("mapNodes"); wrap.className = "cats"; wrap.innerHTML = "";
-  const seen = new Set();
   CATEGORIES.forEach(cat => {
-    visibleGames(cat).forEach(gid => {
-      if (seen.has(gid)) return;
-      seen.add(gid);
-      const g = GAMES[gid];
-      const b = document.createElement("button");
-      b.className = "node";
-      b.innerHTML = `<div class="node-disc b-${gid}"><span>${g.icon}</span></div>
-                     <div class="node-label">${locName(g)}</div>
-                     <div class="node-stars">${"⭐".repeat(Math.min(3, completions[gid] || 0))}</div>`;
-      b.onclick = () => { sfx.tap(); launchGame(gid); };
-      wrap.appendChild(b);
-    });
+    const games = visibleGames(cat);
+    if (!games.length) return;
+    const earned = games.reduce((s, gid) => s + Math.min(3, completions[gid] || 0), 0);
+    const b = document.createElement("button");
+    b.className = "node";
+    b.innerHTML = `<div class="node-disc ${cat.cls}"><span>${cat.icon}</span></div>
+                   <div class="node-label">${locName(cat)}</div>
+                   <div class="node-stars">${"⭐".repeat(Math.min(3, Math.round(earned / games.length)))}</div>`;
+    b.onclick = () => { sfx.tap(); openCategory(cat.id); };
+    wrap.appendChild(b);
   });
   renderQuest();
 }
@@ -258,6 +282,7 @@ function openSettings() {
   document.querySelectorAll("#segDiff button").forEach(b => b.classList.toggle("sel", b.dataset.d === settings.diff));
   document.querySelectorAll("#segVoice button").forEach(b => b.classList.toggle("sel", String(settings.voice) === b.dataset.v));
   document.querySelectorAll("#segMusic button").forEach(b => b.classList.toggle("sel", b.dataset.m === settings.music));
+  const vEl = $("settingsVersion"); if (vEl) vEl.textContent = "v" + APP_VERSION;
 }
 function showCharScreen(returnTo) {
   hideAllScreens();
@@ -310,6 +335,7 @@ function showHub() {
   applyName();
   buildHub();
   if (!questGreeted && settings.voice) { questGreeted = true; core.wait(questIntro, 800); }
+  else core.wait(() => narratorSay(hubGreeting()), 700);
 }
 function startLevel(name) {
   audio(); cleanupLevel();
@@ -373,6 +399,9 @@ $("setReset").onclick = () => {
     stickers.length = 0; sparks = 0; trips = 0; questShown = 0;
     saveCompletions(); saveStickers(); saveQuest(); buildHub();
   }
+};
+$("setRestart").onclick = () => {
+  if (confirm(t("settings_restart_confirm"))) { localStorage.clear(); location.reload(); }
 };
 $("setName").onclick = () => { $("settings").classList.add("hidden"); showNameScreen(NAME); };
 document.querySelectorAll("#segLang button").forEach(b => b.onclick = () => {

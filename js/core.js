@@ -87,6 +87,17 @@ const DICT = {
     well_done: "You did it, {n}!",
     hi_let_play: "Hi {n}! Let's play!",
     hi_star_sparks: "Hi {n}! Let's find shiny Star Sparks to fix the rocket ship! Tap a world to play!",
+    narrator_back: "Welcome back, {n}! 🌈",
+    narrator_ready: "Where to today, {n}? 🗺️",
+    narrator_postgame: "Amazing! What's next, {n}? ⭐",
+    narrator_cat_num: "Let's count! 🔢",
+    narrator_cat_shape: "Colors and shapes! 🎨",
+    narrator_cat_brain: "Brain power time! 🧩",
+    narrator_cat_animal: "Animal friends! 🐾",
+    narrator_cat_pets: "Pets need us! 🐶",
+    narrator_cat_space: "3, 2, 1... Blast off! 🚀",
+    narrator_cat_fantasy: "Into make-believe! 🐉",
+    narrator_cat_create: "Let's create! ✨",
     quest_fixed: "The rocket is all fixed! Get ready to blast off!",
     quest_fixed_praise: "Hooray {n}! You found the last Star Spark! The rocket is all fixed! Let's blast off!",
     quest_collect: "Hooray! You earned a Star Spark, {n}! {left} more to fix the rocket!",
@@ -100,6 +111,8 @@ const DICT = {
     settings_name: "✏️ Name",
     settings_progress: "📊 Progress",
     settings_reset: "Reset stars",
+    settings_restart: "🔄 Start over",
+    settings_restart_confirm: "This will erase all of {n}'s stars, stickers, and progress. Are you sure?",
     settings_done: "Done",
     back: "Back",
     next: "Next",
@@ -125,6 +138,12 @@ const DICT = {
     pet_yum: "Yum yum!",
     pet_whee: "Wheee!",
     pet_happy: "{animal} is so happy!",
+    pet_sad: "{animal} looks sad 😢 Let's help them feel better!",
+    pet_feels_clean: "Yay! {animal} feels so fresh and clean! 🫧",
+    pet_feels_fed: "Yum! {animal} is not hungry anymore! 😋",
+    pet_feels_played: "Wheee! {animal} feels so happy playing! 🎾",
+    pet_feels_cuddled: "Aww! {animal} feels loved! 💞",
+    pet_kind: "{animal} is so happy now! 💖 You were so kind!",
     settings_title: "⚙️ Grown-up Settings",
     lang_en: "English", lang_es: "Español",
     diff_auto: "Auto ⬆️", diff_easy: "Easy", diff_med: "Medium", diff_hard: "Hard",
@@ -181,6 +200,9 @@ const DICT = {
     feed_dragon_show: "Feed the dragon {count} {x}!",
     eggs_show: "Tap {count} {x} to hatch the dinos!",
     eggs_say: "Tap {count} {x} to hatch the baby dinosaurs!",
+    flash_look: "Watch the eggs!", flash_look_say: "Watch carefully! Count the eggs!",
+    flash_ask: "How many eggs?", flash_ask_say: "How many eggs did you see?",
+    flash_win: "{count} eggs! You remembered!", flash_peek: "Take another look!",
     scoop_show: "Add a {x} scoop!",
     scoop_say: "Add a {x} scoop on top!",
     thats_find_scoop: "That's {color}! Find the {color2} scoop!",
@@ -193,7 +215,11 @@ const DICT = {
     lookfor_pet: "Look for {x}!",
     takecare_show: "Take care of {x}!",
     takecare_say: "Take care of {x}! Give it a bath, some food, and a toy!",
+    takecare_sad: "{animal} looks sad 😢 Can you help them feel better?",
     give_pet_show: "Give {animal} {count} {x}!",
+    same_pet_show: "Give {right} the same treats as {left}!",
+    same_pet_say: "Give {right} the same number of treats as {left}!",
+    same_pet_win: "They both have {count}! They match!",
     count_x: "{count} {x}!",
     paint_intro: "Let's paint! Pick a color and draw with your finger, {n}!",
     paint_color_q: "Can you paint with {color}?",
@@ -232,9 +258,17 @@ const DICT = {
     sortkind_say: "Put each thing where it belongs!",
     tap_part: "Tap {part}!",
     yes_part: "Yes! {part}!",
-    hideseek_show: "Put it {rel} {spot}!",
-    hideseek_say: "Put {buddy} {rel} {spot}!",
-    hideseek_retry: "Good try! Put it {rel} {spot}!",
+    hideseek_show: "Put it {rel} the {spot}!",
+    hideseek_say: "Put {buddy} {rel} the {spot}!",
+    hideseek_retry: "Good try! Put it {rel} the {spot}!",
+    hideseek_win: "{rel} the {spot}!",
+    hideseek_next: "Now put it {rel} the {spot}!",
+    hideseek_again: "Great! Now try a different spot!",
+    cups_watch: "Watch the ball! Where does it go?",
+    cups_find: "Where is the ball? Tap the cup!",
+    cups_nope: "Not there! Peek under another cup!",
+    cups_retry: "Keep looking! Find the ball!",
+    cups_win: "You found it! 🎉",
     rel_in: "in", rel_on: "on", rel_under: "under",
     basket: { es: "canasta", g: "f" },
     box: { es: "caja", g: "f" },
@@ -247,6 +281,17 @@ const DICT = {
     well_done: "¡Lo hiciste, {n}!",
     hi_let_play: "¡Hola {n}! ¡Vamos a jugar!",
     hi_star_sparks: "¡Hola {n}! ¡Busquemos Chispas de Estrella para arreglar el cohete! ¡Toca un mundo!",
+    narrator_back: "¡Bienvenido de nuevo, {n}! 🌈",
+    narrator_ready: "¿A dónde hoy, {n}? 🗺️",
+    narrator_postgame: "¡Genial! ¿Qué sigue, {n}? ⭐",
+    narrator_cat_num: "¡A contar! 🔢",
+    narrator_cat_shape: "¡Colores y figuras! 🎨",
+    narrator_cat_brain: "¡A pensar! 🧩",
+    narrator_cat_animal: "¡Amigos animales! 🐾",
+    narrator_cat_pets: "¡Las mascotas nos necesitan! 🐶",
+    narrator_cat_space: "¡3, 2, 1... Despegue! 🚀",
+    narrator_cat_fantasy: "¡Al mundo de fantasía! 🐉",
+    narrator_cat_create: "¡Vamos a crear! ✨",
     quest_fixed: "¡El cohete está arreglado! ¡Prepárate para el despegue!",
     quest_fixed_praise: "¡Hurra {n}! ¡Encontraste la última Chispa de Estrella! ¡El cohete está listo!",
     quest_collect: "¡Hurra! ¡Ganaste una Chispa de Estrella, {n}! ¡Faltan {left} para arreglarlo!",
@@ -260,6 +305,8 @@ const DICT = {
     settings_name: "✏️ Nombre",
     settings_progress: "📊 Progreso",
     settings_reset: "Reiniciar",
+    settings_restart: "🔄 Empezar de nuevo",
+    settings_restart_confirm: "Esto borrará todas las estrellas, pegatinas y progreso de {n}. ¿Estás seguro?",
     settings_done: "Listo",
     back: "Atrás",
     next: "Siguiente",
@@ -285,6 +332,12 @@ const DICT = {
     pet_yum: "¡Ñam ñam!",
     pet_whee: "¡Siiii!",
     pet_happy: "¡{animal} está muy feliz!",
+    pet_sad: "{animal} se ve triste 😢 ¡Vamos a ayudarle a sentirse mejor!",
+    pet_feels_clean: "¡Qué bien! ¡{animal} está muy limpio y fresco! 🫧",
+    pet_feels_fed: "¡Ñam! ¡{animal} ya no tiene hambre! 😋",
+    pet_feels_played: "¡Siiii! ¡{animal} está muy contento jugando! 🎾",
+    pet_feels_cuddled: "¡Ahhh! ¡{animal} se siente querido! 💞",
+    pet_kind: "¡{animal} está muy feliz ahora! 💖 ¡Fuiste muy amable!",
     settings_title: "⚙️ Ajustes para adultos",
     lang_en: "English", lang_es: "Español",
     diff_auto: "Auto ⬆️", diff_easy: "Fácil", diff_med: "Medio", diff_hard: "Difícil",
@@ -341,6 +394,9 @@ const DICT = {
     feed_dragon_show: "¡Dale {count} {x} al dragón!",
     eggs_show: "¡Toca {count} {x} para abrir los dinos!",
     eggs_say: "¡Toca {count} {x} para abrir los bebés dinosaurios!",
+    flash_look: "¡Mira los huevos!", flash_look_say: "¡Mira bien! ¡Cuenta los huevos!",
+    flash_ask: "¿Cuántos huevos?", flash_ask_say: "¿Cuántos huevos viste?",
+    flash_win: "¡{count} huevos! ¡Lo recordaste!", flash_peek: "¡Mira otra vez!",
     scoop_show: "¡Agrega una bola {x}!",
     scoop_say: "¡Agrega una bola {x} encima!",
     thats_find_scoop: "¡Eso es {color}! ¡Busca la bola {color2}!",
@@ -353,7 +409,10 @@ const DICT = {
     lookfor_pet: "¡Busca {x}!",
     takecare_show: "¡Cuida {x}!",
     takecare_say: "¡Cuida {x}! ¡Dale un baño, comida y un juguete!",
+    takecare_sad: "{animal} se ve triste 😢 ¿Puedes ayudarle a sentirse mejor?",
     give_pet_show: "¡Dale {count} {x} para {animal}!",
+    same_pet_show: "¡Dales los mismos premios!", same_pet_say: "¡Dales a los dos el mismo número de premios!",
+    same_pet_win: "¡Los dos tienen {count}! ¡Son iguales!",
     count_x: "¡{count} {x}!",
     paint_intro: "¡A pintar! Elige un color y dibuja con tu dedo, {n}!",
     paint_color_q: "¿Puedes pintar con {color}?",
@@ -391,7 +450,19 @@ const DICT = {
     sortcolor_say: "¡Pon cada cosa en la canasta de su color!",
     sortkind_say: "¡Pon cada cosa donde va!",
     tap_part: "¡Toca {part}!",
-    yes_part: "¡Sí! ¡{part}!"
+    yes_part: "¡Sí! ¡{part}!",
+    hideseek_show: "¡Ponlo {rel} {spot}!",
+    hideseek_say: "¡Pon {buddy} {rel} {spot}!",
+    hideseek_retry: "¡Buen intento! ¡Ponlo {rel} {spot}!",
+    hideseek_win: "¡{rel} {spot}!",
+    hideseek_next: "¡Ahora ponlo {rel} {spot}!",
+    hideseek_again: "¡Muy bien! ¡Ahora prueba un lugar diferente!",
+    cups_watch: "¡Mira la pelota! ¿A dónde va?",
+    cups_find: "¿Dónde está la pelota? ¡Toca el vaso!",
+    cups_nope: "¡Ahí no! ¡Mira debajo de otro vaso!",
+    cups_retry: "¡Sigue buscando! ¡Encuentra la pelota!",
+    cups_win: "¡La encontraste! 🎉",
+    rel_in: "dentro de", rel_on: "encima de", rel_under: "debajo de"
   }
 };
 
@@ -445,7 +516,10 @@ const VOC = {
   toe:{es:"dedo del pie",g:"m"}, teeth:{es:"dientes",g:"m"}, neck:{es:"cuello",g:"m"},
   tongue:{es:"lengua",g:"f"}, chin:{es:"barbilla",g:"f"}, cheek:{es:"mejilla",g:"f"},
   // misc
-  treat:{es:"premio",g:"m"}, scoop:{es:"bola",g:"f"}, flower:{es:"flor",g:"f"}, dino:{es:"dino",g:"m"}
+  treat:{es:"premio",g:"m"}, scoop:{es:"bola",g:"f"}, flower:{es:"flor",g:"f"}, dino:{es:"dino",g:"m"},
+  // buddies (used in hide & seek "put {buddy} …")
+  snowman:{es:"muñeco de nieve",g:"m"}, princess:{es:"princesa",g:"f"}, unicorn:{es:"unicornio",g:"m"},
+  robot:{es:"robot",g:"m"}, bear:{es:"oso",g:"m"}, dragon:{es:"dragón",g:"m"}
 };
 const COLOR_ES = { red:"rojo", blue:"azul", yellow:"amarillo", green:"verde", orange:"naranja",
   purple:"morado", pink:"rosa", brown:"marrón", gray:"gris", black:"negro", white:"blanco" };
@@ -576,9 +650,11 @@ let lastSpeakEnd = 0;
 function speak(text, opts = {}) {
   if (!settings.voice || !("speechSynthesis" in window)) { lastSpeakEnd = performance.now(); return; }
   if (!opts.queue) speechSynthesis.cancel();
-  lastSpeakEnd = performance.now() + Math.min(7000, 500 + text.length * 72);   // estimated finish time
-  const u = new SpeechSynthesisUtterance(text + " ");   // trailing space: stops Chrome clipping the last word
-  u.lang = settings.lang === "es" ? "es-ES" : "en-US";
+  // Strip emoji before speaking — TTS reads them as "rainbow", "star", etc.
+  const spoken = text.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").replace(/\s{2,}/g, " ").trim();
+  lastSpeakEnd = performance.now() + Math.min(7000, 500 + spoken.length * 72);
+  const u = new SpeechSynthesisUtterance(spoken + " ");  // trailing space: stops Chrome clipping the last word
+  u.lang = settings.lang === "es" ? "es-MX" : "en-US";
   u.rate = opts.rate || 0.95;
   u.pitch = opts.pitch || 1.25;
   
@@ -927,6 +1003,7 @@ function levelComplete() { core.cleanup(); celebrateWith(state.level); }
 function celebrateWith(levelId, opts = {}) {
   completions[levelId] = (completions[levelId] || 0) + 1;
   saveCompletions();
+  localStorage.setItem("fionaLastGame", levelId);
   const sticker = rand(STICKER_POOL);
   stickers.push({ e: sticker });           // position assigned by the sticker book's grid
   saveStickers();

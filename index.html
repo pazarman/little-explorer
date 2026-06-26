@@ -30,6 +30,7 @@
     <h1>🌈 {n}'s World 🌈</h1>
     <div id="mapNodes"></div>
     <div id="hubMascot" class="mascot"></div>
+    <div id="buddySpeech" class="hidden"></div>
     <button id="questBar" aria-label="Rocket quest">
       <span class="q-rocket">🚀</span>
       <span class="q-slots" id="questSlots"></span>
@@ -183,8 +184,10 @@
       <button id="setName" data-i18n="settings_name">✏️ Name</button>
       <button id="setDash" data-i18n="settings_progress">📊 Progress</button>
       <button id="setReset" data-i18n="settings_reset">Reset stars</button>
+      <button id="setRestart" data-i18n="settings_restart">🔄 Start over</button>
       <button id="setDone" data-i18n="settings_done">Done</button>
     </div>
+    <p class="settings-version" id="settingsVersion"></p>
   </div>
 </div>
 
@@ -228,6 +231,7 @@
 <script src="js/games/icecream.js"></script>
 <script src="js/games/pets.js"></script>
 <script src="js/games/hideseek.js"></script>
+<script src="js/games/cups.js"></script>
 <script src="js/games/paint.js"></script>
 <script src="js/games/dressup.js"></script>
 <script src="js/hub.js"></script>
