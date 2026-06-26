@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#8fd5f7">
+<title>Cantonese TTS Sandbox · 廣東話發音測試</title>
+<style>
+  :root { --bg:#fff7ec; --card:#fff; --ink:#2c2c3a; --accent:#e2584b; --ok:#2f9e6e; --warn:#d98a1f; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; font-family:system-ui,-apple-system,"PingFang HK","Noto Sans HK","Microsoft JhengHei",sans-serif;
+         background:linear-gradient(#ffe6a8,#ffd2e0 60%,#b8e6c0); color:var(--ink); padding:14px; }
+  h1 { font-size:clamp(20px,5vw,28px); margin:.2em 0; }
+  .sub { font-size:13px; opacity:.7; margin-bottom:10px; }
+  .panel { background:var(--card); border-radius:16px; padding:14px; margin-bottom:14px;
+           box-shadow:0 3px 10px rgba(0,0,0,.08); }
+  #status { font-weight:bold; font-size:15px; }
+  .badge { display:inline-block; padding:2px 10px; border-radius:999px; color:#fff; font-size:13px; }
+  .badge.ok { background:var(--ok); } .badge.warn { background:var(--warn); }
+  label { display:block; font-size:13px; font-weight:bold; margin:10px 0 4px; }
+  select, input[type=text] { width:100%; padding:10px; font-size:16px; border:2px solid #ddd; border-radius:10px; background:#fff; }
+  .sliders { display:flex; gap:12px; }
+  .sliders > div { flex:1; }
+  input[type=range] { width:100%; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  button { font-family:inherit; cursor:pointer; border:none; border-radius:12px; padding:12px 14px;
+           font-size:16px; background:var(--accent); color:#fff; font-weight:bold; min-height:48px; }
+  button.ghost { background:#eee; color:var(--ink); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+  .card { background:var(--card); border:3px solid transparent; border-radius:16px; padding:12px; text-align:center;
+          box-shadow:0 2px 6px rgba(0,0,0,.08); cursor:pointer; transition:transform .08s, border-color .15s; }
+  .card:active { transform:scale(.97); }
+  .card.speaking { border-color:var(--accent); background:#fff3f0; }
+  .zh { font-size:clamp(22px,6vw,30px); line-height:1.25; margin-bottom:4px; }
+  .jp { font-size:13px; color:#7a5; font-weight:bold; }
+  .en { font-size:12px; opacity:.65; }
+  .note { font-size:12px; opacity:.7; line-height:1.5; }
+  details { margin-top:8px; } summary { cursor:pointer; font-weight:bold; font-size:14px; }
+  code { background:#f0ead8; padding:1px 5px; border-radius:5px; }
+</style>
+</head>
+<body>
+
+<h1>🥤 廣東話 TTS Sandbox</h1>
+<div class="sub">Test whether this device can speak Cantonese, tune the voice, and review the draft toddler phrases. Nothing here touches the real app.</div>
+
+<div class="panel">
+  <div id="status">Checking voices…</div>
+  <details>
+    <summary>No Cantonese voice? How to install one</summary>
+    <p class="note">
+      <b>iPhone/iPad:</b> Settings → Accessibility → Spoken Content → Voices → Chinese → <b>Cantonese (Hong Kong)</b> (e.g. “Sinji”). Download it, then reload this page.<br>
+      <b>Android:</b> Settings → System → Languages &amp; input → Text-to-speech output → choose <b>Google Text-to-Speech</b> → Install voice data → <b>Chinese (Hong Kong) / 粵語</b>. Then reload.<br>
+      <b>Mac (Safari/Chrome):</b> System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → Chinese (Hong Kong).
+    </p>
+  </details>
+</div>
+
+<div class="panel">
+  <label for="voiceSel">Voice</label>
+  <select id="voiceSel"></select>
+
+  <label for="langSel">Language tag (<code>utterance.lang</code>)</label>
+  <select id="langSel">
+    <option value="zh-HK">zh-HK (most common Cantonese tag)</option>
+    <option value="yue-Hant-HK">yue-Hant-HK</option>
+    <option value="zh-Hant-HK">zh-Hant-HK</option>
+    <option value="zh-yue">zh-yue</option>
+  </select>
+
+  <div class="sliders">
+    <div><label>Rate <span id="rateV">0.9</span></label><input type="range" id="rate" min="0.5" max="1.3" step="0.05" value="0.9"></div>
+    <div><label>Pitch <span id="pitchV">1.2</span></label><input type="range" id="pitch" min="0.6" max="1.8" step="0.05" value="1.2"></div>
+  </div>
+  <div class="note">The real app uses rate ≈ 0.95, pitch ≈ 1.25 (warm, slightly high for toddlers).</div>
+
+  <label for="custom">Type / paste any Cantonese to test</label>
+  <div class="row">
+    <input type="text" id="custom" placeholder="例如：你好呀！" style="flex:1; min-width:160px;">
+    <button id="customSpeak">▶︎ Speak</button>
+  </div>
+
+  <div class="row" style="margin-top:12px;">
+    <button id="speakAll" class="ghost">🔊 Play all phrases</button>
+    <button id="stop" class="ghost">⏹ Stop</button>
+    <button id="refresh" class="ghost">↻ Refresh voices</button>
+  </div>
+</div>
+
+<h1 style="font-size:18px;">Draft toddler phrases</h1>
+<div class="sub">⚠️ <b>DRAFT — pending native review.</b> Tap a card to hear it. The Chinese text is what gets spoken; Jyutping + English are for review.</div>
+<div class="grid" id="grid"></div>
+
+<div class="panel" style="margin-top:14px;">
+  <div class="note" id="diag"></div>
+</div>
+
+<script>
+"use strict";
+// Draft colloquial Cantonese (廣東話) for real app moments. Native review pending.
+const PHRASES = [
+  { zh: "你好呀！",            jp: "nei5 hou2 aa3",                  en: "Hello!" },
+  { zh: "我哋一齊玩啦！",       jp: "ngo5 dei6 jat1 cai4 waan2 laa1", en: "Let's play together!" },
+  { zh: "叻叻豬！",            jp: "lek1 lek1 zyu1",                 en: "Clever! (praise)" },
+  { zh: "做得好好！",          jp: "zou6 dak1 hou2 hou2",            en: "Well done!" },
+  { zh: "再試多次啦！",        jp: "zoi3 si3 do1 ci3 laa1",          en: "Try again!" },
+  { zh: "一、二、三！",        jp: "jat1, ji6, saam1",               en: "One, two, three!" },
+  { zh: "紅色",               jp: "hung4 sik1",                     en: "Red" },
+  { zh: "藍色",               jp: "laam4 sik1",                     en: "Blue" },
+  { zh: "黃色",               jp: "wong4 sik1",                     en: "Yellow" },
+  { zh: "綠色",               jp: "luk6 sik1",                      en: "Green" },
+  { zh: "睇住個波呀！",        jp: "tai2 zyu6 go3 bo1 aa3",          en: "Watch the ball!" },
+  { zh: "個波喺邊個杯下面呀？", jp: "go3 bo1 hai2 bin1 go3 bui1 haa6 min6 aa3", en: "Which cup is the ball under?" },
+  { zh: "撳一下個杯啦！",      jp: "gam6 jat1 haa5 go3 bui1 laa1",   en: "Tap the cup!" },
+  { zh: "搵到喇！好叻呀！",     jp: "wan2 dou2 laa3! hou2 lek1 aa3",  en: "Found it! Very clever!" },
+  { zh: "你叫咩名呀？",        jp: "nei5 giu3 me1 meng2 aa3",        en: "What's your name?" },
+  { zh: "拜拜！",             jp: "baai1 baai3",                    en: "Bye-bye!" }
+];
+
+const $ = id => document.getElementById(id);
+const synth = window.speechSynthesis;
+let voices = [];
+
+// A voice counts as Cantonese if its lang or name says so.
+function isCanto(v) {
+  const l = (v.lang || "").toLowerCase().replace("_", "-");
+  const n = (v.name || "").toLowerCase();
+  return l.includes("yue") || l === "zh-hk" || l.startsWith("zh-hant-hk") ||
+         /cantonese|廣東|粵|sin-?ji/i.test(v.name) || /sin-?ji/.test(n);
+}
+
+function loadVoices() {
+  voices = synth.getVoices();
+  const sel = $("voiceSel");
+  sel.innerHTML = "";
+  const canto = voices.filter(isCanto);
+  // Auto option = let the browser choose from the lang tag
+  const auto = document.createElement("option");
+  auto.value = "__auto__"; auto.textContent = "Auto (browser picks from language tag)";
+  sel.appendChild(auto);
+  // Cantonese voices first, then the rest (so you can A/B against fallbacks)
+  const ordered = [...canto, ...voices.filter(v => !isCanto(v))];
+  ordered.forEach(v => {
+    const o = document.createElement("option");
+    o.value = v.name;
+    o.textContent = (isCanto(v) ? "🟢 " : "") + v.name + "  —  " + v.lang + (v.localService ? " (device)" : " (network)");
+    sel.appendChild(o);
+  });
+  if (canto.length) sel.value = canto[0].name;
+
+  const st = $("status");
+  if (canto.length) {
+    st.innerHTML = `<span class="badge ok">✓ ${canto.length} Cantonese voice${canto.length > 1 ? "s" : ""} found</span> — ` +
+                   canto.map(v => v.name + " (" + v.lang + ")").join(", ");
+  } else {
+    st.innerHTML = `<span class="badge warn">⚠ No Cantonese voice on this device</span> — playback will likely be silent or wrong. See “How to install one” above.`;
+  }
+  $("diag").innerHTML =
+    `<b>Diagnostics</b><br>` +
+    `UserAgent: ${navigator.userAgent}<br>` +
+    `Total voices: ${voices.length} · Cantonese: ${canto.length}<br>` +
+    `All langs seen: ${[...new Set(voices.map(v => v.lang))].sort().join(", ") || "(none yet — tap Refresh)"}`;
+}
+
+let cards = [];
+function buildCards() {
+  const g = $("grid"); g.innerHTML = ""; cards = [];
+  PHRASES.forEach((p, i) => {
+    const c = document.createElement("div");
+    c.className = "card";
+    c.innerHTML = `<div class="zh">${p.zh}</div><div class="jp">${p.jp}</div><div class="en">${p.en}</div>`;
+    c.onclick = () => speak(p.zh, c);
+    g.appendChild(c); cards.push(c);
+  });
+}
+
+function speak(text, cardEl) {
+  if (!("speechSynthesis" in window)) { alert("This browser has no speechSynthesis."); return; }
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text + " ");
+  u.lang = $("langSel").value;
+  u.rate = parseFloat($("rate").value);
+  u.pitch = parseFloat($("pitch").value);
+  const chosen = $("voiceSel").value;
+  if (chosen !== "__auto__") {
+    const v = voices.find(v => v.name === chosen);
+    if (v) u.voice = v;
+  }
+  cards.forEach(c => c.classList.remove("speaking"));
+  if (cardEl) cardEl.classList.add("speaking");
+  u.onend = u.onerror = () => { if (cardEl) cardEl.classList.remove("speaking"); };
+  synth.speak(u);
+}
+
+let allTimer = null;
+function speakAll() {
+  let i = 0;
+  const next = () => {
+    if (i >= PHRASES.length) return;
+    const p = PHRASES[i], card = cards[i]; i++;
+    speak(p.zh, card);
+    // chain on utterance end (plus a small gap)
+    const u = synth; // poll for completion
+    allTimer = setInterval(() => {
+      if (!u.speaking && !u.pending) { clearInterval(allTimer); setTimeout(next, 450); }
+    }, 200);
+  };
+  next();
+}
+
+$("rate").oninput = e => $("rateV").textContent = e.target.value;
+$("pitch").oninput = e => $("pitchV").textContent = e.target.value;
+$("customSpeak").onclick = () => { const t = $("custom").value.trim(); if (t) speak(t, null); };
+$("custom").addEventListener("keydown", e => { if (e.key === "Enter") $("customSpeak").click(); });
+$("speakAll").onclick = speakAll;
+$("stop").onclick = () => { if (allTimer) clearInterval(allTimer); synth.cancel(); cards.forEach(c => c.classList.remove("speaking")); };
+$("refresh").onclick = loadVoices;
+
+buildCards();
+loadVoices();
+// Voices load asynchronously on most browsers.
+if ("onvoiceschanged" in synth) synth.onvoiceschanged = loadVoices;
+setTimeout(loadVoices, 500);
+setTimeout(loadVoices, 1500);
+</script>
+</body>
+</html>
