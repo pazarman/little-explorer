@@ -57,6 +57,8 @@
     <option value="yue-Hant-HK">yue-Hant-HK</option>
     <option value="zh-Hant-HK">zh-Hant-HK</option>
   </select>
+  <label for="nameInput">Child's name — replaces <code>{n}</code> (blank = 小朋友)</label>
+  <input type="text" id="nameInput" placeholder="例如：Fiona / 小明" autocomplete="off" autocorrect="off" spellcheck="false">
   <div class="sliders">
     <div><label>Rate <span id="rateV">0.9</span></label><input type="range" id="rate" min="0.5" max="1.3" step="0.05" value="0.9"></div>
     <div><label>Pitch <span id="pitchV">1.2</span></label><input type="range" id="pitch" min="0.6" max="1.8" step="0.05" value="1.2"></div>
@@ -77,9 +79,9 @@
 // These hand-composed outputs are the acceptance spec the in-app grammar engine will reproduce.
 const GROUPS = [
   { sec: "打招呼 / 旁白 · Greetings & narrator", lines: [
-    { en: "Hi {n}! Let's play!",            yue: "你好呀，小朋友！我哋一齊玩啦！" },
-    { en: "Welcome back, {n}!",             yue: "歡迎返嚟，小朋友！" },
-    { en: "Where to today, {n}?",           yue: "今日想去邊度玩呀，小朋友？" },
+    { en: "Hi {n}! Let's play!",            yue: "你好呀，{n}！我哋一齊玩啦！" },
+    { en: "Welcome back, {n}!",             yue: "歡迎返嚟，{n}！" },
+    { en: "Where to today, {n}?",           yue: "今日想去邊度玩呀，{n}？" },
     { en: "Let's count!",                   yue: "我哋嚟數數啦！" },
     { en: "Colors and shapes!",             yue: "顏色同形狀！" },
     { en: "Brain power time!",              yue: "動下腦筋啦！" },
@@ -87,9 +89,9 @@ const GROUPS = [
     { en: "Pets need us!",                  yue: "小寵物要我哋幫手喇！" },
   ]},
   { sec: "讚賞 · Praise", lines: [
-    { en: "Great job, {n}!",                yue: "做得好好呀，小朋友！" },
+    { en: "Great job, {n}!",                yue: "做得好好呀，{n}！" },
     { en: "Wonderful! / Amazing!",          yue: ["太正喇！", "好犀利呀！"] },
-    { en: "Hooray! / You did it, {n}!",     yue: ["好嘢！", "你做到喇，小朋友！"] },
+    { en: "Hooray! / You did it, {n}!",     yue: ["好嘢！", "你做到喇，{n}！"] },
     { en: "Super! / Fantastic!",            yue: ["超級叻！", "正呀！"] },
   ]},
   { sec: "數數 · Counting — Tap {count} {x}!", lines: [
@@ -182,11 +184,11 @@ const GROUPS = [
     { en: "You found it!",                  yue: "你搵到喇！" },
   ]},
   { sec: "畫畫 / 換衫 / 故事 · Paint / Dress-up / Story", lines: [
-    { en: "Let's paint! Pick a color and draw with your finger, {n}!", yue: "我哋嚟畫畫啦！揀個顏色，用手指畫，小朋友！" },
+    { en: "Let's paint! Pick a color and draw with your finger, {n}!", yue: "我哋嚟畫畫啦！揀個顏色，用手指畫，{n}！" },
     { en: "Can you paint with {color}?  (blue)", yue: "你可唔可以用藍色畫呀？" },
     { en: "What a cool look!",              yue: "好有型呀！" },
     { en: "Can you find the {x}? Tap it!  (dolphin)", yue: "搵唔搵到隻海豚呀？撳佢啦！" },
-    { en: "The end! Goodnight, {n}!",       yue: "故事完喇！小朋友，晚安！" },
+    { en: "The end! Goodnight, {n}!",       yue: "故事完喇！{n}，晚安！" },
   ]},
   { sec: "回應 · Feedback", lines: [
     { en: "Try again!",                     yue: "再試多次啦！" },
@@ -196,7 +198,7 @@ const GROUPS = [
     { en: "Big! / Small!",                  yue: ["大！", "細！"] },
   ]},
   { sec: "火箭任務 · Rocket Quest", lines: [
-    { en: "Hooray! Star Spark earned, {n}! {left} more to fix the rocket!", yue: "好嘢，小朋友！你儲到一粒星星火花！仲差2粒就整好火箭！" },
+    { en: "Hooray! Star Spark earned, {n}! {left} more to fix the rocket!", yue: "好嘢，{n}！你儲到一粒星星火花！仲差2粒就整好火箭！" },
     { en: "Rocket ready!",                  yue: "火箭準備好喇！" },
   ]},
 ];
@@ -226,6 +228,8 @@ function loadVoices() {
     : `<span class="badge warn">⚠ No Cantonese voice on this device</span> — install one (see above), then ↻ Refresh.`;
 }
 
+const nameVal = () => ($("nameInput").value.trim() || "小朋友");
+const sub = t => t.split("{n}").join(nameVal());   // swap the name placeholder
 let playable = [];
 function render() {
   const out = $("out"); out.innerHTML = ""; playable = [];
@@ -234,7 +238,8 @@ function render() {
     const grid = document.createElement("div"); grid.className = "grid"; out.appendChild(grid);
     g.lines.forEach(l => {
       const variants = Array.isArray(l.yue) ? l.yue : [l.yue];
-      variants.forEach(v => {
+      variants.forEach(raw => {
+        const v = sub(raw);
         const c = document.createElement("div"); c.className = "card";
         c.innerHTML = `<div class="zh">${v}</div><div class="en">${l.en}</div>`;
         c.onclick = () => speak(v, c);
@@ -276,6 +281,7 @@ function speakAll() {
 
 $("rate").oninput = e => $("rateV").textContent = e.target.value;
 $("pitch").oninput = e => $("pitchV").textContent = e.target.value;
+$("nameInput").oninput = render;   // re-render cards with the new name
 $("speakAll").onclick = speakAll;
 $("stop").onclick = () => { if (allTimer) clearInterval(allTimer); synth.cancel(); clearSpeaking(); };
 $("refresh").onclick = loadVoices;
