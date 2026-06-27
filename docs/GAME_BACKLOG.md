@@ -32,6 +32,36 @@ This file is the shared state between three agents and you:
 
 <!-- Implementer always picks the first READY item -->
 
+### [PROPOSED] Dolphin Echo
+- **STEM:** Patterns / algebra · repeat + extend AB/ABC sequences · age 2–4
+- **Success:** Child can watch a dolphin tap out a click-pattern (shown as colored bubbles) and repeat it in order
+- **Fills gap:** Patterns — thin coverage; plus bonus phonological rhythm (listening + repeating sequences)
+- **Rubric focus:** Learning efficacy (pattern rule made explicit by voice: "blue… yellow… blue… your turn!"), Sensory (dolphin clicks are satisfying but calm), Pacing (tier 0=2-element repeat, tier 1=3-element, tier 2=child leads)
+- **Estimated complexity:** Low–Medium — colored bubble grid, sequence playback, tap-to-replay
+- **File:** `js/games/dolphinecho.js`
+- **Fun factor:** Dolphin jumps and squeaks with joy when the child nails the pattern; missed step = gentle "oops, let me show you again" with no penalty
+- **Theme origin:** Daughter requested a dolphin game 🐬
+
+### [PROPOSED] Dolphin Dive (Positional Language)
+- **STEM:** Spatial reasoning · positional language · in / on / under / beside · age 2–4
+- **Success:** Child can guide the dolphin to the fish by following instructions: "swim UNDER the boat", "jump OVER the wave", "go BESIDE the seal"
+- **Fills gap:** Spatial reasoning — zero coverage; highest-ROI spatial gap in STEM doc
+- **Rubric focus:** Learning efficacy (positional word spoken + shown simultaneously), Clarity (one instruction at a time, arrow hint if stuck), Motor (big tap targets for each position)
+- **Estimated complexity:** Medium — SVG ocean scene with positioned objects, dolphin animation path
+- **File:** `js/games/dolphindive.js`
+- **Fun factor:** Dolphin zooms through the scene with a splash trail; fish caught = star burst; kids love directing the dolphin
+- **Theme origin:** Daughter requested a dolphin game 🐬
+
+### [PROPOSED] Happy Dolphin (Emotions / SEL)
+- **STEM:** Social-emotional learning · name + recognize emotions · age 2–4
+- **Success:** Child can identify how the dolphin is feeling (happy / sad / tired / surprised) from its body language and choose the matching emotion card
+- **Fills gap:** SEL — zero explicit coverage; highest-competitor gap (Daniel Tiger, Sago Mini all treat this as first-class); dolphin body language makes emotions readable without a human face
+- **Rubric focus:** Learning efficacy (emotion label + cause spoken aloud: "Splash is SAD because she lost her friend"), Emotional safety (all emotions are valid, all paths lead to comfort), Pacing (tier 0=happy/sad, tier 1=+tired/surprised, tier 2=cause of feeling)
+- **Estimated complexity:** Medium — SVG dolphin with animated expression states, 4-card emotion picker
+- **File:** `js/games/happydolphin.js`
+- **Fun factor:** When child picks correctly the dolphin does its signature move (happy=leap, tired=yawn-bubble, surprised=startled splash); gentle empathy voice for sad state
+- **Theme origin:** Daughter requested a dolphin game 🐬
+
 ### [PROPOSED] Sort & Classify by Color
 - **STEM:** Sorting / classification · sort by 1 attribute (color) · age 2–3
 - **Success:** Child can tap all the red items (or blue, or yellow) into the correct bucket
