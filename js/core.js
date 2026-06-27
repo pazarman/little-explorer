@@ -145,7 +145,7 @@ const DICT = {
     pet_feels_cuddled: "Aww! {animal} feels loved! 💞",
     pet_kind: "{animal} is so happy now! 💖 You were so kind!",
     settings_title: "⚙️ Grown-up Settings",
-    lang_en: "English", lang_es: "Español",
+    lang_en: "English", lang_es: "Español", lang_yue: "廣東話",
     diff_auto: "Auto ⬆️", diff_easy: "Easy", diff_med: "Medium", diff_hard: "Hard",
     diff_title: "Grown-ups: pick a level!", diff_say: "Grown-ups, pick a level for your little one!",
     diff_easy_age: "Ages 2-3", diff_med_age: "Ages 3-4", diff_hard_age: "Ages 4-5",
@@ -339,7 +339,7 @@ const DICT = {
     pet_feels_cuddled: "¡Ahhh! ¡{animal} se siente querido! 💞",
     pet_kind: "¡{animal} está muy feliz ahora! 💖 ¡Fuiste muy amable!",
     settings_title: "⚙️ Ajustes para adultos",
-    lang_en: "English", lang_es: "Español",
+    lang_en: "English", lang_es: "Español", lang_yue: "廣東話",
     diff_auto: "Auto ⬆️", diff_easy: "Fácil", diff_med: "Medio", diff_hard: "Difícil",
     diff_title: "Adultos: ¡elijan un nivel!", diff_say: "Adultos, elijan un nivel para su pequeño.",
     diff_easy_age: "2-3 años", diff_med_age: "3-4 años", diff_hard_age: "4-5 años",
@@ -524,7 +524,7 @@ const DICT = {
     pet_feels_cuddled: "啊！{animal}覺得好被愛！💞",
     pet_kind: "{animal}宜家好開心！💖 你好錫佢呀！",
     settings_title: "⚙️ 大人設定",
-    lang_en: "English", lang_es: "Español",
+    lang_en: "English", lang_es: "Español", lang_yue: "廣東話",
     diff_auto: "自動 ⬆️", diff_easy: "簡單", diff_med: "中等", diff_hard: "困難",
     diff_title: "大人：揀個難度！", diff_say: "大人，幫你嘅小朋友揀個難度啦！",
     diff_easy_age: "2-3歲", diff_med_age: "3-4歲", diff_hard_age: "4-5歲",
@@ -653,8 +653,8 @@ const DICT = {
 };
 
 function t(key, params = {}) {
-  const lang = settings.lang || "en";
-  let str = DICT[lang][key] || DICT["en"][key] || key;
+  const lang = curLang();
+  let str = (DICT[lang] && DICT[lang][key]) || DICT["en"][key] || key;
   if (Array.isArray(str)) str = rand(str);
   params.n = NAME;
   for (const k in params) str = str.split(`{${k}}`).join(params[k]);
@@ -744,7 +744,32 @@ const VOC_YUE = {
   princess:{cl:"位",yue:"公主"}, unicorn:{cl:"隻",yue:"獨角獸"}, robot:{cl:"個",yue:"機械人"}, bear:{cl:"隻",yue:"小熊"}, dragon:{cl:"條",yue:"龍"},
   basket:{cl:"個",yue:"籃"}, box:{cl:"個",yue:"箱"}, table:{cl:"張",yue:"枱"}
 };
-const curLang = () => settings.lang || "en";
+// Cantonese TTS depends on a device-installed zh-HK voice we can't bundle. Detect it; if it's
+// absent we fall back to English (text + voice) and prompt the parent to install one.
+let cantoVoiceReady = false;
+function isCantoVoice(v) {
+  const l = (v.lang || "").toLowerCase().replace("_", "-");
+  return l === "zh-hk" || l.includes("yue") || l.startsWith("zh-hant-hk") || /cantonese|廣東|粵|sin-?ji/i.test(v.name);
+}
+function detectCantoVoice() {
+  if (!("speechSynthesis" in window)) { cantoVoiceReady = false; return; }
+  cantoVoiceReady = speechSynthesis.getVoices().some(isCantoVoice);
+}
+// effective language: 'yue' only fully engages once a Cantonese voice exists, else 'en'
+const curLang = () => (settings.lang === "yue" && !cantoVoiceReady) ? "en" : (settings.lang || "en");
+const htmlLang = () => curLang() === "es" ? "es" : curLang() === "yue" ? "zh-HK" : "en";
+function relocalize() {                       // re-apply labels when the voice becomes available
+  detectCantoVoice();
+  if (typeof document !== "undefined") {
+    document.documentElement.lang = htmlLang();
+    applyI18n();
+    if (typeof buildHub === "function" && $("hub") && !$("hub").classList.contains("hidden")) buildHub();
+  }
+}
+if ("speechSynthesis" in window) {
+  detectCantoVoice();
+  speechSynthesis.addEventListener("voiceschanged", () => { const was = cantoVoiceReady; relocalize(); if (was !== cantoVoiceReady) relocalize(); });
+}
 function esPlural(w) {
   if (/[aeiouáéíóú]$/i.test(w)) return w + "s";
   if (/z$/i.test(w)) return w.slice(0, -1) + "ces";
@@ -891,14 +916,16 @@ function speak(text, opts = {}) {
   const spoken = text.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").replace(/\s{2,}/g, " ").trim();
   lastSpeakEnd = performance.now() + Math.min(7000, 500 + spoken.length * 72);
   const u = new SpeechSynthesisUtterance(spoken + " ");  // trailing space: stops Chrome clipping the last word
-  u.lang = settings.lang === "es" ? "es-MX" : "en-US";
+  const lang = curLang();   // 'yue' only when a Cantonese voice exists, else falls back to 'en'
+  u.lang = lang === "es" ? "es-MX" : lang === "yue" ? "zh-HK" : "en-US";
   u.rate = opts.rate || 0.95;
   u.pitch = opts.pitch || 1.25;
-  
+
   // Find a matching voice if possible (browser support varies)
   const voices = speechSynthesis.getVoices();
-  const langTag = settings.lang === "es" ? "es" : "en";
-  const v = voices.find(v => v.lang.startsWith(langTag) && (v.name.includes("Google") || v.localService));
+  const v = lang === "yue"
+    ? voices.find(isCantoVoice)
+    : voices.find(v => v.lang.startsWith(lang === "es" ? "es" : "en") && (v.name.includes("Google") || v.localService));
   if (v) u.voice = v;
 
   setMascots("talking", true);

@@ -405,9 +405,19 @@ $("setRestart").onclick = () => {
   if (confirm(t("settings_restart_confirm"))) { localStorage.clear(); location.reload(); }
 };
 $("setName").onclick = () => { $("settings").classList.add("hidden"); showNameScreen(NAME); };
+function promptInstallCanto() {
+  const ua = navigator.userAgent || "";
+  const how = /iPhone|iPad|iPod|Macintosh/.test(ua)
+      ? "Settings → Accessibility → Spoken Content → Voices → Chinese → Cantonese (Hong Kong)"
+    : /Android/.test(ua)
+      ? "Settings → System → Languages → Text-to-speech output → Google Text-to-Speech → install Chinese (Hong Kong) / 粵語 voice data"
+      : "your device's Text-to-Speech settings → add a Chinese (Hong Kong) / Cantonese voice";
+  alert("廣東話 — Cantonese voice not found on this device.\n\nTo hear Cantonese, install a Cantonese voice:\n" + how + "\n\nUntil then the games stay in English. Reopen the app after installing.");
+}
 document.querySelectorAll("#segLang button").forEach(b => b.onclick = () => {
   settings.lang = b.dataset.l; saveSettings();
-  document.documentElement.lang = settings.lang === "es" ? "es" : "en";
+  if (b.dataset.l === "yue") { detectCantoVoice(); if (!cantoVoiceReady) promptInstallCanto(); }
+  document.documentElement.lang = htmlLang();
   sfx.tap(); openSettings();
 });
 document.querySelectorAll("#segDiff button").forEach(b => b.onclick = () => { settings.diff = b.dataset.d; saveSettings(); openSettings(); });
@@ -500,7 +510,7 @@ document.querySelectorAll("#diffGrid .diff-btn").forEach(b => b.onclick = () => 
 });
 $("nameInput").addEventListener("keydown", e => { if (e.key === "Enter") commitName(); });
 
-document.documentElement.lang = (settings.lang === "es") ? "es" : "en";
+document.documentElement.lang = htmlLang();
 applyName();
 if (!localStorage.getItem("fionaNameSet")) showNameScreen("");
 else showHub();
