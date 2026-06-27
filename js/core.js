@@ -145,7 +145,7 @@ const DICT = {
     pet_feels_cuddled: "Aww! {animal} feels loved! 💞",
     pet_kind: "{animal} is so happy now! 💖 You were so kind!",
     settings_title: "⚙️ Grown-up Settings",
-    lang_en: "English", lang_es: "Español",
+    lang_en: "English", lang_es: "Español", lang_yue: "廣東話",
     diff_auto: "Auto ⬆️", diff_easy: "Easy", diff_med: "Medium", diff_hard: "Hard",
     diff_title: "Grown-ups: pick a level!", diff_say: "Grown-ups, pick a level for your little one!",
     diff_easy_age: "Ages 2-3", diff_med_age: "Ages 3-4", diff_hard_age: "Ages 4-5",
@@ -339,7 +339,7 @@ const DICT = {
     pet_feels_cuddled: "¡Ahhh! ¡{animal} se siente querido! 💞",
     pet_kind: "¡{animal} está muy feliz ahora! 💖 ¡Fuiste muy amable!",
     settings_title: "⚙️ Ajustes para adultos",
-    lang_en: "English", lang_es: "Español",
+    lang_en: "English", lang_es: "Español", lang_yue: "廣東話",
     diff_auto: "Auto ⬆️", diff_easy: "Fácil", diff_med: "Medio", diff_hard: "Difícil",
     diff_title: "Adultos: ¡elijan un nivel!", diff_say: "Adultos, elijan un nivel para su pequeño.",
     diff_easy_age: "2-3 años", diff_med_age: "3-4 años", diff_hard_age: "4-5 años",
@@ -463,12 +463,198 @@ const DICT = {
     cups_retry: "¡Sigue buscando! ¡Encuentra la pelota!",
     cups_win: "¡La encontraste! 🎉",
     rel_in: "dentro de", rel_on: "encima de", rel_under: "debajo de"
+  },
+  yue: {
+    num: ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"],
+    praise: ["做得好好呀，{n}！", "太正喇！", "好犀利呀！", "好嘢！", "你做到喇，{n}！", "超級叻！", "好棒呀！", "耶！"],
+    blastoff: "發射喇！",
+    well_done: "你做到喇，{n}！",
+    hi_let_play: "你好呀，{n}！我哋一齊玩啦！",
+    hi_star_sparks: "你好呀，{n}！我哋一齊搵啲閃亮嘅星星火花，整好火箭啦！撳一個世界開始玩！",
+    narrator_back: "歡迎返嚟，{n}！🌈",
+    narrator_ready: "今日想去邊度玩呀，{n}？🗺️",
+    narrator_postgame: "好犀利！下一個玩咩呀，{n}？⭐",
+    narrator_cat_num: "我哋嚟數數啦！🔢",
+    narrator_cat_shape: "顏色同形狀！🎨",
+    narrator_cat_brain: "動下腦筋啦！🧩",
+    narrator_cat_animal: "動物朋友！🐾",
+    narrator_cat_pets: "小寵物要我哋幫手喇！🐶",
+    narrator_cat_space: "三、二、一……發射！🚀",
+    narrator_cat_fantasy: "入去幻想世界！🐉",
+    narrator_cat_create: "我哋嚟創作啦！✨",
+    quest_fixed: "火箭整好喇！準備發射啦！",
+    quest_fixed_praise: "好嘢，{n}！你搵到最後一粒星星火花！火箭整好喇！我哋發射啦！",
+    quest_collect: "好嘢！你儲到一粒星星火花，{n}！仲差{left}粒就整好火箭！",
+    quest_status: "我哋一齊儲星星火花整好火箭！仲差{left}粒。撳一個世界玩啦！",
+    quest_ready: "火箭整好喇！撳佢發射啦！",
+    settings_lang: "語言",
+    settings_voice: "說話聲音",
+    settings_music: "音樂",
+    settings_diff: "難度",
+    settings_buddy: "🧸 夥伴",
+    settings_name: "✏️ 名",
+    settings_progress: "📊 進度",
+    settings_reset: "重設星星",
+    settings_restart: "🔄 重新開始",
+    settings_restart_confirm: "呢個會清除{n}所有嘅星星、貼紙同進度。你肯定嗎？",
+    settings_done: "完成",
+    back: "返去", next: "下一個", home: "首頁", clear: "清除", done: "完成",
+    big: "大！", small: "細！",
+    try_again: "再試多次啦！",
+    look_at_pattern: "睇下個規律！",
+    yes_it: "啱喇！{animal}會{sound}叫！",
+    found_it: "啱喇！你搵到{item}喇！",
+    all_sorted: "全部分好喇！",
+    found_all: "你全部搵晒喇！",
+    match: "啱一對！兩{item}！",
+    beautiful_music: "好好聽嘅音樂！",
+    traced_it: "你描好喇！",
+    yummy: "好味呀！",
+    fed_all: "{count}{item}！好好食！",
+    hatched_all: "{count}隻恐龍BB！",
+    icecream_finish: "好味嘅{count}球雪糕！",
+    pet_clean: "全部乾淨晒！",
+    pet_yum: "好好食！",
+    pet_whee: "好開心呀！",
+    pet_happy: "{animal}好開心呀！",
+    pet_sad: "{animal}好似好唔開心😢 我哋幫下佢啦！",
+    pet_feels_clean: "好嘢！{animal}覺得好乾淨好舒服！🫧",
+    pet_feels_fed: "好味！{animal}唔肚餓喇！😋",
+    pet_feels_played: "好開心！{animal}玩得好高興！🎾",
+    pet_feels_cuddled: "啊！{animal}覺得好被愛！💞",
+    pet_kind: "{animal}宜家好開心！💖 你好錫佢呀！",
+    settings_title: "⚙️ 大人設定",
+    lang_en: "English", lang_es: "Español", lang_yue: "廣東話",
+    diff_auto: "自動 ⬆️", diff_easy: "簡單", diff_med: "中等", diff_hard: "困難",
+    diff_title: "大人：揀個難度！", diff_say: "大人，幫你嘅小朋友揀個難度啦！",
+    diff_easy_age: "2-3歲", diff_med_age: "3-4歲", diff_hard_age: "4-5歲",
+    voice_on: "開", voice_off: "關",
+    music_bouncy: "活潑", music_calm: "寧靜", music_march: "進行曲", music_off: "關",
+    rocket_ready: "🚀 火箭準備好喇！",
+    rocket_zoomed: "好犀利呀，{n}！火箭飛上咗天空！我哋再搵多啲星星火花啦！",
+    tap_count: "撳{count}{x}！",
+    you_counted: "{num}！你數到{count}喇！",
+    tap_fish: "撳{x}嗰條魚！",
+    goodtry_fish: "再試下！搵{x}嗰條魚！",
+    drag_pizza_show: "將{x}拖去個薄餅度！",
+    drag_pizza_say: "搵{x}，拖去個薄餅度！",
+    shape_fits: "好味！{x}啱啱好！",
+    thats_look: "嗰個係{x}！搵{y}！",
+    put_pizza: "放{count}{x}喺個薄餅度！",
+    placed_pizza: "{num}！{count}{x}！",
+    drag_topping: "將{color}嘅配料拖去個薄餅度！",
+    color_excl: "{color}！",
+    thats_find_one: "嗰個係{color}！搵{color2}嗰個！",
+    pop_balloon_show: "撳爆{target}號氣球！",
+    pop_balloon_say: "撳爆寫住{target}嘅氣球！",
+    thats_that_num: "{num}！嗰個係{target}！",
+    thats_find_num: "嗰個係{num}號。搵{target}號！",
+    put_base: "放{count}{x}喺{base}！",
+    fed_count: "{num}！{count}{x}！好味呀！",
+    new_shapes: "新形狀！我哋嚟描下啦！",
+    matching_show: "搵出相同嘅一對！",
+    matching_say: "搵相同嘅{x}！撳張卡反開佢！",
+    listen_show: "聽下啲動物！",
+    listen_say: "聽下動物樂隊啦！",
+    yourturn_show: "到你玩喇！撳啲發光嘅動物！",
+    yourturn_say: "到你喇！撳啲發光嘅動物！",
+    who_show: "邊個發出呢個聲呀？",
+    who_say: "聽下！邊個發出呢個聲呀？",
+    countdown_show: "倒數啦！撳{next}！",
+    countdown_say: "我哋倒數準備發射！撳{next}號！",
+    blastoff_screen: "🚀 發射喇！🌟",
+    find_num: "搵{next}號！",
+    sortsize_show: "按大細分類！",
+    sortsize_say: "將大嘅拖去大星球，細嘅拖去細星球！",
+    that_big: "嗰個係大嘅！放去大星球！",
+    that_small: "嗰個係細嘅！放去細星球！",
+    sortcolor_show: "按顏色分類！",
+    sortkind_show: "分類啦！",
+    sorted_one: "{x}！",
+    that_basket: "嗰個係{x}。搵{x}個籃！",
+    goes_with: "嗰個同{x}一齊！",
+    next_show: "下一個係咩呀？",
+    next_say: "睇下個規律！下一個係咩呀？",
+    try_pattern: "再試多次！睇下個規律！",
+    feed_dragon_show: "餵{count}{x}俾條龍食！",
+    eggs_show: "撳{count}{x}，孵化啲恐龍！",
+    eggs_say: "撳{count}{x}，孵出恐龍BB！",
+    flash_look: "睇住啲蛋！", flash_look_say: "睇清楚！數下啲蛋！",
+    flash_ask: "有幾多隻蛋呀？", flash_ask_say: "你見到幾多隻蛋呀？",
+    flash_win: "{count}隻蛋！你記得喇！", flash_peek: "再睇多次！",
+    scoop_show: "加一球{x}雪糕！",
+    scoop_say: "喺上面加一球{x}雪糕！",
+    thats_find_scoop: "嗰個係{color}！搵{color2}嗰球！",
+    scoop_count: "{color}！{num}{x}！",
+    cherry_show: "撳上面粒車厘子！",
+    cherry_say: "撳粒車厘子，整好個雪糕！",
+    yummy_cherry: "好味！喺上面加粒車厘子啦！",
+    tap_pet: "撳{x}！",
+    yes_pet: "啱喇！{x}！",
+    lookfor_pet: "搵下{x}！",
+    takecare_show: "照顧下{x}！",
+    takecare_say: "照顧下{x}！同佢沖涼、餵佢食嘢、俾玩具佢玩！",
+    takecare_sad: "{animal}好似好唔開心😢 你可唔可以令佢開心啲呀？",
+    give_pet_show: "俾{count}{x}{animal}食！",
+    same_pet_show: "俾{right}同{left}一樣多嘅零食！",
+    same_pet_say: "俾{right}同{left}一樣咁多嘅零食！",
+    same_pet_win: "兩邊都係{count}！一樣咁多！",
+    count_x: "{count}{x}！",
+    paint_intro: "我哋嚟畫畫啦！揀個顏色，用手指畫，{n}！",
+    paint_color_q: "你可唔可以用{color}畫呀？",
+    paint_stamp_q: "你可唔可以喺幅畫度加個{x}呀？",
+    paint_outline_q: "我哋嚟畫{x}啦！",
+    paint_finish: "好靚嘅畫！",
+    paint_stamp_win: "好嘢！一個{x}！",
+    dash_title: "📊 大人進度",
+    dash_stars: "星星", dash_played: "玩過嘅遊戲", dash_stickers: "貼紙",
+    dash_tried: "試過嘅活動", dash_trips: "火箭旅程", dash_sparks: "星星火花",
+    dressup_intro: "我哋嚟換衫啦！喺下面揀件嘢著上身，{n}！",
+    cool_look: "好有型呀！",
+    story_find: "搵唔搵到{x}呀？撳佢啦！",
+    story_tap: "👆 撳幅圖！",
+    story_end: "故事完喇！{n}，晚安！",
+    name_title: "你好呀！你叫咩名呀？", name_ph: "輸入個名…",
+    name_start: "開始玩啦！🎉", name_skip: "暫時跳過",
+    char_title: "揀你嘅夥伴！", char_done: "出發啦！🎉",
+    hub_title: "🌈 {n}嘅世界 🌈", book_title: "📒 {n}嘅貼紙簿 📒",
+    sticker_empty_hint: "玩遊戲賺貼紙嚟裝飾啦！",
+    sticker_empty_say: "玩遊戲賺貼紙啦！",
+    sticker_hint: "撳一張貼紙，再撳幅圖貼上去！🎨",
+    sticker_intro: "呢本係你嘅貼紙簿，{n}！撳一張貼紙，再撳幅圖貼上去！",
+    sticker_belongs: "啱晒！{x}應該喺{scene}度！",
+    off_slot: "關",
+    theme_animals: "動物", theme_food: "食物", theme_frozen: "冰雪嘢", theme_ocean: "海洋嘢",
+    kind_animal: "動物", kind_food: "好味嘅食物", kind_vehicle: "識郁嘅嘢",
+    celeb_done_sub: "⚡ 你搵到最後一粒星星火花！火箭準備好喇！🚀",
+    celeb_more_sub: "⚡ 儲到星星火花！仲差{left}粒就整好火箭 🚀",
+    quest_onemore: "火箭整好喇！再玩多一個遊戲就可以發射！",
+    trip_complete: "第{trips}次旅程完成——你係星星探險家！{badge}",
+    trace_number: "描下{x}字！", trace_letter: "描下{x}字母！", trace_shape: "描下{x}！",
+    follow_dots: "跟住啲點畫！",
+    tap_next: "🚀 撳{next}！", lbl_big: "大", lbl_small: "細",
+    sortcolor_say: "將每樣嘢放入同顏色嘅籃度！",
+    sortkind_say: "將每樣嘢放返去啱嘅地方！",
+    tap_part: "撳{part}！",
+    yes_part: "啱喇！{part}！",
+    hideseek_show: "放佢喺{spot}{rel}！",
+    hideseek_say: "將{buddy}放喺{spot}{rel}！",
+    hideseek_retry: "好嘅嘗試！放佢喺{spot}{rel}！",
+    hideseek_win: "喺{spot}{rel}！",
+    hideseek_next: "宜家放佢喺{spot}{rel}！",
+    hideseek_again: "好嘢！宜家試下另一個位置啦！",
+    cups_watch: "睇住個波呀！個波去咗邊？",
+    cups_find: "個波喺邊呀？撳個杯啦！",
+    cups_nope: "唔喺度！睇下另一個杯！",
+    cups_retry: "繼續搵！搵個波出嚟！",
+    cups_win: "你搵到喇！🎉",
+    rel_in: "入面", rel_on: "上面", rel_under: "下面"
   }
 };
 
 function t(key, params = {}) {
-  const lang = settings.lang || "en";
-  let str = DICT[lang][key] || DICT["en"][key] || key;
+  const lang = curLang();
+  let str = (DICT[lang] && DICT[lang][key]) || DICT["en"][key] || key;
   if (Array.isArray(str)) str = rand(str);
   params.n = NAME;
   for (const k in params) str = str.split(`{${k}}`).join(params[k]);
@@ -523,29 +709,105 @@ const VOC = {
 };
 const COLOR_ES = { red:"rojo", blue:"azul", yellow:"amarillo", green:"verde", orange:"naranja",
   purple:"morado", pink:"rosa", brown:"marrón", gray:"gris", black:"negro", white:"blanco" };
-const curLang = () => settings.lang || "en";
+const COLOR_YUE = { red:"紅色", blue:"藍色", yellow:"黃色", green:"綠色", orange:"橙色",
+  purple:"紫色", pink:"粉紅色", brown:"啡色", gray:"灰色", black:"黑色", white:"白色" };
+const ANIMAL_YUE = { dog:"汪汪", cat:"喵喵", cow:"哞哞", frog:"呱呱", duck:"嘎嘎",
+  sheep:"咩咩", bird:"啾啾", lion:"吼吼", pig:"哼哼", horse:"嘶嘶" };
+/* Cantonese vocabulary: yue = noun, cl = measure word (classifier). Parallel to VOC so the
+   classifier-aware helpers below can compose grammatical Cantonese (e.g. 三 + 粒 + 星星). */
+const VOC_YUE = {
+  circle:{cl:"個",yue:"圓形"}, square:{cl:"個",yue:"正方形"}, triangle:{cl:"個",yue:"三角形"},
+  star:{cl:"粒",yue:"星星"}, heart:{cl:"個",yue:"心心"}, oval:{cl:"個",yue:"橢圓形"}, diamond:{cl:"個",yue:"菱形"},
+  dog:{cl:"隻",yue:"狗"}, cat:{cl:"隻",yue:"貓"}, cow:{cl:"隻",yue:"牛"}, frog:{cl:"隻",yue:"青蛙"},
+  duck:{cl:"隻",yue:"鴨仔"}, sheep:{cl:"隻",yue:"綿羊"}, bird:{cl:"隻",yue:"雀仔"}, lion:{cl:"隻",yue:"獅子"},
+  pig:{cl:"隻",yue:"豬"}, horse:{cl:"隻",yue:"馬"},
+  puppy:{cl:"隻",yue:"小狗"}, kitten:{cl:"隻",yue:"小貓"}, kitty:{cl:"隻",yue:"小貓"}, bunny:{cl:"隻",yue:"兔仔"},
+  hamster:{cl:"隻",yue:"倉鼠"}, birdie:{cl:"隻",yue:"雀仔"}, fishy:{cl:"條",yue:"魚仔"}, pony:{cl:"隻",yue:"小馬"},
+  butterfly:{cl:"隻",yue:"蝴蝶"}, penguin:{cl:"隻",yue:"企鵝"},
+  snowflake:{cl:"片",yue:"雪花"}, snowman:{cl:"個",yue:"雪人"}, mitten:{cl:"隻",yue:"手套"},
+  reindeer:{cl:"隻",yue:"馴鹿"}, present:{cl:"份",yue:"禮物"},
+  meatball:{cl:"粒",yue:"丸"}, cookie:{cl:"嚿",yue:"曲奇"}, blueberry:{cl:"粒",yue:"藍莓"},
+  cherry:{cl:"粒",yue:"車厘子"}, strawberry:{cl:"粒",yue:"士多啤梨"}, grape:{cl:"粒",yue:"提子"}, carrot:{cl:"條",yue:"紅蘿蔔"},
+  donut:{cl:"個",yue:"冬甩"}, egg:{cl:"隻",yue:"蛋"}, banana:{cl:"條",yue:"香蕉"}, cupcake:{cl:"個",yue:"紙杯蛋糕"},
+  pizza:{cl:"個",yue:"薄餅"}, "ice cream":{cl:"個",yue:"雪糕"},
+  spaghetti:{cl:"碟",yue:"意粉"}, plate:{cl:"隻",yue:"碟"}, pancake:{cl:"塊",yue:"班戟"}, cake:{cl:"個",yue:"蛋糕"},
+  mushroom:{cl:"粒",yue:"蘑菇"}, olive:{cl:"粒",yue:"橄欖"}, pepper:{cl:"隻",yue:"燈籠椒"},
+  fish:{cl:"條",yue:"魚"}, dolphin:{cl:"隻",yue:"海豚"}, shell:{cl:"個",yue:"貝殼"}, wave:{cl:"個",yue:"浪"},
+  starfish:{cl:"隻",yue:"海星"}, crab:{cl:"隻",yue:"蟹"}, octopus:{cl:"隻",yue:"八爪魚"}, turtle:{cl:"隻",yue:"龜"},
+  crown:{cl:"個",yue:"皇冠"}, castle:{cl:"座",yue:"城堡"}, sparkle:{cl:"點",yue:"閃光"}, skate:{cl:"隻",yue:"溜冰鞋"},
+  head:{cl:"個",yue:"頭"}, hand:{cl:"隻",yue:"手"}, foot:{cl:"隻",yue:"腳"}, eye:{cl:"隻",yue:"眼"},
+  nose:{cl:"個",yue:"鼻"}, mouth:{cl:"個",yue:"嘴"}, ear:{cl:"隻",yue:"耳仔"}, tummy:{cl:"個",yue:"肚"},
+  knee:{cl:"個",yue:"膝頭"}, elbow:{cl:"個",yue:"手踭"}, shoulder:{cl:"個",yue:"膊頭"}, hair:{cl:"把",yue:"頭髮"},
+  arm:{cl:"隻",yue:"手臂"}, leg:{cl:"隻",yue:"腳"}, finger:{cl:"隻",yue:"手指"}, toe:{cl:"隻",yue:"腳趾"},
+  teeth:{cl:"隻",yue:"牙"}, neck:{cl:"個",yue:"頸"}, tongue:{cl:"條",yue:"脷"}, chin:{cl:"個",yue:"下巴"}, cheek:{cl:"個",yue:"面珠"},
+  treat:{cl:"件",yue:"零食"}, scoop:{cl:"球",yue:"雪糕"}, flower:{cl:"朵",yue:"花"}, dino:{cl:"隻",yue:"恐龍"},
+  princess:{cl:"位",yue:"公主"}, unicorn:{cl:"隻",yue:"獨角獸"}, robot:{cl:"個",yue:"機械人"}, bear:{cl:"隻",yue:"小熊"}, dragon:{cl:"條",yue:"龍"},
+  basket:{cl:"個",yue:"籃"}, box:{cl:"個",yue:"箱"}, table:{cl:"張",yue:"枱"}
+};
+// Cantonese TTS depends on a device-installed zh-HK voice we can't bundle. Detect it; if it's
+// absent we fall back to English (text + voice) and prompt the parent to install one.
+let cantoVoiceReady = false;
+function isCantoVoice(v) {
+  const l = (v.lang || "").toLowerCase().replace("_", "-");
+  return l === "zh-hk" || l.includes("yue") || l.startsWith("zh-hant-hk") || /cantonese|廣東|粵|sin-?ji/i.test(v.name);
+}
+function detectCantoVoice() {
+  if (!("speechSynthesis" in window)) { cantoVoiceReady = false; return; }
+  cantoVoiceReady = speechSynthesis.getVoices().some(isCantoVoice);
+}
+// effective language: 'yue' only fully engages once a Cantonese voice exists, else 'en'
+const curLang = () => (settings.lang === "yue" && !cantoVoiceReady) ? "en" : (settings.lang || "en");
+const htmlLang = () => curLang() === "es" ? "es" : curLang() === "yue" ? "zh-HK" : "en";
+function relocalize() {                       // re-apply labels when the voice becomes available
+  detectCantoVoice();
+  if (typeof document !== "undefined") {
+    document.documentElement.lang = htmlLang();
+    applyI18n();
+    if (typeof buildHub === "function" && $("hub") && !$("hub").classList.contains("hidden")) buildHub();
+  }
+}
+if ("speechSynthesis" in window) {
+  detectCantoVoice();
+  speechSynthesis.addEventListener("voiceschanged", () => { const was = cantoVoiceReady; relocalize(); if (was !== cantoVoiceReady) relocalize(); });
+}
 function esPlural(w) {
   if (/[aeiouáéíóú]$/i.test(w)) return w + "s";
   if (/z$/i.test(w)) return w.slice(0, -1) + "ces";
   return w.replace(/ón$/, "on").replace(/ín$/, "in").replace(/én$/, "en") + "es";
 }
 const numWord = n => ((DICT[curLang()] && DICT[curLang()].num) || DICT.en.num)[n] || "";
-function word(key) { const v = VOC[key]; return (curLang() === "es" && v) ? v.es : key; }      // bare singular
+// Cantonese: classifier (measure word) + noun; no plural inflection, no article.
+const yueCls = key => { const v = VOC_YUE[key]; return v ? (v.cl + v.yue) : key; };
+function word(key) {                                                                              // bare singular
+  if (curLang() === "yue") { const v = VOC_YUE[key]; return v ? v.yue : key; }
+  const v = VOC[key]; return (curLang() === "es" && v) ? v.es : key;
+}
 function words(key, n) {                                                                          // count-agreeing plural
+  if (curLang() === "yue") return yueCls(key);            // 粒星星 — the number lives in the template
   const v = VOC[key];
   if (curLang() === "es") return !v ? key : (n === 1 ? v.es : (v.espl || esPlural(v.es)));
   return (v && v.enpl && n !== 1) ? v.enpl : plural(key, n);
 }
 const genderOf = key => (VOC[key] ? VOC[key].g : "m");
-function theWord(key) { return curLang() === "es" ? (genderOf(key) === "f" ? "la " : "el ") + word(key) : "the " + key; }
-function aWord(key)   { return curLang() === "es" ? (genderOf(key) === "f" ? "una " : "un ") + word(key) : "a " + key; }
-const locName = o => (curLang() === "es" && o && o.es) ? o.es : (o ? o.name : "");                // localized data-object name
+function theWord(key) {                                                                           // "the X"
+  if (curLang() === "yue") return yueCls(key);            // 隻小狗 / 個鼻 / 張枱
+  return curLang() === "es" ? (genderOf(key) === "f" ? "la " : "el ") + word(key) : "the " + key;
+}
+function aWord(key) {                                                                             // "a X"
+  if (curLang() === "yue") return yueCls(key);
+  return curLang() === "es" ? (genderOf(key) === "f" ? "una " : "un ") + word(key) : "a " + key;
+}
+const locName = o => !o ? "" : (curLang() === "es" && o.es) ? o.es : (curLang() === "yue" && o.yue) ? o.yue : o.name; // localized data-object name
 function applyI18n(root = document) {                                                             // translate static [data-i18n] markup
   root.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
   root.querySelectorAll("[data-i18n-ph]").forEach(el => el.placeholder = t(el.dataset.i18nPh));
 }
-function colorName(key) { return curLang() === "es" ? (COLOR_ES[key] || key) : key; }            // standalone color
+function colorName(key) {                                                                          // standalone color
+  if (curLang() === "yue") return COLOR_YUE[key] || key;
+  return curLang() === "es" ? (COLOR_ES[key] || key) : key;
+}
 function colorAdj(key, g) {                                                                       // color agreeing with a noun's gender
+  if (curLang() === "yue") return COLOR_YUE[key] || key;
   if (curLang() !== "es") return key;
   let c = COLOR_ES[key] || key;
   if (g === "f" && c.endsWith("o")) c = c.slice(0, -1) + "a";
@@ -654,14 +916,16 @@ function speak(text, opts = {}) {
   const spoken = text.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").replace(/\s{2,}/g, " ").trim();
   lastSpeakEnd = performance.now() + Math.min(7000, 500 + spoken.length * 72);
   const u = new SpeechSynthesisUtterance(spoken + " ");  // trailing space: stops Chrome clipping the last word
-  u.lang = settings.lang === "es" ? "es-MX" : "en-US";
+  const lang = curLang();   // 'yue' only when a Cantonese voice exists, else falls back to 'en'
+  u.lang = lang === "es" ? "es-MX" : lang === "yue" ? "zh-HK" : "en-US";
   u.rate = opts.rate || 0.95;
   u.pitch = opts.pitch || 1.25;
-  
+
   // Find a matching voice if possible (browser support varies)
   const voices = speechSynthesis.getVoices();
-  const langTag = settings.lang === "es" ? "es" : "en";
-  const v = voices.find(v => v.lang.startsWith(langTag) && (v.name.includes("Google") || v.localService));
+  const v = lang === "yue"
+    ? voices.find(isCantoVoice)
+    : voices.find(v => v.lang.startsWith(lang === "es" ? "es" : "en") && (v.name.includes("Google") || v.localService));
   if (v) u.voice = v;
 
   setMascots("talking", true);
@@ -899,7 +1163,7 @@ const ANIMALS = {
   pig:   { e: "🐷", sound: "Oink oink", es: "Oinc oinc", freq: 250 },
   horse: { e: "🐴", sound: "Neigh",     es: "Iiii",      freq: 320 }
 };
-const animalSound = key => curLang() === "es" ? ANIMALS[key].es : ANIMALS[key].sound;
+const animalSound = key => curLang() === "es" ? ANIMALS[key].es : curLang() === "yue" ? (ANIMAL_YUE[key] || ANIMALS[key].sound) : ANIMALS[key].sound;
 function speakAnimal(key, opts = {}) {
   const a = ANIMALS[key];
   tone(a.freq, 0, .4, "sine", .16);

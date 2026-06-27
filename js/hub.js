@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "27";
+const APP_VERSION = "28";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -12,34 +12,34 @@ const LEVELS = {
 /* ================= Categories & games ================= */
 // lvl: difficulty rating (0 = easy/ages 2-3, 1 = medium/3-4, 2 = hard/4-5). Used to hide games above the chosen level.
 const GAMES = {
-  snow:    { icon: "❄️", name: "Count", es: "Contar", lvl: 0 },     ocean:   { icon: "🐠", name: "Colors", es: "Colores", lvl: 0 },
-  memory:  { icon: "🃏", name: "Memory", es: "Memoria", lvl: 1 },    bike:    { icon: "🚲", name: "Numbers", es: "Números", lvl: 1 },
-  music:   { icon: "🥁", name: "Animal Band", es: "Banda Animal", lvl: 1 }, whosays: { icon: "🔊", name: "Who Says?", es: "¿Quién Dice?", lvl: 0 },
-  pizza:   { icon: "🍕", name: "Pizza", es: "Pizza", lvl: 1 },     pasta:   { icon: "🍝", name: "Yum Count", es: "A Contar", lvl: 0 },
-  trace:   { icon: "✨", name: "Tracing", es: "Trazar", lvl: 2 },   rocket:  { icon: "🚀", name: "Countdown", es: "Cuenta Atrás", lvl: 2 },
-  sort:    { icon: "🪐", name: "Big & Small", es: "Grande y Pequeño", lvl: 0 }, pattern: { icon: "🔮", name: "Patterns", es: "Patrones", lvl: 2 },
-  sortkind:{ icon: "🧺", name: "Sort It", es: "A Ordenar", lvl: 1 },
-  paint:   { icon: "🎨", name: "Paint", es: "Pintar", lvl: 0 },     story:   { icon: "📖", name: "Story", es: "Cuento", lvl: 0 },
-  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón", lvl: 0 }, dino:  { icon: "🦕", name: "Flash Count", es: "Cuenta Rápida", lvl: 0 },
-  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado", lvl: 0 },  petfeed: { icon: "🦴", name: "Same Treats", es: "Mismos Premios", lvl: 1 },
-  petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca", lvl: 0 },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida", lvl: 0 },
-  body:    { icon: "😊", name: "Body Match", es: "El Cuerpo", lvl: 0 },
-  dressup: { icon: "👗", name: "Dress Up", es: "Vestir", lvl: 0 },
-  hideseek: { icon: "🐾", name: "Hide & Seek", es: "Escondite", lvl: 0 },
-  cups:     { icon: "🥤", name: "Three Cups",  es: "Tres Vasos", lvl: 1 },
-  nightday: { icon: "🌙", name: "Day & Night", es: "Día y Noche", lvl: 0 }
+  snow:    { icon: "❄️", name: "Count", es: "Contar", yue: "數一數", lvl: 0 },     ocean:   { icon: "🐠", name: "Colors", es: "Colores", yue: "顏色", lvl: 0 },
+  memory:  { icon: "🃏", name: "Memory", es: "Memoria", yue: "記憶", lvl: 1 },    bike:    { icon: "🚲", name: "Numbers", es: "Números", yue: "數字", lvl: 1 },
+  music:   { icon: "🥁", name: "Animal Band", es: "Banda Animal", yue: "動物樂隊", lvl: 1 }, whosays: { icon: "🔊", name: "Who Says?", es: "¿Quién Dice?", yue: "邊個叫？", lvl: 0 },
+  pizza:   { icon: "🍕", name: "Pizza", es: "Pizza", yue: "薄餅", lvl: 1 },     pasta:   { icon: "🍝", name: "Yum Count", es: "A Contar", yue: "數食物", lvl: 0 },
+  trace:   { icon: "✨", name: "Tracing", es: "Trazar", yue: "描畫", lvl: 2 },   rocket:  { icon: "🚀", name: "Countdown", es: "Cuenta Atrás", yue: "倒數", lvl: 2 },
+  sort:    { icon: "🪐", name: "Big & Small", es: "Grande y Pequeño", yue: "大同細", lvl: 0 }, pattern: { icon: "🔮", name: "Patterns", es: "Patrones", yue: "規律", lvl: 2 },
+  sortkind:{ icon: "🧺", name: "Sort It", es: "A Ordenar", yue: "分類", lvl: 1 },
+  paint:   { icon: "🎨", name: "Paint", es: "Pintar", yue: "畫畫", lvl: 0 },     story:   { icon: "📖", name: "Story", es: "Cuento", yue: "故事", lvl: 0 },
+  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón", yue: "餵龍", lvl: 0 }, dino:  { icon: "🦕", name: "Flash Count", es: "Cuenta Rápida", yue: "快數", lvl: 0 },
+  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado", yue: "雪糕", lvl: 0 },  petfeed: { icon: "🦴", name: "Same Treats", es: "Mismos Premios", yue: "一樣零食", lvl: 1 },
+  petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca", yue: "搵寵物", lvl: 0 },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida", yue: "照顧寵物", lvl: 0 },
+  body:    { icon: "😊", name: "Body Match", es: "El Cuerpo", yue: "身體", lvl: 0 },
+  dressup: { icon: "👗", name: "Dress Up", es: "Vestir", yue: "換衫", lvl: 0 },
+  hideseek: { icon: "🐾", name: "Hide & Seek", es: "Escondite", yue: "捉迷藏", lvl: 0 },
+  cups:     { icon: "🥤", name: "Three Cups",  es: "Tres Vasos", yue: "三個杯", lvl: 1 },
+  nightday: { icon: "🌙", name: "Day & Night", es: "Día y Noche", yue: "日同夜", lvl: 0 }
 };
 // chosen difficulty → max game level shown (auto/hard show everything)
 const diffLevel = () => settings.diff === "easy" ? 0 : settings.diff === "med" ? 1 : 2;
 const gameVisible = gid => (GAMES[gid].lvl || 0) <= diffLevel();
 const visibleGames = cat => cat.games.filter(gameVisible);
 const CATEGORIES = [
-  { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",          cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
-  { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
-  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind", "nightday"] },
-  { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          cls: "c-animal", games: ["music", "whosays", "dino", "body"] },
-  { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
-  { id: "create", icon: "✏️", name: "Create",          es: "Crear",             cls: "c-create", games: ["paint", "story", "dressup"] }
+  { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",          yue: "數字",       cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
+  { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", yue: "顏色同形狀", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
+  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   yue: "動腦遊戲",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind", "nightday"] },
+  { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          yue: "動物",       cls: "c-animal", games: ["music", "whosays", "dino", "body"] },
+  { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          yue: "寵物",       cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
+  { id: "create", icon: "✏️", name: "Create",          es: "Crear",             yue: "創作",       cls: "c-create", games: ["paint", "story", "dressup"] }
 ];
 /* ── Narrator speech bubble ── */
 let _narratorTimer = null;
@@ -114,15 +114,15 @@ function openCategory(id) {
 
 /* ================= Story mode ================= */
 const STORY = [
-  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. “I'm going on an adventure!” she said, and rode into the magical park.", es: "Una mañana soleada, {n} se subió a su bici. «¡Voy de aventura!», dijo, y entró al parque mágico.", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle"), task: "🚲" },
-  { theme: "theme-snow",  art: "🏔️⛄❄️", text: "First she climbed a sparkly snow mountain. A friendly snowman waved hello. Together they counted the snowflakes: one, two, three!", es: "Primero subió una montaña de nieve brillante. Un muñeco de nieve la saludó. ¡Juntos contaron los copos de nieve: uno, dos, tres!", tapEmoji: ["❄️", "✨", "⛄"], tapSound: () => tone(880, 0, .2, "sine"), task: "⛄" },
-  { theme: "theme-ocean", art: "🌊🐠🐬", text: "Next, {n} sailed across the bright blue ocean. Red, yellow, and green fish swam all around, and a dolphin did a happy flip!", es: "Después, {n} navegó por el océano azul. Peces rojos, amarillos y verdes nadaban alrededor, ¡y un delfín dio un saltito feliz!", tapEmoji: ["🐠", "💦", "🐬"], tapSound: () => tone(523, 0, .25, "sine"), task: "🐬" },
-  { theme: "theme-pizza", art: "🍕🍝🧆", text: "All that adventuring made {n} hungry! She stopped in Yummy Town for a slice of pizza and spaghetti with three little meatballs.", es: "¡Tanta aventura le dio hambre a {n}! Paró en Pueblo Rico por una rebanada de pizza y espagueti con tres albóndigas.", tapEmoji: ["🍕", "😋", "🍝"], tapSound: () => tone(440, 0, .2, "triangle"), task: "🍕" },
-  { theme: "theme-music", art: "🐸🐱🐮", text: "In the meadow, the animal band was playing! The frog went ribbit, the cat went meow, and the cow went moo. {n} danced and danced.", es: "En el prado, ¡la banda de animales tocaba! La rana hacía croac, el gato miau y la vaca muu. {n} bailó y bailó.", tapEmoji: ["🎵", "🎶", "💃"], tapSound: () => speakAnimal(rand(["frog", "cat", "cow", "duck"]), { queue: true }), task: "🐱" },
-  { theme: "theme-space", art: "🚀🌙⭐", text: "Then {n} put on a shiny space helmet and zoomed to the moon in a rocket! Five, four, three, two, one... blast off! She counted the twinkly stars up high.", es: "Luego {n} se puso un casco espacial brillante y voló a la luna en un cohete. ¡Cinco, cuatro, tres, dos, uno... despegue! Contó las estrellas brillantes en lo alto.", tapEmoji: ["⭐", "🚀", "🪐"], tapSound: () => tone(130, 0, .5, "sawtooth", .15), task: "🚀" },
-  { theme: "theme-story", art: "🌈⭐💖", text: "As the sun set, {n} flew home, happy and sleepy. “What a wonderful day!” she yawned. Goodnight, {n}. The End. 💖", es: "Cuando el sol se ocultó, {n} voló a casa, feliz y con sueño. «¡Qué día tan maravilloso!», bostezó. Buenas noches, {n}. Fin. 💖", tapEmoji: ["⭐", "🌙", "💖"], tapSound: () => sfx.good(), last: true }
+  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. “I'm going on an adventure!” she said, and rode into the magical park.", es: "Una mañana soleada, {n} se subió a su bici. «¡Voy de aventura!», dijo, y entró al parque mágico.", yue: "一個晴朗嘅早晨，{n}跳上佢嘅單車。佢話：「我要去探險喇！」然後就騎入咗魔法公園。", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle"), task: "🚲" },
+  { theme: "theme-snow",  art: "🏔️⛄❄️", text: "First she climbed a sparkly snow mountain. A friendly snowman waved hello. Together they counted the snowflakes: one, two, three!", es: "Primero subió una montaña de nieve brillante. Un muñeco de nieve la saludó. ¡Juntos contaron los copos de nieve: uno, dos, tres!", yue: "佢首先爬上一座閃閃發光嘅雪山。一個友善嘅雪人揮手打招呼。佢哋一齊數雪花：一、二、三！", tapEmoji: ["❄️", "✨", "⛄"], tapSound: () => tone(880, 0, .2, "sine"), task: "⛄" },
+  { theme: "theme-ocean", art: "🌊🐠🐬", text: "Next, {n} sailed across the bright blue ocean. Red, yellow, and green fish swam all around, and a dolphin did a happy flip!", es: "Después, {n} navegó por el océano azul. Peces rojos, amarillos y verdes nadaban alrededor, ¡y un delfín dio un saltito feliz!", yue: "跟住，{n}航行過蔚藍嘅海洋。紅色、黃色同綠色嘅魚游嚟游去，仲有一隻海豚開心咁翻咗個筋斗！", tapEmoji: ["🐠", "💦", "🐬"], tapSound: () => tone(523, 0, .25, "sine"), task: "🐬" },
+  { theme: "theme-pizza", art: "🍕🍝🧆", text: "All that adventuring made {n} hungry! She stopped in Yummy Town for a slice of pizza and spaghetti with three little meatballs.", es: "¡Tanta aventura le dio hambre a {n}! Paró en Pueblo Rico por una rebanada de pizza y espagueti con tres albóndigas.", yue: "探險咗咁耐，{n}肚餓喇！佢喺美食鎮停低，食咗一件薄餅同埋有三粒丸嘅意粉。", tapEmoji: ["🍕", "😋", "🍝"], tapSound: () => tone(440, 0, .2, "triangle"), task: "🍕" },
+  { theme: "theme-music", art: "🐸🐱🐮", text: "In the meadow, the animal band was playing! The frog went ribbit, the cat went meow, and the cow went moo. {n} danced and danced.", es: "En el prado, ¡la banda de animales tocaba! La rana hacía croac, el gato miau y la vaca muu. {n} bailó y bailó.", yue: "喺草地上面，動物樂隊正在演奏！青蛙呱呱叫，貓喵喵叫，牛哞哞叫。{n}不停咁跳舞。", tapEmoji: ["🎵", "🎶", "💃"], tapSound: () => speakAnimal(rand(["frog", "cat", "cow", "duck"]), { queue: true }), task: "🐱" },
+  { theme: "theme-space", art: "🚀🌙⭐", text: "Then {n} put on a shiny space helmet and zoomed to the moon in a rocket! Five, four, three, two, one... blast off! She counted the twinkly stars up high.", es: "Luego {n} se puso un casco espacial brillante y voló a la luna en un cohete. ¡Cinco, cuatro, tres, dos, uno... despegue! Contó las estrellas brillantes en lo alto.", yue: "之後，{n}戴上閃亮嘅太空頭盔，坐火箭飛上月球！五、四、三、二、一……發射！佢數住高空中閃爍嘅星星。", tapEmoji: ["⭐", "🚀", "🪐"], tapSound: () => tone(130, 0, .5, "sawtooth", .15), task: "🚀" },
+  { theme: "theme-story", art: "🌈⭐💖", text: "As the sun set, {n} flew home, happy and sleepy. “What a wonderful day!” she yawned. Goodnight, {n}. The End. 💖", es: "Cuando el sol se ocultó, {n} voló a casa, feliz y con sueño. «¡Qué día tan maravilloso!», bostezó. Buenas noches, {n}. Fin. 💖", yue: "太陽落山嗰陣，{n}開開心心、攰攰哋飛返屋企。佢打住呵欠話：「今日真係好開心！」晚安，{n}。故事完。💖", tapEmoji: ["⭐", "🌙", "💖"], tapSound: () => sfx.good(), last: true }
 ];
-const storyText = p => fillName(curLang() === "es" ? p.es : p.text);
+const storyText = p => fillName(curLang() === "yue" && p.yue ? p.yue : curLang() === "es" ? p.es : p.text);
 let storyPage = 0, storySolved = false;
 function showStory() {
   cleanupLevel();
@@ -181,11 +181,11 @@ function storyNav(dir) {
 
 /* ================= Sticker book ================= */
 const SCENES = [
-  { id: "park",   name: "Park 🌳",   es: "Parque 🌳",   cls: "sc-park",   deco: "🌳 🛝 🌷 🌳 ⛲" },
-  { id: "space",  name: "Space 🚀",  es: "Espacio 🚀",  cls: "sc-space",  deco: "🌑 🪐 ⭐ 🌙 ⭐" },
-  { id: "ocean",  name: "Ocean 🌊",  es: "Océano 🌊",  cls: "sc-ocean",  deco: "🐚 🪸 🌊 🐚 🌊" },
-  { id: "castle", name: "Castle 🏰", es: "Castillo 🏰", cls: "sc-castle", deco: "🌸 🏰 🌳 🌸" },
-  { id: "bed",    name: "Cozy 🌙",   es: "Acogedor 🌙", cls: "sc-bed",    deco: "🛏️ 🧸 🪟 🌙" }
+  { id: "park",   name: "Park 🌳",   es: "Parque 🌳",   yue: "公園 🌳",   cls: "sc-park",   deco: "🌳 🛝 🌷 🌳 ⛲" },
+  { id: "space",  name: "Space 🚀",  es: "Espacio 🚀",  yue: "太空 🚀",   cls: "sc-space",  deco: "🌑 🪐 ⭐ 🌙 ⭐" },
+  { id: "ocean",  name: "Ocean 🌊",  es: "Océano 🌊",  yue: "海洋 🌊",   cls: "sc-ocean",  deco: "🐚 🪸 🌊 🐚 🌊" },
+  { id: "castle", name: "Castle 🏰", es: "Castillo 🏰", yue: "城堡 🏰",   cls: "sc-castle", deco: "🌸 🏰 🌳 🌸" },
+  { id: "bed",    name: "Cozy 🌙",   es: "Acogedor 🌙", yue: "舒適窩 🌙", cls: "sc-bed",    deco: "🛏️ 🧸 🪟 🌙" }
 ];
 let decor = JSON.parse(localStorage.getItem("fionaDecor") || "{}");
 let curScene = localStorage.getItem("fionaScene") || "park";
@@ -405,9 +405,19 @@ $("setRestart").onclick = () => {
   if (confirm(t("settings_restart_confirm"))) { localStorage.clear(); location.reload(); }
 };
 $("setName").onclick = () => { $("settings").classList.add("hidden"); showNameScreen(NAME); };
+function promptInstallCanto() {
+  const ua = navigator.userAgent || "";
+  const how = /iPhone|iPad|iPod|Macintosh/.test(ua)
+      ? "Settings → Accessibility → Spoken Content → Voices → Chinese → Cantonese (Hong Kong)"
+    : /Android/.test(ua)
+      ? "Settings → System → Languages → Text-to-speech output → Google Text-to-Speech → install Chinese (Hong Kong) / 粵語 voice data"
+      : "your device's Text-to-Speech settings → add a Chinese (Hong Kong) / Cantonese voice";
+  alert("廣東話 — Cantonese voice not found on this device.\n\nTo hear Cantonese, install a Cantonese voice:\n" + how + "\n\nUntil then the games stay in English. Reopen the app after installing.");
+}
 document.querySelectorAll("#segLang button").forEach(b => b.onclick = () => {
   settings.lang = b.dataset.l; saveSettings();
-  document.documentElement.lang = settings.lang === "es" ? "es" : "en";
+  if (b.dataset.l === "yue") { detectCantoVoice(); if (!cantoVoiceReady) promptInstallCanto(); }
+  document.documentElement.lang = htmlLang();
   sfx.tap(); openSettings();
 });
 document.querySelectorAll("#segDiff button").forEach(b => b.onclick = () => { settings.diff = b.dataset.d; saveSettings(); openSettings(); });
@@ -500,7 +510,7 @@ document.querySelectorAll("#diffGrid .diff-btn").forEach(b => b.onclick = () => 
 });
 $("nameInput").addEventListener("keydown", e => { if (e.key === "Enter") commitName(); });
 
-document.documentElement.lang = (settings.lang === "es") ? "es" : "en";
+document.documentElement.lang = htmlLang();
 applyName();
 if (!localStorage.getItem("fionaNameSet")) showNameScreen("");
 else showHub();

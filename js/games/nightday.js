@@ -4,26 +4,30 @@
 
 const ND_ITEMS = {
   day: [
-    { e: "☀️", name: "sun",        es: "sol"        },
-    { e: "🌈", name: "rainbow",    es: "arcoíris"   },
-    { e: "🥞", name: "pancakes",   es: "panqueques" },
-    { e: "🚌", name: "school bus", es: "autobús"    },
-    { e: "🌻", name: "sunflower",  es: "girasol"    },
-    { e: "⛅",  name: "clouds",    es: "nubes"      },
-    { e: "🦋", name: "butterfly",  es: "mariposa"   },
-    { e: "🐦", name: "bird",       es: "pájaro"     },
+    { e: "☀️", name: "sun",        es: "sol",        yue: "太陽"   },
+    { e: "🌈", name: "rainbow",    es: "arcoíris",   yue: "彩虹"   },
+    { e: "🥞", name: "pancakes",   es: "panqueques", yue: "班戟"   },
+    { e: "🚌", name: "school bus", es: "autobús",    yue: "校車"   },
+    { e: "🌻", name: "sunflower",  es: "girasol",    yue: "向日葵" },
+    { e: "⛅",  name: "clouds",    es: "nubes",      yue: "雲"     },
+    { e: "🦋", name: "butterfly",  es: "mariposa",   yue: "蝴蝶"   },
+    { e: "🐦", name: "bird",       es: "pájaro",     yue: "雀仔"   },
   ],
   night: [
-    { e: "🌙", name: "moon",       es: "luna"           },
-    { e: "⭐", name: "stars",      es: "estrellas"      },
-    { e: "🛏️", name: "bed",        es: "cama"           },
-    { e: "🧸", name: "teddy bear", es: "osito"          },
-    { e: "🦉", name: "owl",        es: "búho"           },
-    { e: "💤", name: "sleep time", es: "hora de dormir" },
-    { e: "🌟", name: "night star", es: "estrella"       },
-    { e: "🔭", name: "telescope",  es: "telescopio"     },
+    { e: "🌙", name: "moon",       es: "luna",           yue: "月光"       },
+    { e: "⭐", name: "stars",      es: "estrellas",      yue: "星星"       },
+    { e: "🛏️", name: "bed",        es: "cama",           yue: "床"         },
+    { e: "🧸", name: "teddy bear", es: "osito",          yue: "玩具熊"     },
+    { e: "🦉", name: "owl",        es: "búho",           yue: "貓頭鷹"     },
+    { e: "💤", name: "sleep time", es: "hora de dormir", yue: "瞓覺時間"   },
+    { e: "🌟", name: "night star", es: "estrella",       yue: "星"         },
+    { e: "🔭", name: "telescope",  es: "telescopio",     yue: "望遠鏡"     },
   ]
 };
+
+// localization helpers (this game holds its strings inline rather than in DICT)
+const ndL = (en, es, yue) => curLang() === "yue" ? yue : curLang() === "es" ? es : en;
+const ndName = it => curLang() === "yue" ? it.yue : curLang() === "es" ? it.es : it.name;
 
 function ndDaySVG() {
   return `<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
@@ -93,7 +97,6 @@ const nightdayLevel = {
   rounds: 5,
 
   startRound() {
-    const es = curLang() === "es";
     this.itemMistakes = {};
 
     const counts  = [2, 3, 4][state.tier];
@@ -105,10 +108,11 @@ const nightdayLevel = {
     ]);
     this.remaining = items.length;
 
-    const showTxt = es ? "☀️🌙 ¡Separa el día y la noche!" : "☀️🌙 Sort day and night!";
-    const sayTxt  = es
-      ? "¡Pon las cosas de día en el cielo azul, y las de noche en el cielo oscuro!"
-      : "Put daytime things under the sunny sky, and nighttime things under the dark sky!";
+    const showTxt = ndL("☀️🌙 Sort day and night!", "☀️🌙 ¡Separa el día y la noche!", "☀️🌙 分開日頭同夜晚！");
+    const sayTxt  = ndL(
+      "Put daytime things under the sunny sky, and nighttime things under the dark sky!",
+      "¡Pon las cosas de día en el cielo azul, y las de noche en el cielo oscuro!",
+      "將日頭嘅嘢放喺藍色天空，夜晚嘅嘢放喺黑色天空！");
     setInstruction(showTxt, sayTxt);
 
     $("playArea").innerHTML = `
@@ -134,12 +138,12 @@ const nightdayLevel = {
           <div class="nd-bin nd-day"   id="ndDay"   data-bin="day">
             <div class="nd-sky">${ndDaySVG()}</div>
             <div class="nd-drop" id="ndDropDay"></div>
-            <div class="nd-lbl">${es ? "☀️ Día" : "☀️ Day"}</div>
+            <div class="nd-lbl">${ndL("☀️ Day", "☀️ Día", "☀️ 日頭")}</div>
           </div>
           <div class="nd-bin nd-night" id="ndNight" data-bin="night">
             <div class="nd-sky">${ndNightSVG()}</div>
             <div class="nd-drop" id="ndDropNight"></div>
-            <div class="nd-lbl">${es ? "🌙 Noche" : "🌙 Night"}</div>
+            <div class="nd-lbl">${ndL("🌙 Night", "🌙 Noche", "🌙 夜晚")}</div>
           </div>
         </div>
         <div class="nd-tray" id="ndTray"></div>
@@ -151,7 +155,7 @@ const nightdayLevel = {
       b.textContent = it.e;
       b.dataset.bucket = it.bucket;
       b.dataset.uid    = it.uid;
-      b.dataset.name   = es ? it.es : it.name;
+      b.dataset.name   = ndName(it);
       makeDraggable(b, (el, ev, info) => this.release(el, ev, info));
       $("ndTray").appendChild(b);
     });
@@ -168,7 +172,6 @@ const nightdayLevel = {
 
     const want = el.dataset.bucket;
     const got  = overDay ? "day" : "night";
-    const es   = curLang() === "es";
     const name = el.dataset.name;
 
     if (want === got) {
@@ -181,8 +184,8 @@ const nightdayLevel = {
       tone(got === "day" ? 660 : 440, 0, .18, "sine", .15);
       floaters(["✨"], ev.clientX, ev.clientY, 3);
       speak(got === "day"
-        ? (es ? `¡${name}! ¡De día!`   : `${name}! Daytime!`)
-        : (es ? `¡${name}! ¡De noche!` : `${name}! Nighttime!`));
+        ? ndL(`${name}! Daytime!`,   `¡${name}! ¡De día!`,   `${name}！日頭！`)
+        : ndL(`${name}! Nighttime!`, `¡${name}! ¡De noche!`, `${name}！夜晚！`));
       this.remaining--;
       if (this.remaining === 0) { speak(praise()); roundComplete(); }
 
@@ -221,8 +224,8 @@ const nightdayLevel = {
 
       // Verbal hint (all wrong attempts)
       speak(want === "day"
-        ? (es ? `¡${name} es de día! ¡Busca el cielo azul!`     : `${name} is daytime! Find the sunny sky!`)
-        : (es ? `¡${name} es de noche! ¡Busca el cielo oscuro!` : `${name} is nighttime! Find the dark sky!`));
+        ? ndL(`${name} is daytime! Find the sunny sky!`,  `¡${name} es de día! ¡Busca el cielo azul!`,     `${name}係日頭！搵藍色天空！`)
+        : ndL(`${name} is nighttime! Find the dark sky!`, `¡${name} es de noche! ¡Busca el cielo oscuro!`, `${name}係夜晚！搵黑色天空！`));
     }
   }
 };
