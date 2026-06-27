@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTS POC — Little Explorer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #2d3748; min-height: 100vh; padding: 2rem 1rem; }
+    .container { max-width: 820px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .subtitle { color: #718096; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+    .card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    label { display: block; font-size: 0.8rem; font-weight: 600; color: #4a5568; margin-bottom: 0.3rem; margin-top: 0.75rem; }
+    label:first-child { margin-top: 0; }
+    input[type="text"], input[type="password"], select { width: 100%; padding: 0.5rem 0.75rem; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; transition: border-color 0.15s; }
+    input:focus, select:focus { outline: none; border-color: #667eea; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    button { padding: 0.45rem 0.9rem; border: none; border-radius: 7px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s, transform 0.1s; display: inline-flex; align-items: center; gap: 0.3rem; }
+    button:hover:not(:disabled) { opacity: 0.88; }
+    button:active:not(:disabled) { transform: scale(0.97); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-el { background: #667eea; color: white; }
+    .btn-browser { background: #48bb78; color: white; }
+    .btn-load { background: #ed8936; color: white; width: 100%; margin-top: 1rem; padding: 0.65rem; font-size: 0.9rem; }
+    .btn-clone { background: #9f7aea; color: white; }
+    .btn-danger { background: #fc8181; color: white; }
+    .phrase-list { list-style: none; }
+    .phrase-list li { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0; border-bottom: 1px solid #f0f4f8; }
+    .phrase-list li:last-child { border-bottom: none; }
+    .phrase-text { flex: 1; font-size: 0.95rem; }
+    .phrase-label { font-size: 0.7rem; color: #a0aec0; display: block; }
+    .note { background: #fefcbf; border-left: 3px solid #f6e05e; border-radius: 6px; padding: 0.65rem 0.9rem; font-size: 0.82rem; color: #744210; margin-bottom: 1rem; }
+    .note.info { background: #ebf8ff; border-color: #63b3ed; color: #2c5282; }
+    .note.warn { background: #fff5f5; border-color: #fc8181; color: #742a2a; }
+    .status-line { font-size: 0.78rem; color: #a0aec0; margin-top: 0.5rem; min-height: 1.1rem; }
+    .status-line.ok { color: #38a169; }
+    .status-line.err { color: #e53e3e; }
+    .voice-chip { display: inline-block; padding: 0.2rem 0.5rem; background: #edf2f7; border-radius: 4px; font-size: 0.75rem; color: #4a5568; margin-left: 0.5rem; }
+    .spinner { width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .lang-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .lang-tab { padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 2px solid transparent; background: #edf2f7; color: #4a5568; }
+    .lang-tab.active { background: #667eea; color: white; }
+    .lang-panel { display: none; }
+    .lang-panel.active { display: block; }
+    .voices-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; max-height: 220px; overflow-y: auto; }
+    .voice-option { padding: 0.5rem 0.75rem; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-size: 0.82rem; transition: border-color 0.15s; }
+    .voice-option:hover { border-color: #667eea; }
+    .voice-option.selected { border-color: #667eea; background: #ebf4ff; }
+    .voice-option .v-name { font-weight: 600; }
+    .voice-option .v-cat { color: #a0aec0; font-size: 0.72rem; }
+    .clone-dropzone { border: 2px dashed #cbd5e0; border-radius: 10px; padding: 1.5rem; text-align: center; cursor: pointer; color: #718096; font-size: 0.9rem; transition: border-color 0.15s; }
+    .clone-dropzone:hover, .clone-dropzone.drag { border-color: #667eea; color: #667eea; }
+    .cloned-voice-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; font-size: 0.85rem; }
+    input[type="file"] { display: none; }
+    section.hidden { display: none; }
+    .key-row { display: flex; gap: 0.5rem; align-items: flex-end; }
+    .key-row > div { flex: 1; }
+    .key-row button { flex-shrink: 0; padding: 0.52rem 1rem; }
+    .perf-badge { font-size: 0.7rem; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 600; }
+    .perf-badge.fast { background: #c6f6d5; color: #276749; }
+    .perf-badge.quality { background: #bee3f8; color: #2a4365; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>TTS POC — Little Explorer</h1>
+  <p class="subtitle">Compare ElevenLabs vs browser speech across English, Spanish &amp; Cantonese. No backend needed.</p>
+
+  <!-- ── Setup ── -->
+  <div class="card" id="setupCard">
+    <h2>🔑 ElevenLabs Setup</h2>
+    <p class="note info">Get a free API key at <strong>elevenlabs.io</strong> (free tier: 10,000 chars/month). Your key is stored only in sessionStorage — never sent anywhere except ElevenLabs.</p>
+    <div class="key-row">
+      <div>
+        <label for="apiKey">API Key</label>
+        <input type="password" id="apiKey" placeholder="sk_…" autocomplete="off">
+      </div>
+      <button class="btn-load" id="loadBtn" onclick="loadVoices()" style="width:auto">Load Voices →</button>
+    </div>
+    <div id="setupStatus" class="status-line"></div>
+  </div>
+
+  <!-- ── Voice picker (shown after key entered) ── -->
+  <div class="card hidden" id="voiceCard">
+    <h2>🎙️ Voice &amp; Model</h2>
+    <div class="row2">
+      <div>
+        <label>Model</label>
+        <select id="modelSel" onchange="updateModelNote()">
+          <option value="eleven_multilingual_v2">Multilingual v2 — highest quality</option>
+          <option value="eleven_flash_v2_5">Flash v2.5 — faster, adds Cantonese</option>
+          <option value="eleven_turbo_v2_5">Turbo v2.5 — balanced</option>
+        </select>
+        <div id="modelNote" class="status-line"></div>
+      </div>
+      <div>
+        <label>Stability / Expressiveness</label>
+        <input type="range" id="stability" min="0" max="100" value="50" style="width:100%;margin-top:0.6rem">
+        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#a0aec0"><span>More variable</span><span>More stable</span></div>
+      </div>
+    </div>
+    <label style="margin-top:1rem">Available Voices <span id="voiceCount" class="voice-chip">loading…</span></label>
+    <div class="voices-grid" id="voicesGrid"></div>
+    <div id="selectedVoiceName" class="status-line ok" style="margin-top:0.5rem"></div>
+  </div>
+
+  <!-- ── Voice Cloning ── -->
+  <div class="card hidden" id="cloneCard">
+    <h2>🧬 Voice Cloning (optional)</h2>
+    <p class="note">Record ~1 min of clear speech (e.g. a parent's voice), upload here, and ElevenLabs creates a custom voice you can select above. Works best with a quiet room and natural speech — not reading a list.</p>
+    <label>Clone name</label>
+    <input type="text" id="cloneName" placeholder="e.g. Mum's voice" style="margin-bottom:0.75rem">
+    <div class="clone-dropzone" id="dropzone" onclick="document.getElementById('cloneFile').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+      Drop audio file here or click to browse<br>
+      <span style="font-size:0.78rem;color:#a0aec0">mp3, mp4, wav, m4a · max 10 MB · min 30 sec</span>
+    </div>
+    <input type="file" id="cloneFile" accept="audio/*" onchange="fileChosen(this.files[0])">
+    <div id="cloneStatus" class="status-line"></div>
+    <div id="clonedVoiceRow" class="cloned-voice-row hidden">
+      <span id="clonedVoiceLabel"></span>
+      <button class="btn-danger" onclick="deleteClonedVoice()">Delete</button>
+    </div>
+    <button class="btn-clone" id="cloneBtn" style="margin-top:0.75rem" onclick="cloneVoice()" disabled>Upload &amp; Clone Voice</button>
+  </div>
+
+  <!-- ── Phrases ── -->
+  <div class="card hidden" id="phrasesCard">
+    <h2>▶ Phrase Comparison</h2>
+    <p class="note info">Each phrase shows two buttons: <strong style="color:#667eea">EL</strong> = ElevenLabs · <strong style="color:#48bb78">BR</strong> = Browser Web Speech. Click to hear both and compare.</p>
+
+    <div class="lang-tabs">
+      <div class="lang-tab active" onclick="switchLang('en', this)">🇺🇸 English</div>
+      <div class="lang-tab" onclick="switchLang('es', this)">🇲🇽 Spanish</div>
+      <div class="lang-tab" onclick="switchLang('yue', this)">🇭🇰 Cantonese</div>
+    </div>
+
+    <!-- English -->
+    <div class="lang-panel active" id="panel-en">
+      <ul class="phrase-list" id="list-en"></ul>
+    </div>
+
+    <!-- Spanish -->
+    <div class="lang-panel" id="panel-es">
+      <ul class="phrase-list" id="list-es"></ul>
+    </div>
+
+    <!-- Cantonese -->
+    <div class="lang-panel" id="panel-yue">
+      <div class="note warn" id="yueCaveat">
+        <strong>⚠️ Cantonese note:</strong> <em>Multilingual v2</em> reads Chinese characters as <strong>Mandarin</strong>.
+        Switch to <strong>Flash v2.5</strong> above — it added dedicated Cantonese support.
+        Browser Web Speech requires a Cantonese voice installed on the device (en-US is <em>not</em> Cantonese).
+      </div>
+      <ul class="phrase-list" id="list-yue"></ul>
+    </div>
+
+    <div id="playStatus" class="status-line" style="margin-top:0.75rem"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+// ── Phrases drawn directly from the app's translation strings ──
+const PHRASES = {
+  en: [
+    { text: "Let's go exploring!",                   label: "Hub greeting" },
+    { text: "Find the red circle!",                   label: "Color instruction" },
+    { text: "Amazing! You got it!",                   label: "Praise" },
+    { text: "Let's count together. One, two, three!", label: "Counting" },
+    { text: "What number is this?",                   label: "Number question" },
+    { text: "Excellent job, Explorer!",               label: "Celebration" },
+    { text: "Try again, you can do it!",              label: "Encouragement" },
+    { text: "Which one is the biggest?",              label: "Size comparison" },
+  ],
+  es: [
+    { text: "¡Vamos a explorar!",                      label: "Hub greeting" },
+    { text: "¡Encuentra el círculo rojo!",             label: "Color instruction" },
+    { text: "¡Increíble! ¡Lo lograste!",              label: "Praise" },
+    { text: "¡Contemos juntos! ¡Uno, dos, tres!",     label: "Counting" },
+    { text: "¿Qué número es éste?",                   label: "Number question" },
+    { text: "¡Excelente, Explorador!",                 label: "Celebration" },
+    { text: "¡Inténtalo de nuevo, tú puedes!",        label: "Encouragement" },
+    { text: "¿Cuál es el más grande?",                label: "Size comparison" },
+  ],
+  yue: [
+    { text: "我哋去探索囉！",           label: "Hub greeting" },
+    { text: "搵紅色嘅圓形！",           label: "Color instruction" },
+    { text: "做得好好呀！你做到喇！",   label: "Praise" },
+    { text: "一齊數數！一、二、三！",   label: "Counting" },
+    { text: "呢個係咩數字？",           label: "Number question" },
+    { text: "好嘢，探索家！",           label: "Celebration" },
+    { text: "再試一次，你得㗎！",       label: "Encouragement" },
+    { text: "邊個最大？",               label: "Size comparison" },
+  ],
+};
+
+const LANG_CODES = { en: "en-US", es: "es-MX", yue: "zh-HK" };
+
+let selectedVoiceId = null;
+let cloneFile = null;
+let clonedVoiceId = null;
+let clonedVoiceName = null;
+
+// ── Restore key from session ──
+window.addEventListener("DOMContentLoaded", () => {
+  const saved = sessionStorage.getItem("el_key");
+  if (saved) { document.getElementById("apiKey").value = saved; }
+  buildPhraseLists();
+  updateModelNote();
+});
+
+function getKey() { return document.getElementById("apiKey").value.trim(); }
+function getModel() { return document.getElementById("modelSel").value; }
+function getStability() { return document.getElementById("stability").value / 100; }
+
+function updateModelNote() {
+  const n = document.getElementById("modelNote");
+  const m = getModel();
+  if (m === "eleven_multilingual_v2") {
+    n.textContent = "29 languages — best quality. Chinese = Mandarin only.";
+    n.className = "status-line";
+  } else if (m === "eleven_flash_v2_5") {
+    n.textContent = "Fastest. Added Cantonese (yue) as a distinct language.";
+    n.className = "status-line ok";
+  } else {
+    n.textContent = "Balanced speed/quality. Multilingual.";
+    n.className = "status-line";
+  }
+}
+
+// ── Load voices from ElevenLabs ──
+async function loadVoices() {
+  const key = getKey();
+  if (!key) { setStatus("setupStatus", "Enter your API key first.", "err"); return; }
+  sessionStorage.setItem("el_key", key);
+  const btn = document.getElementById("loadBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Loading…';
+  setStatus("setupStatus", "", "");
+  try {
+    const res = await fetch("https://api.elevenlabs.io/v1/voices", {
+      headers: { "xi-api-key": key }
+    });
+    if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`);
+    const data = await res.json();
+    const voices = data.voices || [];
+    renderVoices(voices);
+    ["voiceCard","cloneCard","phrasesCard"].forEach(id => document.getElementById(id).classList.remove("hidden"));
+    setStatus("setupStatus", `Loaded ${voices.length} voices.`, "ok");
+  } catch (e) {
+    setStatus("setupStatus", e.message, "err");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "Load Voices →";
+  }
+}
+
+function renderVoices(voices) {
+  const grid = document.getElementById("voicesGrid");
+  document.getElementById("voiceCount").textContent = voices.length + " voices";
+  grid.innerHTML = "";
+  voices.forEach(v => {
+    const div = document.createElement("div");
+    div.className = "voice-option";
+    div.dataset.id = v.voice_id;
+    div.innerHTML = `<div class="v-name">${v.name}</div><div class="v-cat">${v.category || "premade"}</div>`;
+    div.onclick = () => selectVoice(v.voice_id, v.name, div);
+    grid.appendChild(div);
+    // Pre-select first "premade" voice
+    if (!selectedVoiceId && (v.category === "premade" || !v.category)) {
+      selectVoice(v.voice_id, v.name, div);
+    }
+  });
+}
+
+function selectVoice(id, name, el) {
+  document.querySelectorAll(".voice-option").forEach(d => d.classList.remove("selected"));
+  if (el) el.classList.add("selected");
+  selectedVoiceId = id;
+  document.getElementById("selectedVoiceName").textContent = `Selected: ${name} (${id})`;
+}
+
+// ── Build phrase rows ──
+function buildPhraseLists() {
+  ["en","es","yue"].forEach(lang => {
+    const ul = document.getElementById("list-" + lang);
+    ul.innerHTML = "";
+    PHRASES[lang].forEach((p, i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="phrase-text">
+          <span>${p.text}</span>
+          <span class="phrase-label">${p.label}</span>
+        </div>
+        <button class="btn-el" onclick="playEL('${lang}',${i},this)">EL</button>
+        <button class="btn-browser" onclick="playBrowser('${lang}',${i})">BR</button>
+      `;
+      ul.appendChild(li);
+    });
+  });
+}
+
+// ── ElevenLabs playback ──
+async function playEL(lang, idx, btn) {
+  if (!selectedVoiceId) { setStatus("playStatus", "Select a voice first.", "err"); return; }
+  const key = getKey();
+  if (!key) { setStatus("playStatus", "Enter API key and load voices.", "err"); return; }
+  const phrase = PHRASES[lang][idx];
+  const origHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  setStatus("playStatus", `Fetching "${phrase.text.slice(0,30)}…"`, "");
+  try {
+    const body = {
+      text: phrase.text,
+      model_id: getModel(),
+      voice_settings: {
+        stability: getStability(),
+        similarity_boost: 0.75,
+        style: 0.25,
+        use_speaker_boost: true
+      }
+    };
+    const voiceId = clonedVoiceId || selectedVoiceId;
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+      method: "POST",
+      headers: { "xi-api-key": key, "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(`ElevenLabs ${res.status}: ${await res.text()}`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.onended = () => URL.revokeObjectURL(url);
+    await audio.play();
+    setStatus("playStatus", `Playing via ElevenLabs (${getModel()})`, "ok");
+  } catch (e) {
+    setStatus("playStatus", "Error: " + e.message, "err");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origHTML;
+  }
+}
+
+// ── Browser Web Speech playback ──
+function playBrowser(lang, idx) {
+  if (!("speechSynthesis" in window)) { setStatus("playStatus", "Browser does not support Web Speech.", "err"); return; }
+  const phrase = PHRASES[lang][idx];
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(phrase.text);
+  u.lang = LANG_CODES[lang];
+  u.rate = 0.95;
+  u.pitch = 1.25;
+  // Prefer natural/neural voices if available
+  const voices = speechSynthesis.getVoices();
+  const match = voices.find(v => v.lang.startsWith(lang === "yue" ? "zh" : lang === "es" ? "es" : "en") && /natural|neural|online|enhanced|siri/i.test(v.name))
+    || voices.find(v => v.lang === LANG_CODES[lang])
+    || voices.find(v => v.lang.startsWith(lang === "yue" ? "zh" : lang === "es" ? "es" : "en"));
+  if (match) u.voice = match;
+  u.onstart = () => setStatus("playStatus", `Browser: ${match ? match.name : "default voice"} · lang=${u.lang}`, "ok");
+  u.onerror = e => setStatus("playStatus", "Browser TTS error: " + e.error, "err");
+  speechSynthesis.speak(u);
+}
+
+// ── Voice cloning ──
+function fileChosen(file) {
+  if (!file) return;
+  cloneFile = file;
+  document.getElementById("cloneStatus").textContent = `Ready: ${file.name} (${(file.size/1024/1024).toFixed(1)} MB)`;
+  document.getElementById("cloneStatus").className = "status-line ok";
+  document.getElementById("cloneBtn").disabled = false;
+  document.getElementById("dropzone").textContent = `✓ ${file.name}`;
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById("dropzone").classList.remove("drag");
+  const file = e.dataTransfer.files[0];
+  if (file) fileChosen(file);
+}
+
+async function cloneVoice() {
+  const key = getKey();
+  const name = document.getElementById("cloneName").value.trim() || "Custom Voice";
+  if (!key) { setStatus("cloneStatus", "Enter API key first.", "err"); return; }
+  if (!cloneFile) { setStatus("cloneStatus", "Choose an audio file first.", "err"); return; }
+  const btn = document.getElementById("cloneBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Uploading…';
+  setStatus("cloneStatus", "Uploading to ElevenLabs…", "");
+  try {
+    const fd = new FormData();
+    fd.append("name", name);
+    fd.append("files", cloneFile, cloneFile.name);
+    fd.append("description", "Little Explorer POC — voice clone");
+    const res = await fetch("https://api.elevenlabs.io/v1/voices/add", {
+      method: "POST",
+      headers: { "xi-api-key": key },
+      body: fd
+    });
+    if (!res.ok) throw new Error(`Clone error ${res.status}: ${await res.text()}`);
+    const data = await res.json();
+    clonedVoiceId = data.voice_id;
+    clonedVoiceName = name;
+    setStatus("cloneStatus", `Cloned! Voice ID: ${clonedVoiceId}`, "ok");
+    const row = document.getElementById("clonedVoiceRow");
+    document.getElementById("clonedVoiceLabel").textContent = `Active clone: "${name}" — will be used for all EL playback`;
+    row.classList.remove("hidden");
+    // Reload voices to include the new clone
+    loadVoices();
+  } catch (e) {
+    setStatus("cloneStatus", e.message, "err");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "Upload &amp; Clone Voice";
+  }
+}
+
+async function deleteClonedVoice() {
+  if (!clonedVoiceId) return;
+  const key = getKey();
+  try {
+    await fetch(`https://api.elevenlabs.io/v1/voices/${clonedVoiceId}`, {
+      method: "DELETE",
+      headers: { "xi-api-key": key }
+    });
+  } catch (_) {}
+  clonedVoiceId = null;
+  clonedVoiceName = null;
+  document.getElementById("clonedVoiceRow").classList.add("hidden");
+  setStatus("cloneStatus", "Clone deleted.", "");
+}
+
+// ── Language tab switch ──
+function switchLang(lang, tabEl) {
+  document.querySelectorAll(".lang-tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".lang-panel").forEach(p => p.classList.remove("active"));
+  tabEl.classList.add("active");
+  document.getElementById("panel-" + lang).classList.add("active");
+}
+
+// ── Utilities ──
+function setStatus(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = "status-line" + (type ? " " + type : "");
+}
+</script>
+</body>
+</html>
