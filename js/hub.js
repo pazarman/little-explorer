@@ -12,34 +12,34 @@ const LEVELS = {
 /* ================= Categories & games ================= */
 // lvl: difficulty rating (0 = easy/ages 2-3, 1 = medium/3-4, 2 = hard/4-5). Used to hide games above the chosen level.
 const GAMES = {
-  snow:    { icon: "❄️", name: "Count", es: "Contar", lvl: 0 },     ocean:   { icon: "🐠", name: "Colors", es: "Colores", lvl: 0 },
-  memory:  { icon: "🃏", name: "Memory", es: "Memoria", lvl: 1 },    bike:    { icon: "🚲", name: "Numbers", es: "Números", lvl: 1 },
-  music:   { icon: "🥁", name: "Animal Band", es: "Banda Animal", lvl: 1 }, whosays: { icon: "🔊", name: "Who Says?", es: "¿Quién Dice?", lvl: 0 },
-  pizza:   { icon: "🍕", name: "Pizza", es: "Pizza", lvl: 1 },     pasta:   { icon: "🍝", name: "Yum Count", es: "A Contar", lvl: 0 },
-  trace:   { icon: "✨", name: "Tracing", es: "Trazar", lvl: 2 },   rocket:  { icon: "🚀", name: "Countdown", es: "Cuenta Atrás", lvl: 2 },
-  sort:    { icon: "🪐", name: "Big & Small", es: "Grande y Pequeño", lvl: 0 }, pattern: { icon: "🔮", name: "Patterns", es: "Patrones", lvl: 2 },
-  sortkind:{ icon: "🧺", name: "Sort It", es: "A Ordenar", lvl: 1 },
-  paint:   { icon: "🎨", name: "Paint", es: "Pintar", lvl: 0 },     story:   { icon: "📖", name: "Story", es: "Cuento", lvl: 0 },
-  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón", lvl: 0 }, dino:  { icon: "🦕", name: "Flash Count", es: "Cuenta Rápida", lvl: 0 },
-  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado", lvl: 0 },  petfeed: { icon: "🦴", name: "Same Treats", es: "Mismos Premios", lvl: 1 },
-  petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca", lvl: 0 },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida", lvl: 0 },
-  body:    { icon: "😊", name: "Body Match", es: "El Cuerpo", lvl: 0 },
-  dressup: { icon: "👗", name: "Dress Up", es: "Vestir", lvl: 0 },
-  hideseek: { icon: "🐾", name: "Hide & Seek", es: "Escondite", lvl: 0 },
-  cups:     { icon: "🥤", name: "Three Cups",  es: "Tres Vasos", lvl: 1 },
-  nightday: { icon: "🌙", name: "Day & Night", es: "Día y Noche", lvl: 0 }
+  snow:    { icon: "❄️", name: "Count", es: "Contar", yue: "數一數", lvl: 0 },     ocean:   { icon: "🐠", name: "Colors", es: "Colores", yue: "顏色", lvl: 0 },
+  memory:  { icon: "🃏", name: "Memory", es: "Memoria", yue: "記憶", lvl: 1 },    bike:    { icon: "🚲", name: "Numbers", es: "Números", yue: "數字", lvl: 1 },
+  music:   { icon: "🥁", name: "Animal Band", es: "Banda Animal", yue: "動物樂隊", lvl: 1 }, whosays: { icon: "🔊", name: "Who Says?", es: "¿Quién Dice?", yue: "邊個叫？", lvl: 0 },
+  pizza:   { icon: "🍕", name: "Pizza", es: "Pizza", yue: "薄餅", lvl: 1 },     pasta:   { icon: "🍝", name: "Yum Count", es: "A Contar", yue: "數食物", lvl: 0 },
+  trace:   { icon: "✨", name: "Tracing", es: "Trazar", yue: "描畫", lvl: 2 },   rocket:  { icon: "🚀", name: "Countdown", es: "Cuenta Atrás", yue: "倒數", lvl: 2 },
+  sort:    { icon: "🪐", name: "Big & Small", es: "Grande y Pequeño", yue: "大同細", lvl: 0 }, pattern: { icon: "🔮", name: "Patterns", es: "Patrones", yue: "規律", lvl: 2 },
+  sortkind:{ icon: "🧺", name: "Sort It", es: "A Ordenar", yue: "分類", lvl: 1 },
+  paint:   { icon: "🎨", name: "Paint", es: "Pintar", yue: "畫畫", lvl: 0 },     story:   { icon: "📖", name: "Story", es: "Cuento", yue: "故事", lvl: 0 },
+  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón", yue: "餵龍", lvl: 0 }, dino:  { icon: "🦕", name: "Flash Count", es: "Cuenta Rápida", yue: "快數", lvl: 0 },
+  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado", yue: "雪糕", lvl: 0 },  petfeed: { icon: "🦴", name: "Same Treats", es: "Mismos Premios", yue: "一樣零食", lvl: 1 },
+  petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca", yue: "搵寵物", lvl: 0 },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida", yue: "照顧寵物", lvl: 0 },
+  body:    { icon: "😊", name: "Body Match", es: "El Cuerpo", yue: "身體", lvl: 0 },
+  dressup: { icon: "👗", name: "Dress Up", es: "Vestir", yue: "換衫", lvl: 0 },
+  hideseek: { icon: "🐾", name: "Hide & Seek", es: "Escondite", yue: "捉迷藏", lvl: 0 },
+  cups:     { icon: "🥤", name: "Three Cups",  es: "Tres Vasos", yue: "三個杯", lvl: 1 },
+  nightday: { icon: "🌙", name: "Day & Night", es: "Día y Noche", yue: "日同夜", lvl: 0 }
 };
 // chosen difficulty → max game level shown (auto/hard show everything)
 const diffLevel = () => settings.diff === "easy" ? 0 : settings.diff === "med" ? 1 : 2;
 const gameVisible = gid => (GAMES[gid].lvl || 0) <= diffLevel();
 const visibleGames = cat => cat.games.filter(gameVisible);
 const CATEGORIES = [
-  { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",          cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
-  { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
-  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind", "nightday"] },
-  { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          cls: "c-animal", games: ["music", "whosays", "dino", "body"] },
-  { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
-  { id: "create", icon: "✏️", name: "Create",          es: "Crear",             cls: "c-create", games: ["paint", "story", "dressup"] }
+  { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",          yue: "數字",       cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon"] },
+  { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", yue: "顏色同形狀", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
+  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   yue: "動腦遊戲",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind", "nightday"] },
+  { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          yue: "動物",       cls: "c-animal", games: ["music", "whosays", "dino", "body"] },
+  { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          yue: "寵物",       cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
+  { id: "create", icon: "✏️", name: "Create",          es: "Crear",             yue: "創作",       cls: "c-create", games: ["paint", "story", "dressup"] }
 ];
 /* ── Narrator speech bubble ── */
 let _narratorTimer = null;
