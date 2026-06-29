@@ -32,6 +32,30 @@ This file is the shared state between three agents and you:
 
 <!-- Implementer always picks the first READY item -->
 
+### [PROPOSED] Rhyme Time
+- **STEM:** Phonological awareness / literacy · rhyme recognition → onset sounds · age 2–4
+- **Success:** Child can tap the picture that rhymes with the one the voice names (e.g., "cat" → taps "hat" not "dog")
+- **Fills gap:** Phonological awareness — zero coverage; single highest-ROI domain for ages 3–5 per STEM doc
+- **Rubric focus:** Learning efficacy (phoneme pair made explicit by voice + visual highlight), Clarity (2 choices tier 0 → 3 choices tier 2), Pacing (tier 0=rhyme yes/no, tier 1=pick rhyme from 3, tier 2=match onset sound)
+- **Estimated complexity:** Medium — new game with SVG picture cards; audio-first (no reading); needs curated rhyme word pairs
+- **File:** `js/games/rhyme.js`
+
+### [PROPOSED] Feelings Friends
+- **STEM:** Social-emotional learning (SEL) · emotion naming → cause of feelings · age 2–4
+- **Success:** Child can point to the face that shows "happy" / "sad" / "surprised" / "scared" and, at tier 1, match an emotion to its cause ("Bunny dropped her ice cream — how does she feel?")
+- **Fills gap:** SEL — zero explicit coverage; Daniel Tiger, PBS Kids, and Sago Mini all treat this as a first-class domain
+- **Rubric focus:** Learning efficacy (emotion word spoken + face shown simultaneously), Emotional safety (all feelings are valid — no wrong answer path, gentle correction only), Pacing (tier 0=2 emotions, tier 1=4 emotions with cause scene, tier 2=self-regulation choice)
+- **Estimated complexity:** Medium — SVG character faces with animated expressions; scenario scenes at tier 1; voice-first
+- **File:** `js/games/feelings.js`
+
+### [PROPOSED] Where's Teddy?
+- **STEM:** Spatial reasoning · positional language (in / on / under / behind / next to) · age 2–4
+- **Success:** Child can tap the correct hiding spot when voice says "Teddy is UNDER the table" and, at tier 1, drag Teddy to the place the voice names
+- **Fills gap:** Spatial reasoning — hideseek.js teaches object permanence but not explicit prepositional vocabulary; this is the zero-coverage positional-language track from the STEM doc
+- **Rubric focus:** Learning efficacy (preposition spoken + spatially highlighted on each reveal), Clarity (single scene, one highlighted spot per round), Motor (large tap / drag targets)
+- **Estimated complexity:** Low — single SVG room scene with 3–5 named positions; tier 0=receptive (tap), tier 1=expressive (place), tier 2=4+ positions
+- **File:** `js/games/position.js`
+
 ### [PROPOSED] Sort & Classify by Color
 - **STEM:** Sorting / classification · sort by 1 attribute (color) · age 2–3
 - **Success:** Child can tap all the red items (or blue, or yellow) into the correct bucket
