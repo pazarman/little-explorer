@@ -32,6 +32,30 @@ This file is the shared state between three agents and you:
 
 <!-- Implementer always picks the first READY item -->
 
+### [PROPOSED] Sound Safari
+- **STEM:** Phonological awareness / literacy · letter sounds (phoneme matching) · age 3–5
+- **Success:** Child can tap the picture whose name starts with the sound the voice makes (e.g., voice says "/b/" → taps "ball" not "fish")
+- **Fills gap:** Phonological awareness — Rhyme Time covers rhyme recognition; letter phoneme matching is a distinct zero-coverage sub-concept; highest-ROI domain for ages 3–5 per STEM doc
+- **Rubric focus:** Learning efficacy (phoneme isolated and repeated, then matched to object name), Clarity (2 choices tier 0 → 3 choices tier 2), Pacing (tier 0=initial consonant yes/no, tier 1=pick the right picture from 2, tier 2=same vs. different starting sound from 3)
+- **Estimated complexity:** Medium — voice-first phoneme delivery, curated word-picture pairs for 6–8 consonant sounds; no reading required
+- **File:** `js/games/sounds.js`
+
+### [PROPOSED] Line Them Up (Seriation)
+- **STEM:** Measurement / comparison · ordering 3 objects by size/length (seriation) · age 3–4
+- **Success:** Child can drag 3 objects into correct size order from smallest to biggest (or tallest to shortest)
+- **Fills gap:** Measurement/comparison — Tall or Short compares 2 objects; More or Less compares quantities; neither covers seriation (ordering 3+ by magnitude), which is the "order by size" sub-concept explicitly listed in the STEM doc
+- **Rubric focus:** Learning efficacy (comparative language spoken at each placement: "bigger!" "biggest!"), Motor (big drag targets), Pacing (tier 0=2 items, tier 1=3 items, tier 2=4 items with mixed reveal order)
+- **Estimated complexity:** Low-Medium — 3–4 SVG objects with clear size variation; drag-to-slot interaction; voice confirms order at each step
+- **File:** `js/games/lineup.js`
+
+### [PROPOSED] Seasons Wheel
+- **STEM:** Scientific thinking · seasons + time-of-year observation · age 3–5
+- **Success:** Child can look at a nature scene (leaves falling, snow on ground, flowers blooming, sunny beach) and tap the correct season name, then match one season-appropriate item (coat, swimsuit, umbrella, boots) to it
+- **Fills gap:** Scientific thinking — Night & Day Sort (IN_REVIEW) covers day/night; Weather Dresser (PROPOSED) covers daily weather; seasons is explicitly flagged as a roadmap item in the STEM doc and is zero-coverage as a distinct concept
+- **Rubric focus:** Learning efficacy (observation chain: visual cues → season name → real-world implication), Clarity (one visible scene per round, four season choices shown as icons), Emotional safety (gentle voice redirect on wrong tap, no fail state)
+- **Estimated complexity:** Medium — 4 SVG season scenes with characteristic nature cues; seasonal item matching at tier 1; voice names each season on reveal
+- **File:** `js/games/seasons.js`
+
 ### [PROPOSED] Rhyme Time
 - **STEM:** Phonological awareness / literacy · rhyme recognition → onset sounds · age 2–4
 - **Success:** Child can tap the picture that rhymes with the one the voice names (e.g., "cat" → taps "hat" not "dog")
