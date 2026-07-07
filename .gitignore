@@ -14,3 +14,6 @@ node_modules/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# Local agent logs
+scripts/implementer.log
