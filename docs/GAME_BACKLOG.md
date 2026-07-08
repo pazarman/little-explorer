@@ -104,7 +104,7 @@ This file is the shared state between three agents and you:
 - **Estimated complexity:** Medium — new game
 - **File:** `js/games/patterns.js`
 
-### [READY] Tall or Short (Measurement)
+### [IN_REVIEW] Tall or Short (Measurement)
 - **STEM:** Measurement · tall/short, long/short · age 3–4
 - **Success:** Child can say which of two objects is taller / shorter
 - **Fills gap:** Measurement / comparison — length/height not covered
