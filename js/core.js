@@ -270,6 +270,14 @@ const DICT = {
     cups_retry: "Keep looking! Find the ball!",
     cups_win: "You found it! 🎉",
     rel_in: "in", rel_on: "on", rel_under: "under",
+    measure_show_taller: "Which one is TALLER?",
+    measure_say_taller: "Which one is taller? Tap it!",
+    measure_show_shorter: "Which one is SHORTER?",
+    measure_say_shorter: "Which one is shorter? Tap it!",
+    measure_yes_taller: "Yes! Taller!",
+    measure_yes_shorter: "Yes! Shorter!",
+    measure_no_taller: "That one is shorter! Find the taller one!",
+    measure_no_shorter: "That one is taller! Find the shorter one!",
     basket: { es: "canasta", g: "f" },
     box: { es: "caja", g: "f" },
     table: { es: "mesa", g: "f" }
@@ -462,7 +470,15 @@ const DICT = {
     cups_nope: "¡Ahí no! ¡Mira debajo de otro vaso!",
     cups_retry: "¡Sigue buscando! ¡Encuentra la pelota!",
     cups_win: "¡La encontraste! 🎉",
-    rel_in: "dentro de", rel_on: "encima de", rel_under: "debajo de"
+    rel_in: "dentro de", rel_on: "encima de", rel_under: "debajo de",
+    measure_show_taller: "¿Cuál es más ALTO?",
+    measure_say_taller: "¿Cuál es más alto? ¡Tócalo!",
+    measure_show_shorter: "¿Cuál es más BAJO?",
+    measure_say_shorter: "¿Cuál es más bajo? ¡Tócalo!",
+    measure_yes_taller: "¡Sí! ¡Más alto!",
+    measure_yes_shorter: "¡Sí! ¡Más bajo!",
+    measure_no_taller: "¡Ese es más bajo! ¡Busca el más alto!",
+    measure_no_shorter: "¡Ese es más alto! ¡Busca el más bajo!"
   },
   yue: {
     num: ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"],
@@ -648,7 +664,15 @@ const DICT = {
     cups_nope: "唔喺度！睇下另一個杯！",
     cups_retry: "繼續搵！搵個波出嚟！",
     cups_win: "你搵到喇！🎉",
-    rel_in: "入面", rel_on: "上面", rel_under: "下面"
+    rel_in: "入面", rel_on: "上面", rel_under: "下面",
+    measure_show_taller: "邊個高啲？",
+    measure_say_taller: "邊個高啲呀？撳佢啦！",
+    measure_show_shorter: "邊個矮啲？",
+    measure_say_shorter: "邊個矮啲呀？撳佢啦！",
+    measure_yes_taller: "啱喇！高啲！",
+    measure_yes_shorter: "啱喇！矮啲！",
+    measure_no_taller: "嗰個矮啲！搵高啲嗰個！",
+    measure_no_shorter: "嗰個高啲！搵矮啲嗰個！"
   }
 };
 

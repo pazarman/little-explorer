@@ -38,6 +38,7 @@
   body.theme-sort   { background:linear-gradient(#5aa9d6, #9fd0e8 55%, #dff0f8); }
   body.theme-cups     { background:linear-gradient(#ffd98a, #f7b267 55%, #e07a5f); }
   body.theme-nightday { background:linear-gradient(165deg, #87ceeb 0%, #4a7fbf 40%, #1a3366 100%); }
+  body.theme-measure { background:linear-gradient(#bfe8ff, #eaf7d8 55%, #cdeec0); }
 
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
             align-items:center; justify-content:center; padding:2vmin;
