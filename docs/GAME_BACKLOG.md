@@ -32,6 +32,30 @@ This file is the shared state between three agents and you:
 
 <!-- Implementer always picks the first READY item -->
 
+### [PROPOSED] Clap the Beat
+- **STEM:** Phonological awareness / literacy · syllable segmentation (clap the beats) · age 2–4
+- **Success:** Child can tap the clap button once per syllable in a spoken word (e.g., "cat" = 1 tap, "mon-key" = 2 taps, "el-e-phant" = 3 taps) and hear the syllables highlighted as they tap
+- **Fills gap:** Phonological awareness — Rhyme Time covers rhyme recognition; Sound Safari covers phoneme matching; syllable segmentation is a distinct, earlier-developing sub-skill (emerges at age 2–3) with zero backlog coverage; all three sub-concepts must be present for a complete literacy track
+- **Rubric focus:** Learning efficacy (voice breaks word into syllables on each tap with a visible pulse, then praises the total count), Clarity (one picture + one large clap-pad per round, nothing else on screen), Pacing (tier 0 = 1-syllable words tap-confirm, tier 1 = 2-syllable words, tier 2 = 3-syllable words with animated syllable beats)
+- **Estimated complexity:** Low — one SVG picture card + large tap target; voice does the segmentation work; needs a curated 20-word bank (1/2/3 syllable); no drag, no reading
+- **File:** `js/games/syllable.js`
+
+### [PROPOSED] Shape Sorter
+- **STEM:** Sorting / classification / data · sort by shape attribute (1 attribute → 2 attributes) · age 2–4
+- **Success:** Child can drag each object into the correct shape bucket (circles here, squares there) and, at tier 1, sort by two attributes at once (color + shape)
+- **Fills gap:** Sorting/classification — Sort & Classify by Color covers single-attribute color sorting; Grocery Sort covers sort-by-kind; sorting by **shape** as a discrete attribute (a distinct early-math concept) has no backlog entry; also advances Geometry/shapes coverage from recognition to active classification
+- **Rubric focus:** Learning efficacy (shape name spoken on each drop + bucket label highlighted), Motor (large drag targets ≥ 60px), Pacing (tier 0 = 2 shapes/circle+square, tier 1 = 3 shapes, tier 2 = sort by shape AND color simultaneously into 4 buckets)
+- **Estimated complexity:** Medium — 3–4 bucket zones; items are simple filled SVG shapes in 2–3 colors; drag-to-zone interaction; voice confirms shape name on every drop
+- **File:** `js/games/shapesort.js`
+
+### [PROPOSED] What Happens If?
+- **STEM:** Logic / cause–effect · prediction (simple if-then) · age 4–5
+- **Success:** Child can look at a "before" scene (ice cream in the sun, a seed with a watering can, a puddle after rain) and tap the correct "after" picture that shows what happens next — explicitly making the IF-THEN link the voice narrates
+- **Fills gap:** Logic/cause-effect — What Comes Next? covers daily-routine sequencing (ages 3–4); Animal Hospital covers needs-of-living-things reactions; "simple if-then **prediction**" (ages 4–5) per the STEM ladder is a distinct cognitive skill (hypothetical reasoning, not memory of a sequence) with no backlog entry
+- **Rubric focus:** Learning efficacy (voice says "IF the ice cream stays in the sun… THEN…" on each round, making the conditional structure explicit; child predicts before reveal), Emotional safety (both wrong and right predictions end with a neutral discovery frame — "let's find out!"), Pacing (tier 0 = single-step obvious physical change, tier 1 = 2-choice cause–effect, tier 2 = 3-choice with a decoy that's a plausible but wrong outcome)
+- **Estimated complexity:** Medium — 6–8 scenario pairs (before SVG + 2–3 outcome SVGs); no drag; voice-first conditional framing is the core design challenge; scenarios must be concrete and observable (physical changes, not social abstractions)
+- **File:** `js/games/predict.js`
+
 ### [PROPOSED] Sound Safari
 - **STEM:** Phonological awareness / literacy · letter sounds (phoneme matching) · age 3–5
 - **Success:** Child can tap the picture whose name starts with the sound the voice makes (e.g., voice says "/b/" → taps "ball" not "fish")
