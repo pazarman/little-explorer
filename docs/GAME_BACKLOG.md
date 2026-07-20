@@ -32,6 +32,30 @@ This file is the shared state between three agents and you:
 
 <!-- Implementer always picks the first READY item -->
 
+### [PROPOSED] Blend-It!
+- **STEM:** Phonological awareness / literacy · onset-rime blending (simple CVC blending) · age 4–5
+- **Success:** Child can hear the voice say an onset and rime separately (e.g., "/b/…/oat/") and tap the correct picture (boat, not goat or coat) — demonstrating they can blend two phoneme chunks into a whole word
+- **Fills gap:** Phonological awareness, 4–5 age band — Rhyme Time covers rhyme recognition (2–4), Clap the Beat covers syllable segmentation (2–4), Sound Safari covers initial-phoneme matching (3–5); onset-rime blending is the next developmental sub-skill on the literacy ladder and has zero backlog coverage; completing the full phonological awareness track is the #1 highest-ROI domain per the STEM doc
+- **Rubric focus:** Learning efficacy (onset and rime voiced with a clear pause, then merged aloud on correct tap — child hears the two parts collapse into one word), Clarity (2 picture choices tier 0 → 3 minimally-contrasting pictures tier 2), Pacing (tier 0 = obvious onset contrast like /b/+/all vs /f/+/all/, tier 1 = rime contrasts with 2 foils, tier 2 = 3-phoneme CVC words with two plausible foils)
+- **Estimated complexity:** Low-Medium — voice-first phoneme delivery (Web Speech can do paused segments); curated 12–16 onset+rime pairs; picture cards are reusable from Sound Safari word bank; no drag, no reading
+- **File:** `js/games/blend.js`
+
+### [PROPOSED] Alive or Not?
+- **STEM:** Scientific thinking · living vs. nonliving classification · age 3–4
+- **Success:** Child can look at an object (puppy, flower, rock, toy car, fish, cloud, book, caterpillar) and tap the "alive" side (animated heartbeat) or "not alive" side (still icon), correctly sorting at least 6 of 8 objects
+- **Fills gap:** Scientific thinking, 3–4 age band — the STEM doc lists "living/nonliving" as an explicit 3–4 concept; Weather Dresser targets weather observation, Seasons Wheel targets seasonal change, Animal Hospital targets needs of living things (which presupposes knowing something is alive); none teaches the foundational living/nonliving distinction itself, which is the prerequisite concept for those games
+- **Rubric focus:** Learning efficacy (voice names one observable property that makes the answer clear — "A puppy breathes and grows — it's alive!"; gives a concrete observable reason, not an abstract rule), Emotional safety (no fail state; wrong tap leads to gentle discovery narration — "Let's look closer…"), Pacing (tier 0 = 2 maximally different objects per round e.g. dog vs. rock, tier 1 = 4 objects mixed, tier 2 = borderline cases like a seed or a candle flame with explicit reasoning)
+- **Estimated complexity:** Low-Medium — two large tap zones; 8–10 SVG object illustrations; voice carries the science content; no drag required; tier 2 borderline cases are the design challenge (keep reasoning concrete and age-appropriate)
+- **File:** `js/games/alive.js`
+
+### [PROPOSED] How Does Bunny Feel?
+- **STEM:** Social-emotional learning (SEL) · empathy + perspective-taking · age 4–5
+- **Success:** Child can look at a scenario scene (Bunny's tower fell; Bunny is left out of a game; Bunny shares their last cookie) and (a) name what Bunny is probably feeling and (b) choose one kind action from two options — demonstrating they can take another character's perspective, not just label their own face
+- **Fills gap:** SEL, 4–5 age band — Feelings Friends covers emotion naming and cause-of-feelings (2–4 age band, receptive/expressive labeling); perspective-taking and social action ("what could YOU do to help Bunny?") is the distinct 4–5 developmental step, with zero backlog coverage; SEL is the #2 highest-ROI domain per the STEM doc and all top competitors (Daniel Tiger, PBS Kids, Sago Mini) treat this tier as first-class
+- **Rubric focus:** Learning efficacy (two-step structure: identify feeling → choose kind action; voice narrates both Bunny's inner state and the child's potential role — builds theory of mind explicitly), Emotional safety (all feelings are valid and named without judgment; no wrong-answer path — both action choices are gentle; child is never asked to feel bad for Bunny's situation), Pacing (tier 0 = obvious emotion + single kind action offered, tier 1 = child picks from two actions with voice reflecting on the better choice, tier 2 = child initiates the kind action by dragging a comfort item to Bunny)
+- **Estimated complexity:** Medium — 6–8 SVG scenario scenes with Bunny in different emotional states; animated face expression shifts; voice scripting is the core design challenge (empathy language must be warm, specific, and non-preachy); tier 2 drag interaction reuses existing drag infrastructure
+- **File:** `js/games/empathy.js`
+
 ### [PROPOSED] Clap the Beat
 - **STEM:** Phonological awareness / literacy · syllable segmentation (clap the beats) · age 2–4
 - **Success:** Child can tap the clap button once per syllable in a spoken word (e.g., "cat" = 1 tap, "mon-key" = 2 taps, "el-e-phant" = 3 taps) and hear the syllables highlighted as they tap
