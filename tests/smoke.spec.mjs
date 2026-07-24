@@ -89,3 +89,30 @@ test("Body Match game can be played", async ({ page }) => {
 
   expect(errors, "console/page errors in Body Match:\n" + errors.join("\n")).toEqual([]);
 });
+
+test("Fuel Up game plays and blasts off the correct rocket", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("fuelup"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  // Two fuelling stations, each with a numeral that matches its countable fuel cells
+  await expect(page.locator(".fu-station")).toHaveCount(2);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("⛽");
+
+  const mismatch = await page.evaluate(() =>
+    [...document.querySelectorAll(".fu-station")].some(
+      (s) => s.querySelectorAll(".fu-cell").length !== +s.querySelector(".fu-num").textContent
+    )
+  );
+  expect(mismatch, "fuel cells must match the numeral badge").toBe(false);
+
+  // Tapping the correct rocket ignites its flame (blast-off)
+  await page.evaluate(() => fuelupLevel.pick(fuelupLevel.correctIndex, { clientX: 0, clientY: 0 }));
+  await expect(page.locator(".fu-flame.on")).toHaveCount(1);
+
+  expect(errors, "console/page errors in Fuel Up:\n" + errors.join("\n")).toEqual([]);
+});
