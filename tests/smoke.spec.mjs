@@ -117,7 +117,7 @@ test("Fuel Up game plays and blasts off the correct rocket", async ({ page }) =>
   expect(errors, "console/page errors in Fuel Up:\n" + errors.join("\n")).toEqual([]);
 });
 
-test("Dolphin Dive game plays and swims to the named ring", async ({ page }) => {
+test("Dolphin Dive scrolls, steers, and collects hoops", async ({ page }) => {
   const errors = watchErrors(page);
   await page.addInitScript(SKIP_INTRO);
   await page.goto("/index.html?test=1");
@@ -125,22 +125,35 @@ test("Dolphin Dive game plays and swims to the named ring", async ({ page }) => 
   await page.evaluate(() => startLevel("dolphin"));
   await expect(page.locator("#game")).toBeVisible();
 
-  // Easiest tier shows two directional rings (over / under)
+  // Easiest tier: a scrolling swim toward a goal of 4 hoops (shown as HUD pips)
   await page.evaluate(() => { state.tier = 0; dolphinLevel.startRound(); });
-  await expect(page.locator(".dl-ring")).toHaveCount(2);
+  await expect(page.locator("#dlStage")).toBeVisible();
+  await expect(page.locator("#dlDolphin")).toBeVisible();
+  await expect(page.locator(".dl-pip")).toHaveCount(4);
   const instructions = await page.locator("#instruction").textContent();
   expect(instructions).toContain("🐬");
 
-  // Tapping the ring the voice named clears it and moves the dolphin there
-  const moved = await page.evaluate(() => {
-    const t = dolphinLevel.target;
-    const ring = document.querySelector(`.dl-ring[data-pos="${t}"]`);
-    dolphinLevel.pick(t, ring, { clientX: 5, clientY: 5 });
-    const d = document.getElementById("dlDolphin");
-    return { cleared: document.querySelectorAll(".dl-ring.dl-cleared").length, top: d.style.top, expected: DL_POS[t].y + "%" };
+  // Sliding a finger down steers the dolphin's target height lower
+  const steer = await page.evaluate(() => {
+    const st = document.getElementById("dlStage");
+    const r = st.getBoundingClientRect();
+    const before = dolphinLevel.targetY;
+    st.dispatchEvent(new PointerEvent("pointerdown", { clientX: r.left + 30, clientY: r.top + r.height * 0.8, bubbles: true }));
+    return { before, after: dolphinLevel.targetY };
   });
-  expect(moved.cleared).toBe(1);
-  expect(moved.top).toBe(moved.expected);
+  expect(steer.after).toBeGreaterThan(steer.before);
+
+  // Swimming through a hoop scores it and lights a HUD pip
+  const scored = await page.evaluate(() => {
+    cancelAnimationFrame(dolphinLevel.raf); dolphinLevel.raf = null;   // freeze the loop for a deterministic check
+    const el = document.createElement("div"); el.className = "dl-hoop";
+    document.getElementById("dlHoops").appendChild(el);
+    const before = dolphinLevel.collected;
+    dolphinLevel.collect({ el, x: 0, cy: dolphinLevel.y, w: 100, h: 100, hit: false });
+    return { before, after: dolphinLevel.collected, pipsOn: document.querySelectorAll(".dl-pip.on").length };
+  });
+  expect(scored.after).toBe(scored.before + 1);
+  expect(scored.pipsOn).toBeGreaterThan(0);
 
   expect(errors, "console/page errors in Dolphin Dive:\n" + errors.join("\n")).toEqual([]);
 });
