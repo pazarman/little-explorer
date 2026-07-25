@@ -116,3 +116,31 @@ test("Fuel Up game plays and blasts off the correct rocket", async ({ page }) =>
 
   expect(errors, "console/page errors in Fuel Up:\n" + errors.join("\n")).toEqual([]);
 });
+
+test("Dolphin Dive game plays and swims to the named ring", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("dolphin"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  // Easiest tier shows two directional rings (over / under)
+  await page.evaluate(() => { state.tier = 0; dolphinLevel.startRound(); });
+  await expect(page.locator(".dl-ring")).toHaveCount(2);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("🐬");
+
+  // Tapping the ring the voice named clears it and moves the dolphin there
+  const moved = await page.evaluate(() => {
+    const t = dolphinLevel.target;
+    const ring = document.querySelector(`.dl-ring[data-pos="${t}"]`);
+    dolphinLevel.pick(t, ring, { clientX: 5, clientY: 5 });
+    const d = document.getElementById("dlDolphin");
+    return { cleared: document.querySelectorAll(".dl-ring.dl-cleared").length, top: d.style.top, expected: DL_POS[t].y + "%" };
+  });
+  expect(moved.cleared).toBe(1);
+  expect(moved.top).toBe(moved.expected);
+
+  expect(errors, "console/page errors in Dolphin Dive:\n" + errors.join("\n")).toEqual([]);
+});
