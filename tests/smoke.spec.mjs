@@ -157,3 +157,38 @@ test("Dolphin Dive scrolls, steers, and collects hoops", async ({ page }) => {
 
   expect(errors, "console/page errors in Dolphin Dive:\n" + errors.join("\n")).toEqual([]);
 });
+
+test("Zoo Pop surfaces animals and scores only the named target", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("meerkat"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  await page.evaluate(() => { state.tier = 0; meerkatLevel.startRound(); });
+  await expect(page.locator(".mk-hole")).toHaveCount(6);
+  await expect(page.locator(".mk-pip")).toHaveCount(4);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("🐾");
+
+  // Popping the named target scores; popping a wrong animal never does (no fail state)
+  const scored = await page.evaluate(() => {
+    cancelAnimationFrame(meerkatLevel.raf); meerkatLevel.raf = null;   // freeze the loop for a deterministic check
+    const h = meerkatLevel.holes[0];
+    meerkatLevel.pop(h, meerkatLevel.target, performance.now());
+    const beforeRight = meerkatLevel.popped;
+    meerkatLevel.tap(h);
+    const afterRight = meerkatLevel.popped;
+    const h2 = meerkatLevel.holes[1];
+    meerkatLevel.pop(h2, meerkatLevel.distractors[0], performance.now());
+    const beforeWrong = meerkatLevel.popped;
+    meerkatLevel.tap(h2);
+    return { rightInc: afterRight - beforeRight, wrongInc: meerkatLevel.popped - beforeWrong, pipsOn: document.querySelectorAll(".mk-pip.on").length };
+  });
+  expect(scored.rightInc).toBe(1);
+  expect(scored.wrongInc).toBe(0);
+  expect(scored.pipsOn).toBeGreaterThan(0);
+
+  expect(errors, "console/page errors in Zoo Pop:\n" + errors.join("\n")).toEqual([]);
+});

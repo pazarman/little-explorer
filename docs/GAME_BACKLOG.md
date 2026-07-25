@@ -32,6 +32,36 @@ This file is the shared state between three agents and you:
 
 <!-- Implementer always picks the first READY item -->
 
+<!-- Arcade / game-feel concepts — per BAR-CONFIG "Interaction & Game-Feel", prefer real-time,
+     child-driven mechanics. These are distinct game genres, not tap-and-wait. -->
+
+### [DONE] Zoo Pop (Meerkat Pop!)
+- **Genre:** Whack-a-mole / reaction. **STEM:** Sorting / classification · match pop-ups to a named target (listen + discriminate) · age 2–4
+- **Success:** Zoo animals surface from burrows; child pops only the animal the voice names (e.g. "Pop the penguin!"), ignoring the rest, until the goal is met
+- **File:** `js/games/meerkat.js` — shipped. Difficulty scales pop speed, simultaneous burrows, and number of distractor animals (4/5/6 goal). No fail state (a wrong pop is harmless; a missed target just ducks back). Reference for the pop-up game loop.
+
+### [PROPOSED] Feed the Hippo
+- **Genre:** Aiming / toss arcade (Hungry-Hippos feel). **STEM:** Number sense · count to N with 1:1 correspondence · age 2–4
+- **Success:** Child flicks/drags food (peanuts, fish) into an animal's open mouth, feeding it exactly the number the voice asks for; the count badge grows with each fed item and bursts-exactly-N on success
+- **Fills gap:** reinforces number sense in a fresh active genre; ties symbol ↔ quantity through a physical toss + cause-effect (mouth chomps, count ticks up)
+- **Rubric focus:** Learning efficacy (spoken target number + growing numeral), Motor (big flick target, forgiving aim), Emotional safety (a miss just plops back, no penalty)
+- **Estimated complexity:** Medium — drag-release velocity toss, simple arc, mouth hit-zone; reuse floaters/tone juice
+
+### [PROPOSED] Animal Stack
+- **Genre:** Physics stacking tower. **STEM:** Measurement / spatial · size + balance (big base, ordering) · age 3–5
+- **Success:** Child taps to drop zoo animals onto a growing tower; placing bigger animals lower keeps it steady, and the stack height is counted aloud as it grows
+- **Fills gap:** measurement/seriation and spatial reasoning in an active genre; "big on the bottom" makes size-ordering physical
+- **Rubric focus:** Learning efficacy (size comparison made physical + height counted), Emotional safety (keep it forgiving — gentle wobble, no harsh topple/fail; consider a soft catch), Sensory (satisfying settle without stacking intense effects)
+- **Estimated complexity:** Medium-High — lightweight drop + settle physics (or scripted snap), wobble feedback; the no-fail balance is the design challenge
+
+### [PROPOSED] Monkey Swing
+- **Genre:** Endless runner / rhythm. **STEM:** Patterns / logic · rhythm + timing (steady beat) · age 3–5
+- **Success:** Child taps in rhythm to swing a monkey vine-to-vine across the zoo, grabbing bananas; a steady beat carries it farther, and bananas are counted
+- **Fills gap:** rhythm/timing (a phonological-adjacent, pattern-family skill) in a runner genre; extends Patterns via a temporal (not just visual) pattern
+- **Rubric focus:** Learning efficacy (visible + audible beat to tap along to), Emotional safety (a missed tap slows the monkey but never fails — it always makes progress), Motor (large tap zone, generous timing window for toddlers)
+- **Estimated complexity:** Medium — rAF swing loop, forgiving timing window, banana collectibles; keep it no-fail (auto-assist the swing if the child stops tapping)
+
+
 ### [PROPOSED] Blend-It!
 - **STEM:** Phonological awareness / literacy · onset-rime blending (simple CVC blending) · age 4–5
 - **Success:** Child can hear the voice say an onset and rime separately (e.g., "/b/…/oat/") and tap the correct picture (boat, not goat or coat) — demonstrating they can blend two phoneme chunks into a whole word
