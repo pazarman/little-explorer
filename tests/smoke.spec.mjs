@@ -192,3 +192,44 @@ test("Zoo Pop surfaces animals and scores only the named target", async ({ page 
 
   expect(errors, "console/page errors in Zoo Pop:\n" + errors.join("\n")).toEqual([]);
 });
+
+test("Egg Catch steers a basket and catches only the target color", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("eggcatch"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  // Tier 1 introduces the color rule ("Catch the red eggs!")
+  await page.evaluate(() => { state.tier = 1; eggcatchLevel.startRound(); });
+  await expect(page.locator("#egBasket")).toBeVisible();
+  await expect(page.locator(".eg-pip")).toHaveCount(5);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("🧺");
+
+  // Sliding right moves the basket target right
+  const steer = await page.evaluate(() => {
+    const st = document.getElementById("egStage");
+    const r = st.getBoundingClientRect();
+    const before = eggcatchLevel.btx;
+    st.dispatchEvent(new PointerEvent("pointerdown", { clientX: r.left + r.width * 0.85, clientY: r.top + r.height * 0.5, bubbles: true }));
+    return { moved: Math.abs(eggcatchLevel.btx - before) > 1 };
+  });
+  expect(steer.moved).toBe(true);
+
+  // A target-color egg scores; a wrong-color egg in the basket never does (no fail state)
+  const scored = await page.evaluate(() => {
+    cancelAnimationFrame(eggcatchLevel.raf); eggcatchLevel.raf = null;
+    const mk = (color) => { const el = document.createElement("div"); el.className = "eg-egg"; document.getElementById("egEggs").appendChild(el); return { el, x: eggcatchLevel.bx, y: eggcatchLevel.basketY, color, done: false, vy: 0 }; };
+    const tgt = eggcatchLevel.target, wrong = eggcatchLevel.palette.find(c => c.id !== tgt.id);
+    const a = eggcatchLevel.caught; eggcatchLevel.landInBasket(mk(tgt)); const afterRight = eggcatchLevel.caught;
+    const b = eggcatchLevel.caught; eggcatchLevel.landInBasket(mk(wrong));
+    return { rightInc: afterRight - a, wrongInc: eggcatchLevel.caught - b, pipsOn: document.querySelectorAll(".eg-pip.on").length };
+  });
+  expect(scored.rightInc).toBe(1);
+  expect(scored.wrongInc).toBe(0);
+  expect(scored.pipsOn).toBeGreaterThan(0);
+
+  expect(errors, "console/page errors in Egg Catch:\n" + errors.join("\n")).toEqual([]);
+});

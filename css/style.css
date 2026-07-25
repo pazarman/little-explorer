@@ -31,6 +31,7 @@
   body.theme-story  { background:linear-gradient(#244b8f, #6f8fd0 60%, #f0d6a8); }
   body.theme-space  { background:linear-gradient(#070726, #181848 50%, #34215c); }
   body.theme-zoo    { background:linear-gradient(#bfe6ff, #dff3ff 40%, #c8e89a 62%, #8fc85a); }
+  body.theme-farm   { background:linear-gradient(#cdeffb, #eaf7ff 42%, #f3e2a8 64%, #e0c06a); }
   body.theme-dragon { background:linear-gradient(#3a1c4a, #7a3b8a 50%, #e08a5a); }
   body.theme-dino   { background:linear-gradient(#5c9e57, #9ed07e 55%, #e6dba0); }
   body.theme-icecream { background:linear-gradient(#ffd1e8, #ffe6c0 55%, #bfe8ff); }

@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "33";
+const APP_VERSION = "34";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -7,7 +7,7 @@ const LEVELS = {
   dragon: dragonLevel, dino: dinoLevel, icecream: icecreamLevel,
   petmatch: petmatchLevel, petcare: petcareLevel, petfeed: petfeedLevel, body: bodyLevel,
   hideseek: hideseekLevel, cups: cupsLevel, nightday: nightdayLevel, measure: measureLevel,
-  fuelup: fuelupLevel, dolphin: dolphinLevel, meerkat: meerkatLevel
+  fuelup: fuelupLevel, dolphin: dolphinLevel, meerkat: meerkatLevel, eggcatch: eggcatchLevel
 };
 
 /* ================= Categories & games ================= */
@@ -32,7 +32,8 @@ const GAMES = {
   measure:  { icon: "📏", name: "Tall or Short", es: "Alto o Bajo", yue: "高定矮", lvl: 1 },
   fuelup:   { icon: "⛽", name: "Fuel Up", es: "A Cargar", yue: "加油", lvl: 1 },
   dolphin:  { icon: "🐬", name: "Dolphin Dive", es: "Delfín", yue: "海豚", lvl: 0 },
-  meerkat:  { icon: "🦁", name: "Zoo Pop", es: "Zoológico", yue: "動物園", lvl: 0 }
+  meerkat:  { icon: "🦁", name: "Zoo Pop", es: "Zoológico", yue: "動物園", lvl: 0 },
+  eggcatch: { icon: "🥚", name: "Egg Catch", es: "Atrapa Huevos", yue: "接雞蛋", lvl: 0 }
 };
 // chosen difficulty → max game level shown (auto/hard show everything)
 const diffLevel = () => settings.diff === "easy" ? 0 : settings.diff === "med" ? 1 : 2;
@@ -40,7 +41,7 @@ const gameVisible = gid => (GAMES[gid].lvl || 0) <= diffLevel();
 const visibleGames = cat => cat.games.filter(gameVisible);
 const CATEGORIES = [
   { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",          yue: "數字",       cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup"] },
-  { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", yue: "顏色同形狀", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream"] },
+  { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", yue: "顏色同形狀", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream", "eggcatch"] },
   { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   yue: "動腦遊戲",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure"] },
   { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          yue: "動物",       cls: "c-animal", games: ["music", "whosays", "dino", "body", "dolphin", "meerkat"] },
   { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          yue: "寵物",       cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
