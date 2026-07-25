@@ -33,6 +33,9 @@ This repo has a hard quality bar. Use it; don't freelance.
 - Per-action juice (sparkle + rising tone + squish) — but per BAR-CONFIG, **don't stack intense effects**;
   keep a calm path.
 - Big targets (≥44px), no fail states, voice-first, `clamp()`/`vmin` everywhere.
+- **Prefer real-time, child-driven mechanics** (steer/drag/move in a `requestAnimationFrame` loop, motion/
+  scrolling) over tap-and-wait, when the concept supports it — the interaction should *be* the learning
+  practice. Reference: **Dolphin Dive** (`js/games/dolphin.js`). See BAR-CONFIG "Interaction & Game-Feel".
 - Bump `sw.js` `CACHE` when shipping (network-first SW).
 
 ## Run / verify
