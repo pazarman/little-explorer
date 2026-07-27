@@ -233,3 +233,68 @@ test("Egg Catch steers a basket and catches only the target color", async ({ pag
 
   expect(errors, "console/page errors in Egg Catch:\n" + errors.join("\n")).toEqual([]);
 });
+
+test("Feed the Hippo counts feeds and never overfeeds", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("hippo"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  // Force a fixed target of 3 so a single feed never completes the round mid-assertion
+  await page.evaluate(() => {
+    state.tier = 0; hippoLevel.startRound(); hippoLevel.target = 3;
+    document.getElementById("hpTummy").innerHTML = [0, 1, 2].map(i => `<span class="hp-slot" data-i="${i}">◯</span>`).join("");
+  });
+  await expect(page.locator(".hp-slot")).toHaveCount(3);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("🦛");
+
+  // One feed increments the count and lights one tummy slot
+  await page.evaluate(() => hippoLevel.feed(document.querySelector(".hp-food"), {}));
+  expect(await page.evaluate(() => hippoLevel.fed)).toBe(1);
+  await expect(page.locator(".hp-slot.on")).toHaveCount(1, { timeout: 3000 });
+
+  // Hammering feed past the target never exceeds it (no fail / no overfeed)
+  const capped = await page.evaluate(async () => {
+    for (let i = 0; i < 20; i++) hippoLevel.feed(document.querySelector(".hp-food"), {});
+    await new Promise(r => setTimeout(r, 500));
+    return hippoLevel.fed <= hippoLevel.target;
+  });
+  expect(capped).toBe(true);
+
+  expect(errors, "console/page errors in Feed the Hippo:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("Monkey Swing jumps on tap and collects bananas", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("monkey"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  await page.evaluate(() => { state.tier = 1; monkeyLevel.startRound(); });
+  await expect(page.locator("#moMonkey")).toBeVisible();
+  await expect(page.locator(".mo-pip")).toHaveCount(5);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("🐒");
+
+  // A tap gives the monkey an upward impulse
+  const jumped = await page.evaluate(() => { const v = monkeyLevel.vy; monkeyLevel.jump(); return monkeyLevel.vy < v; });
+  expect(jumped).toBe(true);
+
+  // Overlapping a banana collects it and lights a pip
+  const grab = await page.evaluate(() => {
+    cancelAnimationFrame(monkeyLevel.raf); monkeyLevel.raf = null;
+    const el = document.createElement("div"); el.className = "mo-banana"; document.getElementById("moBananas").appendChild(el);
+    const before = monkeyLevel.got;
+    monkeyLevel.grab({ el, x: 0, y: monkeyLevel.y, hit: false });
+    return { inc: monkeyLevel.got - before, on: document.querySelectorAll(".mo-pip.on").length };
+  });
+  expect(grab.inc).toBe(1);
+  expect(grab.on).toBeGreaterThan(0);
+
+  expect(errors, "console/page errors in Monkey Swing:\n" + errors.join("\n")).toEqual([]);
+});

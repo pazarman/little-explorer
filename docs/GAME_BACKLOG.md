@@ -40,12 +40,10 @@ This file is the shared state between three agents and you:
 - **Success:** Zoo animals surface from burrows; child pops only the animal the voice names (e.g. "Pop the penguin!"), ignoring the rest, until the goal is met
 - **File:** `js/games/meerkat.js` — shipped. Difficulty scales pop speed, simultaneous burrows, and number of distractor animals (4/5/6 goal). No fail state (a wrong pop is harmless; a missed target just ducks back). Reference for the pop-up game loop.
 
-### [PROPOSED] Feed the Hippo
-- **Genre:** Aiming / toss arcade (Hungry-Hippos feel). **STEM:** Number sense · count to N with 1:1 correspondence · age 2–4
-- **Success:** Child flicks/drags food (peanuts, fish) into an animal's open mouth, feeding it exactly the number the voice asks for; the count badge grows with each fed item and bursts-exactly-N on success
-- **Fills gap:** reinforces number sense in a fresh active genre; ties symbol ↔ quantity through a physical toss + cause-effect (mouth chomps, count ticks up)
-- **Rubric focus:** Learning efficacy (spoken target number + growing numeral), Motor (big flick target, forgiving aim), Emotional safety (a miss just plops back, no penalty)
-- **Estimated complexity:** Medium — drag-release velocity toss, simple arc, mouth hit-zone; reuse floaters/tone juice
+### [DONE] Feed the Hippo
+- **Genre:** Tap-to-feed counting arcade. **STEM:** Number sense · count to N with 1:1 correspondence · age 2–4
+- **Success:** Child taps food to feed a drawn hippo exactly the number the voice asks for; each tap flies a food into the mouth, chomps, fills one tummy slot, grows the numeral, and the voice counts.
+- **File:** `js/games/hippo.js` — shipped (Numbers world). Tummy slots (= target N) fill one-per-feed for 1:1 correspondence; input caps at N (no overfeed). Difficulty scales the target range (1–3 / 2–5 / 4–8). No fail state.
 
 ### [PROPOSED] Animal Stack
 - **Genre:** Physics stacking tower. **STEM:** Measurement / spatial · size + balance (big base, ordering) · age 3–5
@@ -54,12 +52,10 @@ This file is the shared state between three agents and you:
 - **Rubric focus:** Learning efficacy (size comparison made physical + height counted), Emotional safety (keep it forgiving — gentle wobble, no harsh topple/fail; consider a soft catch), Sensory (satisfying settle without stacking intense effects)
 - **Estimated complexity:** Medium-High — lightweight drop + settle physics (or scripted snap), wobble feedback; the no-fail balance is the design challenge
 
-### [PROPOSED] Monkey Swing
-- **Genre:** Endless runner / rhythm. **STEM:** Patterns / logic · rhythm + timing (steady beat) · age 3–5
-- **Success:** Child taps in rhythm to swing a monkey vine-to-vine across the zoo, grabbing bananas; a steady beat carries it farther, and bananas are counted
-- **Fills gap:** rhythm/timing (a phonological-adjacent, pattern-family skill) in a runner genre; extends Patterns via a temporal (not just visual) pattern
-- **Rubric focus:** Learning efficacy (visible + audible beat to tap along to), Emotional safety (a missed tap slows the monkey but never fails — it always makes progress), Motor (large tap zone, generous timing window for toddlers)
-- **Estimated complexity:** Medium — rAF swing loop, forgiving timing window, banana collectibles; keep it no-fail (auto-assist the swing if the child stops tapping)
+### [DONE] Monkey Swing
+- **Genre:** Endless runner / rhythm. **STEM:** Patterns / logic · rhythm + timing (tap to swing) · age 3–5
+- **Success:** Child taps the screen to swing a monkey up and grab bananas at different heights across a scrolling zoo; bananas are counted toward a goal.
+- **File:** `js/games/monkey.js` — shipped (Animals world). rAF loop: tap = upward impulse, gravity returns the monkey to the ground (never falls off). Bananas spawn at varied heights (some low enough to grab at a run, so progress is always possible). Difficulty scales scroll speed, height spread, and goal (4/5/6). No fail state.
 
 
 ### [PROPOSED] Blend-It!
