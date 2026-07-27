@@ -47,7 +47,9 @@ const dolphinLevel = {
     this.done = false;
     this.collected = 0;
     this.goal = [4, 5, 6][state.tier];
-    this.speedMul = [1, 1.3, 1.6][state.tier];
+    this.miss = 0;
+    this.reduced = reducedMotion();
+    this.speedMul = [1, 1.3, 1.6][state.tier] * (this.reduced ? 0.6 : 1);
     this.rings = [];
     this.spawnIn = 0.4;
     this.saidHeight = false;
@@ -96,7 +98,7 @@ const dolphinLevel = {
       </div>`;
 
     const stage = $("dlStage");
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < (this.reduced ? 0 : 9); i++) {
       const b = document.createElement("span");
       b.className = "dl-bubble";
       const sz = randBetween(6, 16);
@@ -161,19 +163,21 @@ const dolphinLevel = {
     }
 
     // move hoops left; collect on overlap with the dolphin
+    const assist = this.miss >= 3;                               // after repeated misses, make hoops easy to catch
     const dolCX = W * 0.22;
-    const speed = randBetween(1, 1) * (W / 700) * 105 * this.speedMul;
+    const speed = (W / 700) * 105 * this.speedMul;
+    const tolX = assist ? 0.95 : 0.6, tolY = assist ? 1.1 : 0.55;
     for (const r of this.rings) {
       if (r.hit) continue;
       r.x -= speed * dt;
       r.el.style.left = r.x + "px";
-      if (Math.abs(r.x - dolCX) < r.w * 0.6 && Math.abs(r.cy - this.y) < r.h * 0.55) {
+      if (Math.abs(r.x - dolCX) < r.w * tolX && Math.abs(r.cy - this.y) < r.h * tolY) {
         this.collect(r);
       }
     }
     this.rings = this.rings.filter(r => {
       if (r.hit) return false;                                   // collected: its element self-removes after the pop
-      if (r.x < -r.w) { if (r.el.isConnected) r.el.remove(); return false; }
+      if (r.x < -r.w) { this.miss++; if (r.el.isConnected) r.el.remove(); return false; }
       return true;
     });
   },
@@ -183,7 +187,10 @@ const dolphinLevel = {
     el.className = "dl-hoop";
     $("dlHoops").appendChild(el);
     const w = el.offsetWidth || 100, h = el.offsetHeight || 100;
-    const cy = randBetween(this.zoneTop + h * 0.5, this.zoneBot - h * 0.5);
+    // once assisting, spawn the hoop right at the dolphin's height so steering barely matters
+    const cy = this.miss >= 3
+      ? clamp(this.y + randBetween(-h * 0.3, h * 0.3), this.zoneTop + h * 0.5, this.zoneBot - h * 0.5)
+      : randBetween(this.zoneTop + h * 0.5, this.zoneBot - h * 0.5);
     const x = W + w;
     el.style.left = x + "px";
     el.style.top = cy + "px";

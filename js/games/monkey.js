@@ -21,7 +21,9 @@ const monkeyLevel = {
     this.done = false;
     this.got = 0;
     this.goal = [4, 5, 6][state.tier];
-    this.speedMul = [1, 1.25, 1.5][state.tier];
+    this.miss = 0;
+    this.reduced = reducedMotion();
+    this.speedMul = [1, 1.25, 1.5][state.tier] * (this.reduced ? 0.6 : 1);
     this.bananas = [];
     this.spawnIn = 0.6;
 
@@ -113,7 +115,7 @@ const monkeyLevel = {
     }
     this.bananas = this.bananas.filter(bn => {
       if (bn.hit) return false;
-      if (bn.x < -60) { if (bn.el.isConnected) bn.el.remove(); return false; }
+      if (bn.x < -60) { this.miss++; if (bn.el.isConnected) bn.el.remove(); return false; }
       return true;
     });
   },
@@ -122,8 +124,9 @@ const monkeyLevel = {
     const el = document.createElement("div");
     el.className = "mo-banana";
     el.textContent = "🍌";
-    // 45% low (grabbable at a run / small hop), rest spread up toward the canopy
-    const low = Math.random() < 0.45;
+    // 45% low (grabbable at a run / small hop), rest spread up toward the canopy.
+    // After repeated misses, spawn only low bananas so a run or tiny hop always collects.
+    const low = this.miss >= 3 ? true : Math.random() < 0.45;
     const y = low
       ? randBetween(this.groundY - H * 0.06, this.groundY)
       : randBetween(this.ceilY + H * 0.02, this.groundY - H * 0.08);

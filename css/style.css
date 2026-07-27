@@ -916,4 +916,9 @@
     .cup-lift.hop-over, .cup-lift.hop-under, .cup-lift.nudge { animation: none !important; }
     .cup-slot { transition-timing-function: ease !important; }
     .cups-ball.pop { animation: none !important; }
+    /* real-time games: stop decorative loops (object motion is slowed in JS via reducedMotion()) */
+    .dl-bubble, .mo-canopy .marquee, .mo-far .marquee, .dl-far .marquee, .dl-near .marquee { animation: none !important; }
+    .fu-cell, .fu-alien, .eg-egg, .mo-monkey, .mk-animal { animation: none !important; }
+    .dl-hoop.dl-collected, .eg-egg.eg-caught, .mk-animal.pop, .mo-banana.got { animation: none !important; opacity: 0 !important; }
+    .rw-pad.rw-hint .rw-strip { animation: none !important; }
   }
