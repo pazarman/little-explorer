@@ -45,6 +45,30 @@ This file is the shared state between three agents and you:
 - **Success:** Child taps food to feed a drawn hippo exactly the number the voice asks for; each tap flies a food into the mouth, chomps, fills one tummy slot, grows the numeral, and the voice counts.
 - **File:** `js/games/hippo.js` — shipped (Numbers world). Tummy slots (= target N) fill one-per-feed for 1:1 correspondence; input caps at N (no overfeed). Difficulty scales the target range (1–3 / 2–5 / 4–8). No fail state.
 
+### [PROPOSED] Chain Reaction
+- **STEM:** Logic / cause–effect · tap → explicit reaction chain (cause + immediate effect) · age 2–3
+- **Success:** Child can tap a character or object, watch the direct reaction (frog jumps on lily pad → splash!), then tap again to continue the chain — demonstrating they understand that their action caused the effect
+- **Fills gap:** Logic/cause-effect, 2–3 age band — What Comes Next? targets 3–4 band (sequence/order); What Happens If? targets 4–5 band (if-then prediction); the foundational 2–3 concept ("tap → reaction") has zero backlog coverage; making cause-effect EXPLICIT as the learning objective (voice says "YOU did that — you made the frog jump!") is distinct from the implicit tap feedback in all other games
+- **Rubric focus:** Learning efficacy (voice narrates the cause-effect link explicitly — "You tapped the log and the frog jumped!"; 2-step chains progress to 3-step by tier 2), Clarity (one tapable object per scene, reaction is large and immediate), Pacing (tier 0 = single tap → single obvious reaction; tier 1 = 2-step chain where each tap advances the story; tier 2 = 3-step chain with a predictable-but-surprising ending)
+- **Estimated complexity:** Low — 6–8 SVG scenes with scripted reaction animations; no drag; rAF animation triggered on each tap; voice attribution ("you did that!") is the core learning design challenge
+- **File:** `js/games/chain.js`
+
+### [PROPOSED] Tally Tots
+- **STEM:** Sorting / classification / data · data reading — compare sorted group counts (simple "which has more?") · age 4–5
+- **Success:** Child can look at two sorted groups of objects already arranged in picture-graph rows (4 red apples vs. 2 blue apples), tap the group that has more, and hear the count confirmed — demonstrating they can READ organized visual data, not just compare scattered piles
+- **Fills gap:** Sorting/classification/data, 4–5 age band — Sort & Classify by Color, Shape Sorter, and Grocery Sort all teach SORTING (organizing by attribute); the 4–5 sub-skill "simple 'which has more'" is the DATA INTERPRETATION step (reading an already-organized display and comparing group sizes); More or Less teaches scattered quantity comparison (subitizing), which is cognitively distinct from reading a picture-graph arrangement; no backlog entry explicitly covers this foundational data-literacy concept
+- **Rubric focus:** Learning efficacy (picture-graph layout makes counting rows explicit — "there are 4 red ones and 2 blue ones, so red wins!"; quantity comparison is built on a structured visual), Pacing (tier 0 = 2 groups of 1–3 items with large spacing; tier 1 = 3 groups of 2–5 items in picture-graph rows; tier 2 = 3 groups of 3–6 items where child picks which attribute to compare), Clarity (one question per round, group counts spoken aloud)
+- **Estimated complexity:** Low-Medium — SVG picture-graph layout (rows of repeated icons); 3–4 object types in 2–3 colors; no drag (tap the winning group); voice confirms count per group; readable grid layout is the main design challenge
+- **File:** `js/games/tally.js`
+
+### [PROPOSED] Shape Drop
+- **STEM:** Spatial reasoning · spatial fitting — place shape pieces into matching cutout holes · age 2–4
+- **Success:** Child can drag a shape piece (circle, square, triangle) to its matching hole in a scene and feel it "click" into place; at tier 1, must try pieces in multiple holes before finding the fit — demonstrating spatial matching by form through trial-and-error problem-solving
+- **Fills gap:** Spatial reasoning, 2–3 and 3–4 age bands — the STEM doc lists "simple fit" for ages 3–4 as a distinct spatial concept; Where's Teddy? teaches prepositional LANGUAGE (in/on/under); Shadow Match teaches shape-to-silhouette IDENTIFICATION; spatial FITTING (classic shape-sorter toy mechanic — choosing a piece and discovering whether it belongs in a hole) builds a different skill: understanding that form determines fit, learning to try before giving up; zero backlog coverage for this sub-skill
+- **Rubric focus:** Learning efficacy (voice names shape on each correct fit — "A circle! It rolled right in!"; each hole has a visual boundary that matches the piece's outline), Motor (large drag targets ≥ 60px; pieces snap to the correct hole within a generous radius so fine motor errors don't penalize), Pacing (tier 0 = 3 distinct shapes, 1:1 obvious holes, no distractors; tier 1 = 5 pieces with 2 same-shape holes so child must match more carefully; tier 2 = shapes in 2 sizes — form AND size must match)
+- **Estimated complexity:** Medium — SVG shape pieces + cutout holes in a themed scene (barn, rocket, cookie cutter); drag-to-zone with snap radius; size-matching at tier 2 is the design challenge; no reading required
+- **File:** `js/games/shapedrop.js`
+
 ### [PROPOSED] Animal Stack
 - **Genre:** Physics stacking tower. **STEM:** Measurement / spatial · size + balance (big base, ordering) · age 3–5
 - **Success:** Child taps to drop zoo animals onto a growing tower; placing bigger animals lower keeps it steady, and the stack height is counted aloud as it grows
