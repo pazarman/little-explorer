@@ -298,3 +298,44 @@ test("Monkey Swing jumps on tap and collects bananas", async ({ page }) => {
 
   expect(errors, "console/page errors in Monkey Swing:\n" + errors.join("\n")).toEqual([]);
 });
+
+test("Runway Landing matches the plane's letter to the runway", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("runway"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  await page.evaluate(() => { state.tier = 2; runwayLevel.startRound(); });
+  await expect(page.locator(".rw-pad")).toHaveCount(4);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("✈️");
+
+  // The plane's letter equals the round target, and steering works
+  const setup = await page.evaluate(() => {
+    const st = document.getElementById("rwStage");
+    const r = st.getBoundingClientRect();
+    const before = runwayLevel.tx;
+    st.dispatchEvent(new PointerEvent("pointerdown", { clientX: r.left + r.width * 0.85, clientY: r.top + r.height * 0.4, bubbles: true }));
+    return { planeMatches: document.querySelector(".rw-plane text").textContent === runwayLevel.target, steered: Math.abs(runwayLevel.tx - before) > 1 };
+  });
+  expect(setup.planeMatches).toBe(true);
+  expect(setup.steered).toBe(true);
+
+  // Landing on the wrong runway is no-fail; landing on the matching one wins
+  const land = await page.evaluate(() => {
+    cancelAnimationFrame(runwayLevel.raf); runwayLevel.raf = null;
+    const padCenter = (L) => { const sr = runwayLevel._stage.getBoundingClientRect(); const pad = [...document.querySelectorAll(".rw-pad")].find(p => p.dataset.letter === L); const r = pad.getBoundingClientRect(); return r.left + r.width / 2 - sr.left; };
+    const wrong = [...document.querySelectorAll(".rw-pad")].map(p => p.dataset.letter).find(L => L !== runwayLevel.target);
+    runwayLevel.x = padCenter(wrong); runwayLevel.y = runwayLevel.landY + 2; runwayLevel.tryLand();
+    const wrongDone = runwayLevel.done, mistakes = runwayLevel.mistakes;
+    runwayLevel.x = padCenter(runwayLevel.target); runwayLevel.y = runwayLevel.landY + 2; runwayLevel.tryLand();
+    return { wrongDone, mistakes, rightDone: runwayLevel.done };
+  });
+  expect(land.wrongDone).toBe(false);
+  expect(land.mistakes).toBe(1);
+  expect(land.rightDone).toBe(true);
+
+  expect(errors, "console/page errors in Runway Landing:\n" + errors.join("\n")).toEqual([]);
+});
