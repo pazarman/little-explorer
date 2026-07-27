@@ -9,7 +9,7 @@ const HP_FOODS = [
   { e: "🍉", name: "watermelons", es: "sandías",   yue: "西瓜" },
   { e: "🥕", name: "carrots",     es: "zanahorias", yue: "紅蘿蔔" },
   { e: "🍎", name: "apples",      es: "manzanas",   yue: "蘋果" },
-  { e: "🍌", name: "bananas",     es: "plátanos",   yue: "香蕉" },
+  { e: "🍌", name: "bananas",     es: "guineos",    yue: "香蕉" },
   { e: "🥬", name: "leaves",      es: "hojas",      yue: "菜葉" }
 ];
 

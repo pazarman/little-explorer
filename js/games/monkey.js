@@ -5,9 +5,9 @@
 const moL = obj => obj[curLang()] || obj.en;
 
 const MO_TXT = {
-  show: { en: "🐒 Swing and grab the bananas!", es: "🐒 ¡Balancéate y agarra los plátanos!", yue: "🐒 盪過去攞香蕉！" },
+  show: { en: "🐒 Swing and grab the bananas!", es: "🐒 ¡Balancéate y agarra los guineos!", yue: "🐒 盪過去攞香蕉！" },
   say:  { en: "Tap the screen to swing the monkey up and catch the bananas!",
-          es: "¡Toca la pantalla para que el mono salte y atrape los plátanos!",
+          es: "¡Toca la pantalla para que el mono salte y atrape los guineos!",
           yue: "㩒下畫面，等馬騮盪高啲，接住香蕉！" }
 };
 

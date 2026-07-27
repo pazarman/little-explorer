@@ -706,7 +706,7 @@ const VOC = {
   // pasta / food nouns
   meatball:{es:"albóndiga",g:"f"}, cookie:{es:"galleta",g:"f"}, blueberry:{es:"arándano",g:"m"},
   cherry:{es:"cereza",g:"f"}, strawberry:{es:"fresa",g:"f"}, grape:{es:"uva",g:"f"}, carrot:{es:"zanahoria",g:"f"},
-  donut:{es:"dona",g:"f"}, egg:{es:"huevo",g:"m"}, banana:{es:"plátano",g:"m"}, cupcake:{es:"pastelito",g:"m"},
+  donut:{es:"dona",g:"f"}, egg:{es:"huevo",g:"m"}, banana:{es:"guineo",g:"m"}, cupcake:{es:"pastelito",g:"m"},
   pizza:{es:"pizza",g:"f"}, "ice cream":{es:"helado",g:"m"},
   // food bases
   spaghetti:{es:"espagueti",g:"m"}, plate:{es:"plato",g:"m"}, pancake:{es:"panqueque",g:"m"}, cake:{es:"pastel",g:"m"},
