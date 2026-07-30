@@ -1,0 +1,254 @@
+<style>
+  :root{
+    --bg:#eff3f8; --surface:#ffffff; --surface-2:#f6f8fc;
+    --ink:#17202e; --ink-soft:#556074; --ink-faint:#8a94a6;
+    --line:#dde4ee; --line-soft:#e9eef6;
+    --accent:#2f6fde; --accent-soft:#e7eefb;
+    --ok:#1f9d5b; --ok-soft:#e2f4ea; --warn:#c8892a; --warn-soft:#f8efdd; --idle:#93a0b4;
+    --r-research:#7c5cff; --r-pm:#2f6fde; --r-impl:#e0812f; --r-curator:#0f9b8a; --r-analyst:#d6497f; --r-human:#5a6884;
+    --shadow:0 1px 2px rgba(23,32,46,.05), 0 8px 24px rgba(23,32,46,.06);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0e1420; --surface:#151d2b; --surface-2:#1a2333;
+      --ink:#eaf0f8; --ink-soft:#9fabc0; --ink-faint:#6b7688;
+      --line:#26303f; --line-soft:#202a38;
+      --accent:#5b8cf0; --accent-soft:#182742;
+      --ok:#35c07b; --ok-soft:#12261c; --warn:#e0a44a; --warn-soft:#2a2113; --idle:#5c6a80;
+      --r-research:#9a80ff; --r-pm:#5b8cf0; --r-impl:#ef9d4f; --r-curator:#2bc0ad; --r-analyst:#ee6fa0; --r-human:#8493ad;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#eff3f8; --surface:#ffffff; --surface-2:#f6f8fc;
+    --ink:#17202e; --ink-soft:#556074; --ink-faint:#8a94a6;
+    --line:#dde4ee; --line-soft:#e9eef6;
+    --accent:#2f6fde; --accent-soft:#e7eefb; --ok:#1f9d5b; --ok-soft:#e2f4ea; --warn:#c8892a; --warn-soft:#f8efdd; --idle:#93a0b4;
+    --r-research:#7c5cff; --r-pm:#2f6fde; --r-impl:#e0812f; --r-curator:#0f9b8a; --r-analyst:#d6497f; --r-human:#5a6884;
+    --shadow:0 1px 2px rgba(23,32,46,.05), 0 8px 24px rgba(23,32,46,.06);
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1420; --surface:#151d2b; --surface-2:#1a2333;
+    --ink:#eaf0f8; --ink-soft:#9fabc0; --ink-faint:#6b7688;
+    --line:#26303f; --line-soft:#202a38;
+    --accent:#5b8cf0; --accent-soft:#182742; --ok:#35c07b; --ok-soft:#12261c; --warn:#e0a44a; --warn-soft:#2a2113; --idle:#5c6a80;
+    --r-research:#9a80ff; --r-pm:#5b8cf0; --r-impl:#ef9d4f; --r-curator:#2bc0ad; --r-analyst:#ee6fa0; --r-human:#8493ad;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:clamp(20px,4vw,44px) clamp(16px,4vw,32px) 60px;}
+
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px;}
+  h1{font-size:clamp(27px,5vw,40px);line-height:1.05;letter-spacing:-.02em;margin:0;text-wrap:balance;font-weight:800;}
+  .lede{color:var(--ink-soft);max-width:62ch;margin:12px 0 0;font-size:clamp(15px,1.6vw,17px);}
+  .headrow{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;}
+  .clock{font-family:var(--mono);font-size:12px;color:var(--ink-soft);background:var(--surface);border:1px solid var(--line);
+    border-radius:10px;padding:10px 13px;white-space:nowrap;box-shadow:var(--shadow);line-height:1.7;}
+  .clock b{color:var(--ink);font-weight:600}
+  .clock .live{display:inline-flex;align-items:center;gap:6px;color:var(--ok);font-weight:600}
+  .clock .live .dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:pulse 2.4s ease-in-out infinite}
+
+  h2{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin:42px 0 16px;display:flex;align-items:center;gap:10px;}
+  h2::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  /* KPI tiles */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 16px;box-shadow:var(--shadow);}
+  .kpi .n{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;}
+  .kpi .l{font-size:12px;color:var(--ink-soft);margin-top:7px;font-weight:600;}
+  .kpi.flag .n{color:var(--warn)}
+
+  /* pipeline */
+  .pipe{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);}
+  .step{flex:1 1 120px;min-width:118px;border-radius:12px;padding:12px 13px;background:var(--surface-2);border:1px solid var(--line-soft);}
+  .step.gate{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 35%,transparent);}
+  .step .k{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);}
+  .step .v{font-weight:650;margin-top:3px;font-size:14px;}
+  .step.gate .k{color:var(--accent);}
+  .arrow{align-self:center;color:var(--ink-faint);font-size:17px;flex:0 0 auto;}
+  @media(max-width:640px){.arrow{transform:rotate(90deg)}}
+
+  /* agent grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;}
+  .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 18px 15px;box-shadow:var(--shadow);overflow:hidden;}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--role,var(--accent));}
+  .card .top{display:flex;align-items:center;gap:12px;}
+  .badge{flex:0 0 auto;width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-weight:800;font-size:12.5px;color:#fff;background:var(--role,var(--accent));box-shadow:0 2px 6px color-mix(in srgb,var(--role,var(--accent)) 40%,transparent);}
+  .card h3{margin:0;font-size:16.5px;font-weight:750;letter-spacing:-.01em;}
+  .card .look{font-size:11.5px;color:var(--ink-faint);font-weight:600;}
+  .job{color:var(--ink-soft);font-size:13.5px;margin:12px 0 0;}
+  .meta{margin-top:12px;display:flex;flex-direction:column;gap:6px;font-size:13px;}
+  .meta .row{display:flex;gap:9px;align-items:baseline;}
+  .meta .lbl{flex:0 0 74px;color:var(--ink-faint);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding-top:1px;}
+  .meta .val{color:var(--ink);}
+  .when,.next{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+  .next{color:var(--ok);font-weight:600;}
+  .out{color:var(--ink-soft)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;}
+  .chip{font-size:11px;font-weight:650;padding:4px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ink-soft);background:var(--surface-2);}
+  .chip.status{display:inline-flex;align-items:center;gap:6px;}
+  .chip.sched{color:var(--ok);background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 30%,transparent);}
+  .chip.idle{color:var(--warn);background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 30%,transparent);}
+  .chip.gate{color:var(--accent);background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,transparent);}
+  .dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .chip.sched .dot{animation:pulse 2.4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
+  @media(prefers-reduced-motion:reduce){.chip.sched .dot,.clock .live .dot{animation:none}}
+
+  /* activity feed */
+  .feed{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;}
+  .fitem{display:flex;gap:13px;padding:13px 16px;border-top:1px solid var(--line-soft);}
+  .fitem:first-child{border-top:none;}
+  .fmark{flex:0 0 auto;width:9px;height:9px;border-radius:50%;margin-top:6px;background:var(--role,var(--accent));}
+  .ftext{flex:1;font-size:14px;}
+  .ftext .who{font-weight:650;color:var(--role,var(--ink));}
+  .ftext .sub{color:var(--ink-soft);font-size:12.5px;margin-top:1px;}
+  .fwhen{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);white-space:nowrap;padding-top:1px;}
+
+  /* watch panel */
+  .watch{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;}
+  .wcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:var(--shadow);}
+  .wcard .wt{font-weight:700;font-size:14px;margin:0 0 4px;}
+  .wcard p{margin:0;color:var(--ink-soft);font-size:12.5px;}
+  code{font-family:var(--mono);font-size:11.5px;background:var(--surface-2);border:1px solid var(--line-soft);padding:1px 6px;border-radius:6px;color:var(--ink);}
+  .foot{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);color:var(--ink-faint);font-size:12.5px;display:flex;gap:8px 18px;flex-wrap:wrap;}
+  .foot b{color:var(--ink-soft);font-weight:600;}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="headrow">
+      <div>
+        <p class="eyebrow">Little Explorer · Operations</p>
+        <h1>Agent Control Board</h1>
+        <p class="lede">The team that researches, builds, and oversees the toddler game. Every agent stops at
+          &ldquo;review-ready&rdquo; — <strong>only you merge to&nbsp;main and deploy.</strong></p>
+      </div>
+      <div class="clock">
+        <span class="live"><span class="dot"></span>SNAPSHOT</span> · as of <b>Jul&nbsp;30, 01:49&nbsp;UTC</b><br>
+        Times <b>America/Panama</b> (UTC&minus;5) · refreshes daily
+      </div>
+    </div>
+  </header>
+
+  <h2>At a glance</h2>
+  <div class="kpis">
+    <div class="kpi"><div class="n">31</div><div class="l">games live</div></div>
+    <div class="kpi"><div class="n">5</div><div class="l">agents scheduled</div></div>
+    <div class="kpi"><div class="n">26</div><div class="l">ideas proposed</div></div>
+    <div class="kpi flag"><div class="n">0</div><div class="l">ready to build</div></div>
+    <div class="kpi"><div class="n">2</div><div class="l">in review</div></div>
+  </div>
+
+  <h2>Pipeline</h2>
+  <div class="pipe">
+    <div class="step"><div class="k">Curator + R&amp;D</div><div class="v">Propose ideas</div></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><div class="k">Project Manager</div><div class="v">Vet &amp; prioritize</div></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step gate"><div class="k">You</div><div class="v">Mark READY</div></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><div class="k">Implementer</div><div class="v">Build it</div></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step gate"><div class="k">You</div><div class="v">Merge &amp; deploy</div></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><div class="k">Analyst</div><div class="v">Score it</div></div>
+  </div>
+
+  <h2>The agents · live status</h2>
+  <div class="grid">
+
+    <div class="card" style="--role:var(--r-curator)">
+      <div class="top"><div class="badge">CUR</div><div><h3>Backlog Curator</h3><div class="look">Ideates</div></div></div>
+      <p class="job">Proposes new game concepts that fill STEM gaps, straight into the queue for review.</p>
+      <div class="meta">
+        <div class="row"><span class="lbl">Runs</span><span class="val"><span class="when">Mon · 11:00 AM</span></span></div>
+        <div class="row"><span class="lbl">Last run</span><span class="val out">Jul 27</span></div>
+        <div class="row"><span class="lbl">Produced</span><span class="val out">26 <code>[PROPOSED]</code> ideas in the queue</span></div>
+      </div>
+      <div class="chips"><span class="chip status sched"><span class="dot"></span>Scheduled</span><span class="chip">Proposes only</span></div>
+    </div>
+
+    <div class="card" style="--role:var(--r-research)">
+      <div class="top"><div class="badge">R&amp;D</div><div><h3>Product Researcher</h3><div class="look">Looks outward</div></div></div>
+      <p class="job">Mines learning science + best kids&rsquo; apps into evidence-backed proposals — rejects engagement dark patterns.</p>
+      <div class="meta">
+        <div class="row"><span class="lbl">Runs</span><span class="val"><span class="when">Thu · 9:00 AM</span></span></div>
+        <div class="row"><span class="lbl">Next run</span><span class="val next">Thu, Jul 30</span></div>
+        <div class="row"><span class="lbl">Produced</span><span class="val out">First run pending — no briefs yet</span></div>
+      </div>
+      <div class="chips"><span class="chip status sched"><span class="dot"></span>Scheduled</span><span class="chip">On-demand</span><span class="chip">Proposes only</span></div>
+    </div>
+
+    <div class="card" style="--role:var(--r-pm)">
+      <div class="top"><div class="badge">PM</div><div><h3>Project Manager</h3><div class="look">Looks inward</div></div></div>
+      <p class="job">Audits games vs the quality bar (ship&nbsp;&ge;&nbsp;18/24), flags gaps, keeps the docs honest, ranks what&rsquo;s next.</p>
+      <div class="meta">
+        <div class="row"><span class="lbl">Runs</span><span class="val"><span class="when">Mon · 9:00 AM</span></span></div>
+        <div class="row"><span class="lbl">Last run</span><span class="val out">Jul 30 (manual test)</span></div>
+        <div class="row"><span class="lbl">Next run</span><span class="val next">Mon, Aug 3</span></div>
+      </div>
+      <div class="chips"><span class="chip status sched"><span class="dot"></span>Scheduled</span><span class="chip">On-demand</span><span class="chip">Never merges / deploys</span></div>
+    </div>
+
+    <div class="card" style="--role:var(--r-impl)">
+      <div class="top"><div class="badge">IMP</div><div><h3>Implementer</h3><div class="look">Builds</div></div></div>
+      <p class="job">Builds the #1 <strong>READY</strong> item to spec, verifies it, runs the release gate, and pushes a review branch.</p>
+      <div class="meta">
+        <div class="row"><span class="lbl">Runs</span><span class="val"><span class="when">Wed · 9:00 AM</span></span></div>
+        <div class="row"><span class="lbl">Next run</span><span class="val next">Wed, Aug 5</span></div>
+        <div class="row"><span class="lbl">Status</span><span class="val out">Idle — 0 items marked READY</span></div>
+      </div>
+      <div class="chips"><span class="chip status idle"><span class="dot"></span>Waiting for READY</span><span class="chip">On-demand</span><span class="chip">No deploy</span></div>
+    </div>
+
+    <div class="card" style="--role:var(--r-analyst)">
+      <div class="top"><div class="badge">ANL</div><div><h3>Analyst</h3><div class="look">Scores</div></div></div>
+      <p class="job">Scores shipped games against the rubric and keeps <code>COVERAGE.md</code> current.</p>
+      <div class="meta">
+        <div class="row"><span class="lbl">Runs</span><span class="val"><span class="when">Sun · 11:00 AM</span></span></div>
+        <div class="row"><span class="lbl">Last run</span><span class="val out">Jul 26</span></div>
+        <div class="row"><span class="lbl">Next run</span><span class="val next">Sun, Aug 2</span></div>
+      </div>
+      <div class="chips"><span class="chip status sched"><span class="dot"></span>Scheduled</span><span class="chip">Scores only</span></div>
+    </div>
+
+    <div class="card" style="--role:var(--r-human)">
+      <div class="top"><div class="badge">YOU</div><div><h3>You — the gate</h3><div class="look">Decides &amp; ships</div></div></div>
+      <p class="job">Review proposals, mark items <strong>READY</strong>, merge &amp; deploy. The only role that can push the live site.</p>
+      <div class="meta">
+        <div class="row"><span class="lbl">Owns</span><span class="val">READY approval · merge to <code>main</code> · deploy</span></div>
+        <div class="row"><span class="lbl">Waiting</span><span class="val out">26 proposals to triage into READY</span></div>
+      </div>
+      <div class="chips"><span class="chip gate">Human gate</span><span class="chip gate">Merges &amp; deploys</span></div>
+    </div>
+
+  </div>
+
+  <h2>Recently shipped to the live game</h2>
+  <div class="feed">
+    <div class="fitem"><span class="fmark" style="--role:var(--r-human)"></span><div class="ftext"><span class="who">Team org + safeguards</span><div class="sub">PM, Researcher &amp; Implementer agents added; colorblind + reduced-motion + assist fixes shipped (v38)</div></div><span class="fwhen">Jul 30</span></div>
+    <div class="fitem"><span class="fmark" style="--role:var(--r-impl)"></span><div class="ftext"><span class="who">✈️ Runway Landing</span><div class="sub">Airplane letter-matching — opened the literacy track</div></div><span class="fwhen">Jul 27</span></div>
+    <div class="fitem"><span class="fmark" style="--role:var(--r-impl)"></span><div class="ftext"><span class="who">🦛 Feed the Hippo · 🐒 Monkey Swing</span><div class="sub">Counting (1:1) and a tap-to-swing runner</div></div><span class="fwhen">Jul 27</span></div>
+    <div class="fitem"><span class="fmark" style="--role:var(--r-curator)"></span><div class="ftext"><span class="who">🇵🇦 Panamanian Spanish</span><div class="sub">Banana → <code>guineo</code> across all games</div></div><span class="fwhen">Jul 25</span></div>
+    <div class="fitem"><span class="fmark" style="--role:var(--r-impl)"></span><div class="ftext"><span class="who">🥚 Egg Catch · 🦁 Zoo Pop · 🐬 Dolphin Dive · 🚀 Fuel Up</span><div class="sub">Interactive arcade games — the game-feel batch</div></div><span class="fwhen">Jul 24&ndash;25</span></div>
+  </div>
+
+  <h2>Where to watch it live</h2>
+  <div class="watch">
+    <div class="wcard"><p class="wt">Runs &amp; history</p><p>The <strong>Routines</strong> page on claude.ai — every firing, status, and next run.</p></div>
+    <div class="wcard"><p class="wt">What they produced</p><p>Branches at <code>github.com/pazarman/little-explorer/branches</code> — <code>feat/*</code>, <code>research/*</code>, <code>pm/*</code>.</p></div>
+    <div class="wcard"><p class="wt">Priorities &amp; status</p><p><code>docs/GAME_BACKLOG.md</code>, <code>PLATFORM-BACKLOG.md</code>, <code>COVERAGE.md</code>.</p></div>
+    <div class="wcard"><p class="wt">The org, in text</p><p>Role definitions in <code>docs/AGENTS.md</code> and <code>.claude/agents/</code>.</p></div>
+  </div>
+
+  <div class="foot">
+    <span><b>5 scheduled agents</b> · 1 human gate</span>
+    <span>Snapshot refreshed daily 8&nbsp;AM Panama by the Digest routine</span>
+    <span>Agents never merge or deploy — that&rsquo;s yours</span>
+  </div>
+</div>
