@@ -9,6 +9,10 @@ This file is the shared state between the agents and you:
   audits games vs the quality bar, flags STEM/quality gaps, keeps this backlog and COVERAGE.md
   honest, and prioritizes what to build next. Invoke it on demand; it also runs weekly.
   It never writes game code or deploys.
+- **Product Researcher** (`.claude/agents/product-researcher.md`) looks outward — mines
+  early-childhood learning science and best-in-class kids' apps and files evidence-backed
+  proposals (game ideas here; platform ideas in `PLATFORM-BACKLOG.md`). Researches and proposes
+  only. Flow: Researcher proposes → PM vets → Implementer builds.
 
 ---
 
