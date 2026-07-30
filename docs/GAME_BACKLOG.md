@@ -1,10 +1,14 @@
 # Game Backlog
 
-This file is the shared state between three agents and you:
+This file is the shared state between the agents and you:
 - **Backlog Curator** proposes new games (status: PROPOSED)
 - **You** review, reorder, and mark items READY
 - **Implementer** picks the top READY item and builds it
 - **Analyst** scores the result and updates COVERAGE.md
+- **Project Manager** (`.claude/agents/project-manager.md`) oversees the whole pipeline —
+  audits games vs the quality bar, flags STEM/quality gaps, keeps this backlog and COVERAGE.md
+  honest, and prioritizes what to build next. Invoke it on demand; it also runs weekly.
+  It never writes game code or deploys.
 
 ---
 
