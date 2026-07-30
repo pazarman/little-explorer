@@ -7,8 +7,9 @@ This file is the shared state between the agents and you:
 - **Analyst** scores the result and updates COVERAGE.md
 - **Project Manager** (`.claude/agents/project-manager.md`) oversees the whole pipeline —
   audits games vs the quality bar, flags STEM/quality gaps, keeps this backlog and COVERAGE.md
-  honest, and prioritizes what to build next. Invoke it on demand; it also runs weekly.
-  It never writes game code or deploys.
+  honest, and **approves ~2 top PROPOSED items to READY each week** so the Implementer always has
+  work. Invoke it on demand; it also runs weekly. It never writes game code, merges, or deploys —
+  the human still approves what ships (and can veto any READY by resetting its status).
 - **Product Researcher** (`.claude/agents/product-researcher.md`) looks outward — mines
   early-childhood learning science and best-in-class kids' apps and files evidence-backed
   proposals (game ideas here; platform ideas in `PLATFORM-BACKLOG.md`). Researches and proposes
@@ -20,7 +21,7 @@ This file is the shared state between the agents and you:
 
 1. Review PROPOSED items below — edit the description or reject by changing status to REJECTED
 2. Reorder items by dragging/cutting (priority = top of list)
-3. Change status from PROPOSED → READY when you want it built
+3. The **Project Manager auto-promotes ~2 top items PROPOSED → READY each week**; you can also promote/veto any item yourself by changing its status
 4. Implementer picks the #1 READY item automatically
 
 ---

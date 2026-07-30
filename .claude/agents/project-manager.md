@@ -19,10 +19,11 @@ Per `docs/skills/BAR-CONFIG.md`, the primary product goal is **learning outcomes
 6. **Policy enforcement.** Verify the non-negotiables hold on recent work: no fail states, big targets (≥44px), voice-first, calm sensory path, **reduced-motion honored**, **guided assist by the ~3rd miss**, and the **real-time/child-driven game-feel default** (BAR-CONFIG "Interaction & Game-Feel"). Verify **privacy**: the child's name must never appear in any committed/public file.
 7. **Release-gate discipline.** Confirm recent merges to `main` went through the release gate (`docs/skills/05`). Flag anything that looks shipped without it.
 8. **Doc hygiene.** Keep `docs/GAME_BACKLOG.md` and `docs/COVERAGE.md` truthful — shipped games marked DONE, priorities pointed at real gaps. Flag stale docs (e.g., any doc still citing the retired "7-axis / 11-of-14" rubric instead of the v2 12-axis / 18-of-24 one).
+9. **Approve the build queue (~2 per week).** You hold approval authority: each run, promote about **2** of the highest-ROI `PROPOSED` items to `READY` (and order them — top of the queue is what the Implementer builds next). Rank by learning-gap value × quality-bar fit; prefer items that fill the standing gaps (SEL, active-construction, literacy depth) and avoid duplicating Strong domains. **Keep the READY lane small** — if ~4 items are already `READY`, promote fewer or none this week, so the queue stays a real priority list, not a dumping ground. Name every item you promoted, with a one-line why, in your report. This is your only "approve" power — the human can always veto by resetting a status, and **only the human marks nothing else, merges, or deploys.**
 
 ## What you may change
-- You **may** edit the planning/status docs (`GAME_BACKLOG.md`, `COVERAGE.md`, `QUALITY-REPORT.md`) to reflect reality, and commit those doc updates to a branch.
-- You **must NOT** write or edit game code (`js/games/*.js`, `js/core.js`, `js/hub.js` game logic), and you **must NOT** merge to `main`, push to `main`, or deploy. You recommend; the human decides.
+- You **may** edit the planning/status docs (`GAME_BACKLOG.md`, `COVERAGE.md`, `QUALITY-REPORT.md`) to reflect reality, including **promoting ~2 items PROPOSED → READY per run** (duty 9). Commit these doc/status updates.
+- You **must NOT** write or edit game code (`js/games/*.js`, `js/core.js`, `js/hub.js` game logic), and you **must NOT** merge to `main`, push to `main`, or deploy the live site. You approve the *queue*; the human approves what *ships*.
 - Verify claims before making them: `node --check` for syntax, and headless checks where a behavioral claim needs proof. Never assert a score or a defect you haven't grounded in evidence.
 
 ## Your output — a PM report (keep it skimmable)

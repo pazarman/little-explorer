@@ -6,10 +6,12 @@ deploys** — every agent stops at "review-ready."
 ## The pipeline
 
 ```
-Product Researcher ──proposes──▶ Backlog ──vetted by──▶ Project Manager ──prioritizes──▶ [human marks READY]
-                                                                                              │
-                                                                                              ▼
-                                              Human ◀──review & merge──── Implementer ──builds READY item
+Researcher + Curator ──propose──▶ Backlog ──vet & approve ~2/wk──▶ Project Manager ──marks READY──┐
+                                                                                                   │
+                                                                                                   ▼
+                                     Human ◀──review · merge · deploy──── Implementer ──builds READY item
+                                       │                                                            ▲
+                                       └────────── can veto / promote any item ─────────────────────┘
 ```
 
 ## Roles
@@ -17,7 +19,7 @@ Product Researcher ──proposes──▶ Backlog ──vetted by──▶ Proj
 | Role | Looks | What it does | Writes code? | Merges/Deploys? | Def |
 |---|---|---|---|---|---|
 | **Product Researcher** | Outward | Mines learning science + best-in-class kids' apps; files evidence-backed, values-filtered proposals | No | No | `.claude/agents/product-researcher.md` |
-| **Project Manager** | Inward | Audits games vs the quality bar, flags coverage/quality gaps, keeps docs honest, prioritizes | No | No | `.claude/agents/project-manager.md` |
+| **Project Manager** | Inward | Audits games vs the quality bar, flags gaps, keeps docs honest, and **approves ~2 items to READY/week** | No (docs/status only) | No | `.claude/agents/project-manager.md` |
 | **Implementer** | Build | Builds the #1 `READY` item to spec, verifies + runs the release gate, pushes a review-ready branch | Yes | **No** | `.claude/agents/implementer.md` |
 | **Backlog Curator** | — | Proposes new game ideas into the backlog (existing automation) | No | No | (existing) |
 | **You (human)** | — | Review, mark items `READY`, merge to `main`, deploy | — | **Yes** | — |
