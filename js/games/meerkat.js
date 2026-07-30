@@ -34,11 +34,13 @@ const meerkatLevel = {
     this.cleanup();
     this.done = false;
     this.popped = 0;
+    this.miss = 0;
     this.goal = [4, 5, 6][state.tier];
     this.maxActive = [2, 3, 4][state.tier];
     this.upDur = [2.2, 1.8, 1.4][state.tier];
     this.spawnMin = [0.65, 0.5, 0.4][state.tier];
     this.spawnMax = [1.1, 0.85, 0.7][state.tier];
+    if (reducedMotion()) { this.upDur *= 1.4; this.spawnMin *= 1.3; this.spawnMax *= 1.3; }  // calmer, slower pace
     this.spawnIn = 0.4;
     this.sinceTarget = 0;
 
@@ -76,6 +78,7 @@ const meerkatLevel = {
         .mk-animal{border:none;background:none;padding:0;font-size:clamp(46px,13vmin,92px);line-height:1;cursor:pointer;touch-action:manipulation;
                    transform:translateY(122%);transition:transform .28s cubic-bezier(.34,1.5,.55,1)}
         .mk-animal.up{transform:translateY(4%)}
+        .mk-animal.mk-tgt{filter:drop-shadow(0 0 9px #ffd23e) drop-shadow(0 0 4px #ffd23e)}
         .mk-animal.pop{animation:mkPop .34s ease forwards}
         @keyframes mkPop{0%{transform:translateY(4%) scale(1)}100%{transform:translateY(-46%) scale(1.35);opacity:0}}
         .mk-animal.mk-miss{animation:mkShake .3s}
@@ -132,18 +135,21 @@ const meerkatLevel = {
     h.occupied = true;
     h.def = def;
     h.isTarget = def.e === this.target.e;
-    h.upUntil = t + this.upDur * 1000;   // t is performance.now() in ms; upDur is seconds
+    const assist = h.isTarget && this.miss >= 3;                    // after misses, the target lingers + glows
+    h.upUntil = t + (assist ? this.upDur * 1.9 : this.upDur) * 1000; // t is performance.now() in ms; upDur is seconds
     h.el.textContent = def.e;
-    h.el.classList.remove("pop", "mk-miss");
+    h.el.classList.remove("pop", "mk-miss", "mk-tgt");
     void h.el.offsetWidth;
     h.el.classList.add("up");
+    if (assist) h.el.classList.add("mk-tgt");
   },
 
   duck(h) {
+    if (h.isTarget) this.miss++;                                    // a wanted animal ducked before it was tapped
     h.occupied = false;
     h.isTarget = false;
     h.def = null;
-    h.el.classList.remove("up");
+    h.el.classList.remove("up", "mk-tgt");
   },
 
   tap(h) {

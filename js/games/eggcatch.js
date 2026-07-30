@@ -5,11 +5,13 @@
 // this game holds its strings inline (like Night & Day) rather than in the core DICT
 const egL = obj => obj[curLang()] || obj.en;
 
+// A round never pairs red with green (see startRound) — the most common colorblind clash.
 const EGG_COLORS = [
   { id: "red",    hex: "#e8534e", shade: "#c53f3a", name: "red",    es: "rojo",     yue: "紅色" },
   { id: "blue",   hex: "#4f9fe0", shade: "#3a7fc0", name: "blue",   es: "azul",     yue: "藍色" },
   { id: "yellow", hex: "#f2c53d", shade: "#d6a521", name: "yellow", es: "amarillo", yue: "黃色" },
-  { id: "green",  hex: "#6ac36a", shade: "#4fa34f", name: "green",  es: "verde",    yue: "綠色" }
+  { id: "green",  hex: "#6ac36a", shade: "#4fa34f", name: "green",  es: "verde",    yue: "綠色" },
+  { id: "purple", hex: "#9b5de5", shade: "#7b3fd0", name: "purple", es: "morado",   yue: "紫色" }
 ];
 
 const eggSVG = (c) => `<svg viewBox="0 0 44 56" width="100%" height="100%">
@@ -47,10 +49,15 @@ const eggcatchLevel = {
     this.spawnMax = [1.5, 1.2, 0.95][state.tier];
     this.spawnIn = 0.5;
     this.sinceTarget = 0;
+    this.miss = 0;
     this.eggs = [];
+    this.reduced = reducedMotion();
+    if (this.reduced) this.goalSpeed *= 0.6;   // calmer fall for reduced-motion
 
     const nColors = [1, 2, 3][state.tier];
-    const palette = shuffle(EGG_COLORS).slice(0, nColors);
+    let palette;
+    do { palette = shuffle(EGG_COLORS).slice(0, nColors); }              // never red + green together (colorblind clash)
+    while (palette.some(c => c.id === "red") && palette.some(c => c.id === "green"));
     this.target = palette[0];
     this.palette = palette;
     this.sortByColor = nColors > 1;
@@ -142,20 +149,23 @@ const eggcatchLevel = {
     this.sinceTarget = targetFalling ? 0 : this.sinceTarget + dt;
 
     // spawn eggs from the hen
+    const assist = this.miss >= 3;   // after repeated misses, help the child succeed
     this.spawnIn -= dt;
     if (this.spawnIn <= 0 && this.eggs.filter(e => !e.done).length < 3 && this.caught < this.goal) {
       let color;
-      if (!this.sortByColor) color = this.target;
+      if (!this.sortByColor || assist) color = this.target;   // in assist mode, only target-color eggs fall
       else {
         const forceTarget = !targetFalling && this.sinceTarget > 1.7;
         color = forceTarget ? this.target : (Math.random() < 0.5 ? this.target : rand(this.palette));
       }
-      this.spawnEgg(W, H, color);
+      // assist steers the egg toward wherever the basket is right now
+      const spawnX = assist ? clamp(this.bx + randBetween(-W * 0.06, W * 0.06), W * 0.12, W * 0.88) : null;
+      this.spawnEgg(W, H, color, spawnX);
       this.spawnIn = randBetween(this.spawnMin, this.spawnMax);
     }
 
     // fall + catch/miss
-    const catchTol = W * 0.09;
+    const catchTol = W * (assist ? 0.15 : 0.09);   // more forgiving hit-box while assisting
     for (const e of this.eggs) {
       if (e.done) continue;
       e.y += e.vy * dt;
@@ -163,17 +173,18 @@ const eggcatchLevel = {
       if (e.y >= this.basketY - H * 0.05 && e.y <= this.basketY + H * 0.04 && Math.abs(e.x - this.bx) < catchTol) {
         this.landInBasket(e);
       } else if (e.y > H + 40) {
+        if (!this.sortByColor || e.color.id === this.target.id) this.miss++;   // a catchable egg slipped past
         e.done = true; if (e.el.isConnected) e.el.remove();
       }
     }
     this.eggs = this.eggs.filter(e => !e.done || e.el.isConnected);
   },
 
-  spawnEgg(W, H, color) {
+  spawnEgg(W, H, color, forcedX) {
     const el = document.createElement("div");
     el.className = "eg-egg";
     el.innerHTML = eggSVG(color);
-    const x = randBetween(W * 0.12, W * 0.88);
+    const x = forcedX != null ? forcedX : randBetween(W * 0.12, W * 0.88);
     const y = H * 0.2;
     el.style.left = x + "px";
     el.style.top = y + "px";

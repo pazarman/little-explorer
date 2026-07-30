@@ -26,7 +26,7 @@ const runwayLevel = {
     this.done = false;
     this.mistakes = 0;
     const nPads = [2, 3, 4][state.tier];
-    this.descRate = [0.13, 0.17, 0.22][state.tier];
+    this.descRate = [0.13, 0.17, 0.22][state.tier] * (reducedMotion() ? 0.7 : 1);
 
     const letters = shuffle(RW_LETTERS).slice(0, nPads);
     this.target = rand(letters);

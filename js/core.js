@@ -6,6 +6,8 @@ const rand = arr => arr[Math.floor(Math.random() * arr.length)];
 const shuffle = arr => arr.slice().sort(() => Math.random() - .5);
 const randBetween = (a, b) => a + Math.random() * (b - a);
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+// honor the OS "reduce motion" setting — real-time games slow their scroll and skip ambient particles
+const reducedMotion = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const IRREGULAR = { snowman: "snowmen", reindeer: "reindeer" };
 function plural(noun, n) {
   if (n === 1) return noun;
