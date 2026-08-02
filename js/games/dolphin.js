@@ -6,7 +6,7 @@
 const DOLPHIN_ART = `<svg viewBox="0 0 150 108" width="100%" height="100%">
   <defs>
     <linearGradient id="dlBody" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8ec6e6"/><stop offset="1" stop-color="#4d84ab"/>
+      <stop offset="0" stop-color="#9fd2ee"/><stop offset="1" stop-color="#4d84ab"/>
     </linearGradient>
   </defs>
   <g transform="rotate(-10 75 60)">
@@ -14,12 +14,14 @@ const DOLPHIN_ART = `<svg viewBox="0 0 150 108" width="100%" height="100%">
     <path d="M18 64 Q4 80 18 74 Q18 64 32 62 Z" fill="#3a6484"/>
     <path d="M26 60 Q60 40 104 42 Q132 43 144 30 Q140 46 126 52
             Q140 56 146 50 Q134 70 100 70 Q60 72 34 66 Q26 64 26 60 Z" fill="url(#dlBody)"/>
-    <path d="M40 65 Q72 74 112 68 Q96 74 66 73 Q50 72 40 65 Z" fill="#dff1fb" opacity=".9"/>
+    <path d="M40 65 Q72 74 112 68 Q96 74 66 73 Q50 72 40 65 Z" fill="#eaf6fd" opacity=".95"/>
     <path d="M126 52 Q142 52 150 56 Q142 60 126 58 Z" fill="#4d84ab"/>
     <path d="M66 45 Q74 24 90 40 Q80 42 66 45 Z" fill="#3f6e90"/>
     <path d="M78 66 Q86 84 104 74 Q92 70 78 66 Z" fill="#3a6484"/>
-    <circle cx="121" cy="52" r="3.4" fill="#12303f"/>
-    <path d="M128 60 Q136 64 145 60" stroke="#12303f" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="114" cy="55" r="4.5" fill="#ff7fb6" opacity=".38"/>
+    <circle cx="121" cy="52" r="4.2" fill="#12303f"/>
+    <circle cx="122.5" cy="50.3" r="1.7" fill="#fff"/>
+    <path d="M128 60 Q136 65 145 60" stroke="#12303f" stroke-width="2.4" fill="none" stroke-linecap="round"/>
   </g>
 </svg>`;
 
