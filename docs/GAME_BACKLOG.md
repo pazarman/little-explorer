@@ -44,6 +44,23 @@ This file is the shared state between the agents and you:
 <!-- Arcade / game-feel concepts — per BAR-CONFIG "Interaction & Game-Feel", prefer real-time,
      child-driven mechanics. These are distinct game genres, not tap-and-wait. -->
 
+### [PROPOSED] Wind-Down Corner
+- **Genre:** Calm / self-regulation ritual. **STEM:** SEL · self-regulation + bedtime routine · age 2–5
+- **Success:** Child follows a slow "balloon breath" with the buddy, then says goodnight to the animals (tap each → it curls up under a blanket) in a dimmed, quiet scene.
+- **Fills gap:** SEL self-regulation; extends the shipped Feelings game into a daily wind-down ritual. Uniquely on-brand (calm, anti-overstimulation — the opposite of engagement-maximizing apps).
+- **Rubric focus:** Emotional safety (2), Sensory balance (calm by design, reduced-motion native), Learning efficacy (co-regulation practice).
+- **Estimated complexity:** Low-Medium — dimmed palette, one breath animation (reuse the Feelings breath), tap-to-tuck-in animals.
+- **File:** `js/games/winddown.js`
+
+### [PROPOSED] Build-a-Buddy
+- **Genre:** Creative construction. **STEM:** Active construction + SEL (ownership, creativity) · age 2–5
+- **Success:** Child assembles a creature from parts (body, eyes, ears, color, an accessory), names it, and it comes alive — waves and thanks them.
+- **Fills gap:** **Active construction** — the child builds a unique output, the one rubric axis nothing currently scores on — plus SEL ownership/pride.
+- **Rubric focus:** Active construction (2), Emotional safety, Aesthetic cohesion.
+- **⚠️ Blocked on:** the Graphics/SVG art overhaul (see `PLATFORM-BACKLOG.md`). A build-a-creature toy needs a cohesive, high-quality part library first, or the assembled buddy looks mismatched. Build this after the art system lands.
+- **Estimated complexity:** Medium — drag/tap-to-assemble parts, name step, come-alive celebration.
+- **File:** `js/games/buildbuddy.js`
+
 ### [DONE] Zoo Pop (Meerkat Pop!)
 - **Genre:** Whack-a-mole / reaction. **STEM:** Sorting / classification · match pop-ups to a named target (listen + discriminate) · age 2–4
 - **Success:** Zoo animals surface from burrows; child pops only the animal the voice names (e.g. "Pop the penguin!"), ignoring the rest, until the goal is met

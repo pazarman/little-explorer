@@ -339,3 +339,51 @@ test("Runway Landing matches the plane's letter to the runway", async ({ page })
 
   expect(errors, "console/page errors in Runway Landing:\n" + errors.join("\n")).toEqual([]);
 });
+
+test("Feelings check-in names a feeling with no wrong answer", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("feelings"));
+  await expect(page.locator("#game")).toBeVisible();
+  await page.evaluate(() => { state.tier = 0; feelingsLevel.startRound(); });
+  await expect(page.locator(".fe-face")).toHaveCount(3);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("💛");
+
+  // Any face is a valid answer and advances the round (no fail state)
+  const advanced = await page.evaluate(async () => {
+    const before = state.round;
+    document.querySelector('.fe-face[data-emo="happy"]').click();
+    await new Promise(r => setTimeout(r, 1400));
+    return state.round > before || !document.getElementById("celebrate").classList.contains("hidden");
+  });
+  expect(advanced).toBe(true);
+
+  expect(errors, "console/page errors in Feelings:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("Scavenger Hunt shows a prompt and advances on 'found'", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("scavenger"));
+  await expect(page.locator("#game")).toBeVisible();
+  await page.evaluate(() => { state.tier = 0; scavengerLevel.startRound(); });
+  await expect(page.locator(".sc-card")).toBeVisible();
+  await expect(page.locator("#scFound")).toBeVisible();
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("🔦");
+
+  const advanced = await page.evaluate(async () => {
+    const before = state.round;
+    scavengerLevel.found({ clientX: 100, clientY: 100 });
+    await new Promise(r => setTimeout(r, 1400));
+    return state.round > before || !document.getElementById("celebrate").classList.contains("hidden");
+  });
+  expect(advanced).toBe(true);
+
+  expect(errors, "console/page errors in Scavenger Hunt:\n" + errors.join("\n")).toEqual([]);
+});
