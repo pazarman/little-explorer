@@ -13,21 +13,30 @@ const HP_FOODS = [
   { e: "🥬", name: "leaves",      es: "hojas",      yue: "菜葉" }
 ];
 
-const HIPPO_SVG = `<svg viewBox="0 0 200 180" width="100%" height="100%">
-  <ellipse cx="50" cy="40" rx="16" ry="13" fill="#9c8aa8"/>
-  <ellipse cx="150" cy="40" rx="16" ry="13" fill="#9c8aa8"/>
-  <ellipse cx="50" cy="42" rx="8" ry="6" fill="#c9a6c0"/>
-  <ellipse cx="150" cy="42" rx="8" ry="6" fill="#c9a6c0"/>
-  <path d="M28 68 Q28 18 100 20 Q172 18 172 68 Q172 116 100 116 Q28 116 28 68 Z" fill="#9c8aa8"/>
-  <circle cx="66" cy="56" r="14" fill="#fff"/><circle cx="134" cy="56" r="14" fill="#fff"/>
-  <circle cx="67" cy="58" r="6" fill="#2a2233"/><circle cx="133" cy="58" r="6" fill="#2a2233"/>
-  <path d="M44 92 Q44 150 100 158 Q156 150 156 92 Q156 126 100 130 Q44 126 44 92 Z" fill="#ab99b8"/>
-  <ellipse cx="80" cy="102" rx="7" ry="5" fill="#5f4f6b"/>
-  <ellipse cx="120" cy="102" rx="7" ry="5" fill="#5f4f6b"/>
-  <ellipse cx="100" cy="138" rx="44" ry="28" fill="#7a3b52"/>
-  <ellipse cx="100" cy="148" rx="36" ry="17" fill="#c05f7d"/>
-  <rect x="76" y="116" width="12" height="16" rx="3" fill="#fff"/>
-  <rect x="112" y="116" width="12" height="16" rx="3" fill="#fff"/>
+// Chunky "Hungry Hungry Hippos" energy: round body, big open mouth, glossy eyes, cheeks.
+const HIPPO_SVG = `<svg viewBox="0 0 200 185" width="100%" height="100%">
+  <ellipse cx="58" cy="171" rx="20" ry="11" fill="#7b45b8"/>
+  <ellipse cx="142" cy="171" rx="20" ry="11" fill="#7b45b8"/>
+  <ellipse cx="100" cy="128" rx="82" ry="52" fill="#9b5fd0"/>
+  <ellipse cx="100" cy="140" rx="60" ry="34" fill="#b98be0"/>
+  <ellipse cx="52" cy="58" rx="16" ry="17" fill="#9b5fd0"/>
+  <ellipse cx="148" cy="58" rx="16" ry="17" fill="#9b5fd0"/>
+  <ellipse cx="52" cy="60" rx="8" ry="9" fill="#ff9ecb"/>
+  <ellipse cx="148" cy="60" rx="8" ry="9" fill="#ff9ecb"/>
+  <path d="M26 78 Q26 30 100 30 Q174 30 174 78 Q174 120 100 120 Q26 120 26 78 Z" fill="#9b5fd0"/>
+  <circle cx="46" cy="96" r="13" fill="#ff7fb6" opacity=".55"/>
+  <circle cx="154" cy="96" r="13" fill="#ff7fb6" opacity=".55"/>
+  <ellipse cx="72" cy="60" rx="16" ry="18" fill="#fff"/>
+  <ellipse cx="128" cy="60" rx="16" ry="18" fill="#fff"/>
+  <circle cx="74" cy="64" r="8.5" fill="#2a2233"/><circle cx="126" cy="64" r="8.5" fill="#2a2233"/>
+  <circle cx="77.5" cy="60.5" r="3.4" fill="#fff"/><circle cx="129.5" cy="60.5" r="3.4" fill="#fff"/>
+  <ellipse cx="100" cy="112" rx="66" ry="46" fill="#b98be0"/>
+  <ellipse cx="80" cy="94" rx="6" ry="8" fill="#6b3aa0"/>
+  <ellipse cx="120" cy="94" rx="6" ry="8" fill="#6b3aa0"/>
+  <path d="M46 118 Q100 104 154 118 Q150 168 100 170 Q50 168 46 118 Z" fill="#c74268"/>
+  <path d="M62 126 Q100 118 138 126 Q132 158 100 160 Q68 158 62 126 Z" fill="#ff6f91"/>
+  <rect x="70" y="116" width="15" height="18" rx="5" fill="#fff"/>
+  <rect x="115" y="116" width="15" height="18" rx="5" fill="#fff"/>
 </svg>`;
 
 const hippoLevel = {

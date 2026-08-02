@@ -1,12 +1,20 @@
 "use strict";
 /* ================= LEVEL: Ocean colors ================= */
 function fishSVG(color) {
+  // Whole fish is ONE color (fins/tail match body) so color identity stays clear; overlays add life.
   const stroke = color === "#f4f6f9" ? ` stroke="#9bb" stroke-width="1.5"` : "";
-  return `<svg viewBox="0 0 125 80" xmlns="http://www.w3.org/2000/svg">
-    <polygon points="95,40 120,15 120,65" fill="${color}"${stroke}/>
-    <ellipse cx="55" cy="40" rx="42" ry="27" fill="${color}"${stroke}/>
-    <circle cx="36" cy="32" r="6.5" fill="#fff"/><circle cx="36" cy="32" r="3" fill="#222"/>
-    <path d="M22 48 Q30 55 40 50" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+  return `<svg viewBox="0 0 125 90" xmlns="http://www.w3.org/2000/svg">
+    <path d="M92 45 Q118 21 121 31 Q112 45 121 59 Q118 69 92 45 Z" fill="${color}"${stroke}/>
+    <path d="M46 17 Q64 5 78 19 Q62 21 46 27 Z" fill="${color}"${stroke}/>
+    <path d="M52 67 Q62 79 76 71 Q64 65 52 63 Z" fill="${color}"${stroke}/>
+    <ellipse cx="56" cy="45" rx="44" ry="28" fill="${color}"${stroke}/>
+    <path d="M22 53 Q56 75 92 53 Q84 69 56 69 Q34 69 22 53 Z" fill="#fff" opacity=".28"/>
+    <path d="M40 25 Q34 45 40 65" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round" opacity=".18"/>
+    <circle cx="30" cy="37" r="9" fill="#fff"/>
+    <circle cx="31" cy="38" r="4.6" fill="#222"/>
+    <circle cx="33" cy="35.5" r="1.9" fill="#fff"/>
+    <circle cx="30" cy="51" r="6" fill="#ff6f91" opacity=".45"/>
+    <path d="M18 51 Q26 58 36 53" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round" opacity=".35"/>
   </svg>`;
 }
 const oceanLevel = {
