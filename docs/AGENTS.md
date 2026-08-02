@@ -24,16 +24,20 @@ Researcher + Curator ──propose──▶ Backlog ──vet & approve ~2/wk─
 | **Backlog Curator** | — | Proposes new game ideas into the backlog (existing automation) | No | No | (existing) |
 | **You (human)** | — | Review, mark items `READY`, merge to `main`, deploy | — | **Yes** | — |
 
-## Schedules (all times America/Panama = UTC−5)
+## Schedule — one weekly cycle
 
-| Agent | When | Cron (UTC) | Trigger ID |
-|---|---|---|---|
-| Project Manager | **Mon 9:00 AM** | `0 14 * * 1` | `trig_01DgQE2WqgTpjVLhFEimqz23` |
-| Implementer | **Wed 9:00 AM** | `0 14 * * 3` | `trig_01MQEFXPpNx8ueHB3wzrxFqr` |
-| Product Researcher | **Thu 9:00 AM** | `0 14 * * 4` | `trig_01DWvNwBEhg4eMU8tb9HMsN3` |
+Everything runs in **one orchestrated session, Mondays at 9:00 AM Panama** (`0 13 * * 1`,
+`trig_0148bnc2QDi9Wm4NTrbrEyrM`), in dependency order, ending with **one summary email**:
 
-Each scheduled run spawns a fresh session and **emails + pushes** the owner a report when it finishes.
-All three can also be invoked on demand.
+> **Analyst** (score) → **Researcher** + **Curator** (propose) → **PM** (audit + approve ~2 READY) →
+> **Implementer** (build top READY) → dashboard refresh → single summary email.
+
+All work lands on a `weekly/<date>` branch for the human to review, merge, and deploy — nothing ships
+automatically. Each agent can still be invoked on demand any time.
+
+The individual per-agent triggers are **disabled** in favor of this cycle. (Two legacy triggers —
+Backlog Curator and Analyst, created via the older API — must be disabled by the owner in the
+claude.ai Routines UI; agents can't toggle them.)
 
 ## Where each agent's work shows up
 
