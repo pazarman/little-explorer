@@ -132,7 +132,8 @@ This file is the shared state between the agents and you:
 - **File:** `js/games/monkey.js` — shipped (Animals world). rAF loop: tap = upward impulse, gravity returns the monkey to the ground (never falls off). Bananas spawn at varied heights (some low enough to grab at a run, so progress is always possible). Difficulty scales scroll speed, height spread, and goal (4/5/6). No fail state.
 
 
-### [PROPOSED] Blend-It!
+### [READY] Blend-It!  ⟵ PM-approved · build #1 (top of READY queue)
+- **PM note:** Promoted to READY — literacy/phonological-awareness is the #1 highest-ROI gap domain, this completes the onset-rime step of that track, it's voice-first and low-medium complexity (reuses the Sound Safari word bank), so it's a safe, high-value build. Implementer: build this first.
 - **STEM:** Phonological awareness / literacy · onset-rime blending (simple CVC blending) · age 4–5
 - **Success:** Child can hear the voice say an onset and rime separately (e.g., "/b/…/oat/") and tap the correct picture (boat, not goat or coat) — demonstrating they can blend two phoneme chunks into a whole word
 - **Fills gap:** Phonological awareness, 4–5 age band — Rhyme Time covers rhyme recognition (2–4), Clap the Beat covers syllable segmentation (2–4), Sound Safari covers initial-phoneme matching (3–5); onset-rime blending is the next developmental sub-skill on the literacy ladder and has zero backlog coverage; completing the full phonological awareness track is the #1 highest-ROI domain per the STEM doc
@@ -140,7 +141,8 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Low-Medium — voice-first phoneme delivery (Web Speech can do paused segments); curated 12–16 onset+rime pairs; picture cards are reusable from Sound Safari word bank; no drag, no reading
 - **File:** `js/games/blend.js`
 
-### [PROPOSED] Alive or Not?
+### [READY] Alive or Not?  ⟵ PM-approved · build #2
+- **PM note:** Promoted to READY — foundational scientific-thinking concept (living/nonliving) that other science games presuppose; two big tap-zones, voice carries the content, low-medium complexity → reliable build. Implementer: build after Blend-It!.
 - **STEM:** Scientific thinking · living vs. nonliving classification · age 3–4
 - **Success:** Child can look at an object (puppy, flower, rock, toy car, fish, cloud, book, caterpillar) and tap the "alive" side (animated heartbeat) or "not alive" side (still icon), correctly sorting at least 6 of 8 objects
 - **Fills gap:** Scientific thinking, 3–4 age band — the STEM doc lists "living/nonliving" as an explicit 3–4 concept; Weather Dresser targets weather observation, Seasons Wheel targets seasonal change, Animal Hospital targets needs of living things (which presupposes knowing something is alive); none teaches the foundational living/nonliving distinction itself, which is the prerequisite concept for those games
@@ -252,7 +254,7 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Medium — new game
 - **File:** `js/games/patterns.js`
 
-### [IN_REVIEW] Tall or Short (Measurement)
+### [DONE] Tall or Short (Measurement)
 - **STEM:** Measurement · tall/short, long/short · age 3–4
 - **Success:** Child can say which of two objects is taller / shorter
 - **Fills gap:** Measurement / comparison — length/height not covered
@@ -313,7 +315,7 @@ This file is the shared state between the agents and you:
 - **File:** `js/games/bubbles.js`
 - **Fun factor:** Bubbles float around the screen, pop with a gentle sound and sparkle — pure toddler joy
 
-### [IN_REVIEW] Night & Day Sort
+### [DONE] Night & Day Sort
 - **STEM:** Scientific thinking · day/night cycle · sorting by time context · age 2–4
 - **Success:** Child can sort objects and activities (sun, pajamas, moon, toothbrush, breakfast) into a Day basket and a Night basket
 - **Fills gap:** Scientific thinking (observation of natural patterns) — concrete, age-appropriate entry point
