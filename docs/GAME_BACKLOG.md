@@ -68,7 +68,7 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Low-Medium — 3 synthesised percussion sounds via existing Web Audio sfx; 3 SVG instrument buttons; rhythm sequence engine (array of sound IDs + playback timer with rAF); pattern display strip showing previous beats as colored icons; hint-glow at tier 0; the design challenge is making the "listen first, then respond" structure feel natural rather than passive
 - **File:** `js/games/rhythm.js`
 
-### [PROPOSED] Letter Lights
+### [READY] Letter Lights
 - **STEM:** Phonological awareness / literacy · letter name recognition + symbol-sound link · age 3–4
 - **Success:** Child can see a glowing letter ("A") on screen, hear the voice say its name and sound ("This is A — it says /a/ like in apple"), and tap the picture from a choice of three whose name starts with that letter — demonstrating they can connect a printed letter symbol to both its name and its beginning sound
 - **Fills gap:** Phonological awareness, 3–4 age band — Sound Safari covers phoneme matching (auditory /b/ → tap ball); Clap the Beat covers syllable segmentation; Blend-It! covers onset-rime blending; but **letter NAME recognition** — connecting the visual letter SYMBOL to its spoken name AND phoneme — is the explicit "letter names" sub-concept listed in the STEM doc alongside "letter sounds" for ages 3–4 and is the foundational bridge between phoneme awareness and actual reading. Zero backlog and zero game-file coverage for this specific symbol-to-name-to-sound triple mapping.
@@ -84,7 +84,7 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Low — 3 SVG animal characters with simple keyframe animations (wiggle, clap, wave); an animated "waiting" indicator (e.g. gentle pulsing ring) so the wait is visually engaging; voice carries all narration; no drag; design challenge is making the WAIT feel exciting rather than empty — animals hold an "anticipation" pose with eyes wide, not frozen
 - **File:** `js/games/turntake.js`
 
-### [PROPOSED] My Five Senses
+### [READY] My Five Senses
 - **STEM:** Scientific thinking · observation — naming and matching the five senses to how we explore objects · age 2–4
 - **Success:** Child can tap or drag an object (fluffy bunny, ringing bell, bright flower, tangy lemon, warm soup) onto the sense icon it corresponds to (touch, hear, see, smell, taste) — demonstrating that each sense is a distinct tool for exploring the world and that different objects are explored with different senses
 - **Fills gap:** Scientific thinking, 2–3 and 3–4 age bands — the STEM doc's 2–3 tier is "name + observe" and the 3–4 tier includes observing natural phenomena; Alive or Not! covers living/nonliving (READY); Seasons Wheel, Weather Dresser, Sink or Float? address environmental prediction. **The five senses as an observation framework** — naming which sense you'd use to explore each object — is the canonical 2–4 preschool science concept present in every early-childhood curriculum and is completely absent from the backlog and all existing games. Who Says? (whosays.js) uses animal sounds but teaches animal identity, not hearing as a sense.
@@ -108,7 +108,7 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Low-Medium — 6–8 SVG scene layouts (meadow, kitchen, playground); 2–3 character positions per scene; no drag; voice delivers the spatial direction; the design challenge is always making "left" feel *relative to the landmark*, not as a body-reference absolute (keep the landmark clearly in the middle, characters clearly on each side)
 - **File:** `js/games/direction.js`
 
-### [PROPOSED] Fill It Up!
+### [READY] Fill It Up!
 - **STEM:** Measurement / comparison · capacity — which container holds more? · age 3–4
 - **Success:** Child can hold/tap to pour water into two containers and identify which one is full first — demonstrating they can compare **volume capacity** through an active, continuous cause-and-effect mechanic rather than visual estimation alone
 - **Fills gap:** Measurement/comparison, 3–4 age band — the STEM doc marks Measurement as a Gap with "length/height, more/less, ordering" listed as missing sub-concepts. **Capacity** (how much a container holds) is a distinct measurement sub-concept that none of the backlog or existing games address: Tall or Short (IN_REVIEW) = linear height; More or Less (PROPOSED) = discrete quantity; Line Them Up (PROPOSED) = size seriation; fuelup.js = quantity comparison via countable cells. Pouring water/sand between containers is the canonical toddler measurement experience (Piaget's conservation of volume; children ages 3–4 actively explore this with real containers). Zero backlog overlap.
@@ -159,7 +159,7 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Low-Medium — SVG picture-graph layout (rows of repeated icons); 3–4 object types in 2–3 colors; no drag (tap the winning group); voice confirms count per group; readable grid layout is the main design challenge
 - **File:** `js/games/tally.js`
 
-### [PROPOSED] Shape Drop
+### [READY] Shape Drop
 - **STEM:** Spatial reasoning · spatial fitting — place shape pieces into matching cutout holes · age 2–4
 - **Success:** Child can drag a shape piece (circle, square, triangle) to its matching hole in a scene and feel it "click" into place; at tier 1, must try pieces in multiple holes before finding the fit — demonstrating spatial matching by form through trial-and-error problem-solving
 - **Fills gap:** Spatial reasoning, 2–3 and 3–4 age bands — the STEM doc lists "simple fit" for ages 3–4 as a distinct spatial concept; Where's Teddy? teaches prepositional LANGUAGE (in/on/under); Shadow Match teaches shape-to-silhouette IDENTIFICATION; spatial FITTING (classic shape-sorter toy mechanic — choosing a piece and discovering whether it belongs in a hole) builds a different skill: understanding that form determines fit, learning to try before giving up; zero backlog coverage for this sub-skill
