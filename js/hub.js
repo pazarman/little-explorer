@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "40";
+const APP_VERSION = "41";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -9,7 +9,7 @@ const LEVELS = {
   hideseek: hideseekLevel, cups: cupsLevel, nightday: nightdayLevel, measure: measureLevel,
   fuelup: fuelupLevel, dolphin: dolphinLevel, meerkat: meerkatLevel, eggcatch: eggcatchLevel,
   hippo: hippoLevel, monkey: monkeyLevel, runway: runwayLevel,
-  feelings: feelingsLevel, scavenger: scavengerLevel
+  feelings: feelingsLevel, scavenger: scavengerLevel, senses: sensesLevel
 };
 
 /* ================= Categories & games ================= */
@@ -40,7 +40,8 @@ const GAMES = {
   monkey:   { icon: "🐒", name: "Monkey Swing", es: "Mono", yue: "馬騮", lvl: 1 },
   runway:   { icon: "✈️", name: "Plane Land", es: "Aterriza", yue: "降落", lvl: 1 },
   feelings: { icon: "💛", name: "Feelings", es: "Sentimientos", yue: "心情", lvl: 0 },
-  scavenger:{ icon: "🔦", name: "Go Find It", es: "A Buscar", yue: "去搵嘢", lvl: 0 }
+  scavenger:{ icon: "🔦", name: "Go Find It", es: "A Buscar", yue: "去搵嘢", lvl: 0 },
+  senses:   { icon: "👐", name: "Five Senses", es: "Los Sentidos", yue: "五感", lvl: 0 }
 };
 // chosen difficulty → max game level shown (auto/hard show everything)
 const diffLevel = () => settings.diff === "easy" ? 0 : settings.diff === "med" ? 1 : 2;
@@ -49,7 +50,7 @@ const visibleGames = cat => cat.games.filter(gameVisible);
 const CATEGORIES = [
   { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",          yue: "數字",       cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"] },
   { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", yue: "顏色同形狀", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream", "eggcatch"] },
-  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   yue: "動腦遊戲",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure", "runway", "feelings", "scavenger"] },
+  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   yue: "動腦遊戲",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure", "runway", "feelings", "scavenger", "senses"] },
   { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          yue: "動物",       cls: "c-animal", games: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"] },
   { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          yue: "寵物",       cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
   { id: "create", icon: "✏️", name: "Create",          es: "Crear",             yue: "創作",       cls: "c-create", games: ["paint", "story", "dressup"] }
