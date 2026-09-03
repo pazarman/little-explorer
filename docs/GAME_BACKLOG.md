@@ -132,7 +132,7 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Low — 3 SVG animal characters with simple keyframe animations (wiggle, clap, wave); an animated "waiting" indicator (e.g. gentle pulsing ring) so the wait is visually engaging; voice carries all narration; no drag; design challenge is making the WAIT feel exciting rather than empty — animals hold an "anticipation" pose with eyes wide, not frozen
 - **File:** `js/games/turntake.js`
 
-### [READY] My Five Senses
+### [IN_REVIEW] My Five Senses  ⟵ built on branch `feat/senses` (review & merge to ship)
 - **STEM:** Scientific thinking · observation — naming and matching the five senses to how we explore objects · age 2–4
 - **Success:** Child can tap or drag an object (fluffy bunny, ringing bell, bright flower, tangy lemon, warm soup) onto the sense icon it corresponds to (touch, hear, see, smell, taste) — demonstrating that each sense is a distinct tool for exploring the world and that different objects are explored with different senses
 - **Fills gap:** Scientific thinking, 2–3 and 3–4 age bands — the STEM doc's 2–3 tier is "name + observe" and the 3–4 tier includes observing natural phenomena; Alive or Not! covers living/nonliving (READY); Seasons Wheel, Weather Dresser, Sink or Float? address environmental prediction. **The five senses as an observation framework** — naming which sense you'd use to explore each object — is the canonical 2–4 preschool science concept present in every early-childhood curriculum and is completely absent from the backlog and all existing games. Who Says? (whosays.js) uses animal sounds but teaches animal identity, not hearing as a sense.
