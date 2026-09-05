@@ -116,7 +116,7 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Low-Medium — 3 synthesised percussion sounds via existing Web Audio sfx; 3 SVG instrument buttons; rhythm sequence engine (array of sound IDs + playback timer with rAF); pattern display strip showing previous beats as colored icons; hint-glow at tier 0; the design challenge is making the "listen first, then respond" structure feel natural rather than passive
 - **File:** `js/games/rhythm.js`
 
-### [READY] Letter Lights
+### [IN_REVIEW] Letter Lights  ⟵ built on branch `claude/compassionate-franklin-lip8fx` (js/games/letternames.js — review & merge to ship)
 - **STEM:** Phonological awareness / literacy · letter name recognition + symbol-sound link · age 3–4
 - **Success:** Child can see a glowing letter ("A") on screen, hear the voice say its name and sound ("This is A — it says /a/ like in apple"), and tap the picture from a choice of three whose name starts with that letter — demonstrating they can connect a printed letter symbol to both its name and its beginning sound
 - **Fills gap:** Phonological awareness, 3–4 age band — Sound Safari covers phoneme matching (auditory /b/ → tap ball); Clap the Beat covers syllable segmentation; Blend-It! covers onset-rime blending; but **letter NAME recognition** — connecting the visual letter SYMBOL to its spoken name AND phoneme — is the explicit "letter names" sub-concept listed in the STEM doc alongside "letter sounds" for ages 3–4 and is the foundational bridge between phoneme awareness and actual reading. Zero backlog and zero game-file coverage for this specific symbol-to-name-to-sound triple mapping.

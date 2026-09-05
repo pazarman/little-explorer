@@ -387,3 +387,30 @@ test("Scavenger Hunt shows a prompt and advances on 'found'", async ({ page }) =
 
   expect(errors, "console/page errors in Scavenger Hunt:\n" + errors.join("\n")).toEqual([]);
 });
+
+test("Letter Lights shows a glowing letter and taps the matching picture", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("letternames"));
+  await expect(page.locator("#game")).toBeVisible();
+  await page.evaluate(() => { state.tier = 0; state.round = 0; letternamesLevel.startRound(); });
+
+  // A drawn SVG letter light + at least two big picture choices (tier 0 = 2)
+  await expect(page.locator("#llLight svg")).toBeVisible();
+  await expect(page.locator(".ll-choice")).toHaveCount(2);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("🔤");
+
+  // Tapping the picture that starts with the target letter completes the round
+  const advanced = await page.evaluate(async () => {
+    const before = state.round;
+    document.querySelector(`.ll-choice[data-k="${letternamesLevel.target}"]`).click();
+    await new Promise(r => setTimeout(r, 5200));  // round advance is speech-gated (up to ~4.5s)
+    return state.round > before || !document.getElementById("celebrate").classList.contains("hidden");
+  });
+  expect(advanced).toBe(true);
+
+  expect(errors, "console/page errors in Letter Lights:\n" + errors.join("\n")).toEqual([]);
+});
