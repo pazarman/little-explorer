@@ -356,8 +356,14 @@ test("Feelings check-in names a feeling with no wrong answer", async ({ page }) 
   const advanced = await page.evaluate(async () => {
     const before = state.round;
     document.querySelector('.fe-face[data-emo="happy"]').click();
-    await new Promise(r => setTimeout(r, 1400));
-    return state.round > before || !document.getElementById("celebrate").classList.contains("hidden");
+    // Round advance is speech-gated (core waitSpeech: 900ms–4500ms depending on line length),
+    // so poll for it rather than sleeping a fixed time that can expire too early.
+    const deadline = Date.now() + 9000;
+    while (Date.now() < deadline) {
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return true;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
   });
   expect(advanced).toBe(true);
 
@@ -380,8 +386,14 @@ test("Scavenger Hunt shows a prompt and advances on 'found'", async ({ page }) =
   const advanced = await page.evaluate(async () => {
     const before = state.round;
     scavengerLevel.found({ clientX: 100, clientY: 100 });
-    await new Promise(r => setTimeout(r, 1400));
-    return state.round > before || !document.getElementById("celebrate").classList.contains("hidden");
+    // Round advance is speech-gated (core waitSpeech: 900ms–4500ms depending on line length),
+    // so poll for it rather than sleeping a fixed time that can expire too early.
+    const deadline = Date.now() + 9000;
+    while (Date.now() < deadline) {
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return true;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
   });
   expect(advanced).toBe(true);
 
@@ -397,7 +409,7 @@ test("Letter Lights shows a glowing letter and taps the matching picture", async
   await expect(page.locator("#game")).toBeVisible();
   await page.evaluate(() => { state.tier = 0; state.round = 0; letternamesLevel.startRound(); });
 
-  // A drawn SVG letter light + at least two big picture choices (tier 0 = 2)
+  // A drawn SVG letter light + two big picture choices (tier 0 = 2)
   await expect(page.locator("#llLight svg")).toBeVisible();
   await expect(page.locator(".ll-choice")).toHaveCount(2);
   const instructions = await page.locator("#instruction").textContent();
@@ -407,10 +419,60 @@ test("Letter Lights shows a glowing letter and taps the matching picture", async
   const advanced = await page.evaluate(async () => {
     const before = state.round;
     document.querySelector(`.ll-choice[data-k="${letternamesLevel.target}"]`).click();
-    await new Promise(r => setTimeout(r, 5200));  // round advance is speech-gated (up to ~4.5s)
-    return state.round > before || !document.getElementById("celebrate").classList.contains("hidden");
+    // Round advance is speech-gated (core waitSpeech: 900ms–4500ms depending on line length),
+    // so poll for it rather than sleeping a fixed time that can expire too early.
+    const deadline = Date.now() + 9000;
+    while (Date.now() < deadline) {
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return true;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
   });
   expect(advanced).toBe(true);
 
   expect(errors, "console/page errors in Letter Lights:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("Five Senses matches an object to the right sense and advances", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("senses"));
+  await expect(page.locator("#game")).toBeVisible();
+  // tier 0 shows exactly two sense zones (see + hear)
+  await page.evaluate(() => { state.tier = 0; state.round = 0; sensesLevel.startRound(); });
+  await expect(page.locator(".se-zone")).toHaveCount(2);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("👐");
+
+  // Tapping the correct sense advances the round
+  const advanced = await page.evaluate(async () => {
+    const set = [["see", "hear"], ["see", "hear", "smell", "touch"], ["see", "hear", "smell", "taste", "touch"]][state.tier];
+    const correct = sensesLevel.obj.senses.filter(x => set.includes(x))[0];
+    const before = state.round;
+    document.querySelector(`.se-zone[data-s="${correct}"]`).click();
+    // Round advance is speech-gated (core waitSpeech: 900ms–4500ms depending on line length),
+    // so poll for it rather than sleeping a fixed time that can expire too early.
+    const deadline = Date.now() + 9000;
+    while (Date.now() < deadline) {
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return true;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
+  });
+  expect(advanced).toBe(true);
+
+  // Guided assist: three wrong taps light up the correct sense (no fail state)
+  const assisted = await page.evaluate(async () => {
+    state.busy = false; state.tier = 1; state.round = 0; sensesLevel.startRound();
+    const set = [["see", "hear"], ["see", "hear", "smell", "touch"], ["see", "hear", "smell", "taste", "touch"]][state.tier];
+    const acc = sensesLevel.obj.senses.filter(x => set.includes(x));
+    const wrong = [...document.querySelectorAll(".se-zone")].map(z => z.dataset.s).find(s => !acc.includes(s));
+    for (let i = 0; i < 3; i++) document.querySelector(`.se-zone[data-s="${wrong}"]`).click();
+    return document.querySelectorAll(".se-zone.se-hint").length > 0;
+  });
+  expect(assisted).toBe(true);
+
+  expect(errors, "console/page errors in Five Senses:\n" + errors.join("\n")).toEqual([]);
 });
