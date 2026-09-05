@@ -356,8 +356,14 @@ test("Feelings check-in names a feeling with no wrong answer", async ({ page }) 
   const advanced = await page.evaluate(async () => {
     const before = state.round;
     document.querySelector('.fe-face[data-emo="happy"]').click();
-    await new Promise(r => setTimeout(r, 1400));
-    return state.round > before || !document.getElementById("celebrate").classList.contains("hidden");
+    // Round advance is speech-gated (core waitSpeech: 900ms–4500ms depending on line length),
+    // so poll for it rather than sleeping a fixed time that can expire too early.
+    const deadline = Date.now() + 9000;
+    while (Date.now() < deadline) {
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return true;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
   });
   expect(advanced).toBe(true);
 
@@ -380,8 +386,14 @@ test("Scavenger Hunt shows a prompt and advances on 'found'", async ({ page }) =
   const advanced = await page.evaluate(async () => {
     const before = state.round;
     scavengerLevel.found({ clientX: 100, clientY: 100 });
-    await new Promise(r => setTimeout(r, 1400));
-    return state.round > before || !document.getElementById("celebrate").classList.contains("hidden");
+    // Round advance is speech-gated (core waitSpeech: 900ms–4500ms depending on line length),
+    // so poll for it rather than sleeping a fixed time that can expire too early.
+    const deadline = Date.now() + 9000;
+    while (Date.now() < deadline) {
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return true;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
   });
   expect(advanced).toBe(true);
 
@@ -407,8 +419,14 @@ test("Letter Lights shows a glowing letter and taps the matching picture", async
   const advanced = await page.evaluate(async () => {
     const before = state.round;
     document.querySelector(`.ll-choice[data-k="${letternamesLevel.target}"]`).click();
-    await new Promise(r => setTimeout(r, 5200));  // round advance is speech-gated (up to ~4.5s)
-    return state.round > before || !document.getElementById("celebrate").classList.contains("hidden");
+    // Round advance is speech-gated (core waitSpeech: 900ms–4500ms depending on line length),
+    // so poll for it rather than sleeping a fixed time that can expire too early.
+    const deadline = Date.now() + 9000;
+    while (Date.now() < deadline) {
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return true;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
   });
   expect(advanced).toBe(true);
 
@@ -434,8 +452,14 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
     const correct = sensesLevel.obj.senses.filter(x => set.includes(x))[0];
     const before = state.round;
     document.querySelector(`.se-zone[data-s="${correct}"]`).click();
-    await new Promise(r => setTimeout(r, 5200));  // round advance is speech-gated (up to ~4.5s)
-    return state.round > before || !document.getElementById("celebrate").classList.contains("hidden");
+    // Round advance is speech-gated (core waitSpeech: 900ms–4500ms depending on line length),
+    // so poll for it rather than sleeping a fixed time that can expire too early.
+    const deadline = Date.now() + 9000;
+    while (Date.now() < deadline) {
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return true;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
   });
   expect(advanced).toBe(true);
 

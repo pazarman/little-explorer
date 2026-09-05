@@ -1,4 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
+import fs from "node:fs";
+
+// Some sandboxes ship a pre-installed Chromium that may not match this Playwright
+// version's expected build. Use it when present; in CI the path is absent and
+// Playwright falls back to the browser it downloads itself.
+const LOCAL_CHROMIUM = "/opt/pw-browsers/chromium";
+const localBrowser = fs.existsSync(LOCAL_CHROMIUM)
+  ? { launchOptions: { executablePath: LOCAL_CHROMIUM } }
+  : {};
 
 // Smoke tests run against the static files served locally. No app build step — just a static server.
 export default defineConfig({
@@ -13,6 +22,7 @@ export default defineConfig({
     baseURL: "http://localhost:8765",
     // emulate a phone — this is a toddler PWA, mobile is the real surface
     ...devices["Pixel 5"],
+    ...localBrowser,
   },
   webServer: {
     command: "python3 -m http.server 8765",
