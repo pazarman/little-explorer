@@ -70,8 +70,15 @@
     font-size:clamp(22px, 5vmin, 46px); color:#fff; margin:0;
     text-shadow:0 3px 0 rgba(0,0,0,.25); pointer-events:none;
   }
-  #map { position:relative; width:100%; height:100%; }
+  /* a top-down sea the worlds sit in as islands, with clouds drifting over it */
+  #map { position:relative; width:100%; height:100%;
+         background:linear-gradient(#7ecdee, #a3ddf3 46%, #74c4e6); }
   #mapBg { position:absolute; inset:0; width:100%; height:100%; }
+  /* island scenery: DOM, not SVG, so it never distorts with the stretched viewBox */
+  #mapDeco { position:absolute; inset:0; z-index:1; pointer-events:none; }
+  #mapDeco span { position:absolute; transform:translate(-50%,-50%);
+                  font-size:clamp(15px,3.4vmin,30px); opacity:.75;
+                  filter:drop-shadow(0 1px 1px rgba(0,0,0,.18)); }
   .sun { position:absolute; top:1.5vmin; right:13vmin; font-size:clamp(34px,7.5vmin,68px);
          animation:spin 24s linear infinite; z-index:1; pointer-events:none; }
   @keyframes spin { to { transform:rotate(360deg); } }
@@ -80,8 +87,15 @@
   @keyframes drift { to { transform:translateX(130vw); } }
 
   /* ---- Self-contained world node: flex column, no absolute/grid conflict ---- */
-  .node { display:flex; flex-direction:column; align-items:center; gap:.7vmin;
+  .node { position:relative; display:flex; flex-direction:column; align-items:center; gap:.7vmin;
           border:none; background:none; padding:0; }
+  /* "New!" pennant planted above a disc — gold, matching the app's reward colour language */
+  .node-new { position:absolute; top:-.6em; left:50%; transform:translateX(-50%); z-index:2;
+    background:#ffd23e; color:#5b3c00; font-size:clamp(9px,1.8vmin,14px); font-weight:bold;
+    padding:.18em .7em; border-radius:99px; border:2px solid #fff; white-space:nowrap;
+    box-shadow:0 2px 0 rgba(0,0,0,.2); animation:newPulse 2.2s ease-in-out infinite; }
+  @keyframes newPulse { 0%,100%{transform:translateX(-50%) scale(1);}
+                        50%  {transform:translateX(-50%) scale(1.08);} }
   .node-disc {
     position:relative; width:clamp(58px,15vmin,118px); height:clamp(58px,15vmin,118px);
     border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden;
@@ -135,12 +149,21 @@
   .c-space  { background:linear-gradient(#5a6bd8,#26265a); }
   .c-create { background:linear-gradient(#ff8fb1,#e84393); }
 
-  /* ---- World hub grid: auto-fit, centered, scroll-safe (never clips title/mascot) ---- */
-  #mapNodes.cats { position:absolute; inset:0; display:grid;
-                   grid-template-columns:repeat(auto-fit, minmax(clamp(96px,26vmin,150px), 1fr));
-                   align-content:center; justify-items:center; gap:3vmin 1.5vmin;
-                   padding:16vmin 4vmin 12vmin; z-index:4; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-  @media (max-width:520px) { #mapNodes.cats { grid-template-columns:repeat(2,1fr); } }
+  /* ---- World hub: every world keeps a FIXED spot on the map (see HUB_LAYOUT in hub.js).
+         Percentage coords instead of an auto-fit grid, so a disc never moves between a
+         phone and a tablet — she navigates the map by place, not by reading. ---- */
+  #mapNodes.worlds { position:absolute; inset:0; z-index:4; }
+  /* Only the animation NAMES are overridden, so the base .node timing and the
+     nth-child stagger below still apply; these keyframes carry the centering
+     transform along, which a plain translateY bob would otherwise wipe out. */
+  #mapNodes.worlds .node { position:absolute; transform:translate(-50%,-50%);
+                           width:max-content; animation-name:worldPop, worldFloat; }
+  /* the map has room the game grid doesn't — let full world names through */
+  #mapNodes.worlds .node-label { max-width:32vmin; }
+  @keyframes worldFloat { 0%,100%{transform:translate(-50%,-50%);}
+                          50%   {transform:translate(-50%,calc(-50% - 1vmin));} }
+  @keyframes worldPop   { 0%{opacity:0; transform:translate(-50%,-50%) scale(.3);}
+                          100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
   .node { animation:nodePop .55s cubic-bezier(0.34,1.56,0.64,1) backwards, catFloat 4.6s ease-in-out infinite;
           animation-delay:0s, .55s; }
   /* staggered idle bob so the grid breathes instead of sitting static */
@@ -924,4 +947,8 @@
     .fu-cell, .fu-alien, .eg-egg, .mo-monkey, .mk-animal { animation: none !important; }
     .dl-hoop.dl-collected, .eg-egg.eg-caught, .mk-animal.pop, .mo-banana.got { animation: none !important; opacity: 0 !important; }
     .rw-pad.rw-hint .rw-strip { animation: none !important; }
+    /* world map: no idle bob or entrance pop, and a still New! pennant (the gold
+       pill still reads as new without pulsing) */
+    #mapNodes.worlds .node { animation: none !important; }
+    .node-new { animation: none !important; }
   }

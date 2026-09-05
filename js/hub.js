@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "42";
+const APP_VERSION = "43";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -42,8 +42,8 @@ const GAMES = {
   runway:   { icon: "✈️", name: "Plane Land", es: "Aterriza", yue: "降落", lvl: 1 },
   feelings: { icon: "💛", name: "Feelings", es: "Sentimientos", yue: "心情", lvl: 0 },
   scavenger:{ icon: "🔦", name: "Go Find It", es: "A Buscar", yue: "去搵嘢", lvl: 0 },
-  letternames:{ icon: "🔤", name: "Letter Lights", es: "Letras que Brillan", yue: "字母燈", lvl: 1 },
-  senses:   { icon: "👐", name: "Five Senses", es: "Los Sentidos", yue: "五感", lvl: 0 }
+  letternames:{ icon: "🔤", name: "Letter Lights", es: "Letras que Brillan", yue: "字母燈", lvl: 1, v: 41 },
+  senses:   { icon: "👐", name: "Five Senses", es: "Los Sentidos", yue: "五感", lvl: 0, v: 42 }
 };
 // chosen difficulty → max game level shown (auto/hard show everything)
 const diffLevel = () => settings.diff === "easy" ? 0 : settings.diff === "med" ? 1 : 2;
@@ -57,6 +57,56 @@ const CATEGORIES = [
   { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          yue: "寵物",       cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
   { id: "create", icon: "✏️", name: "Create",          es: "Crear",             yue: "創作",       cls: "c-create", games: ["paint", "story", "dressup"] }
 ];
+/* ================= World map layout =================
+   Every world has a FIXED home on the map so she can find it by place, not by reading.
+   Coordinates are percentages of the map, tuned per orientation:
+     p = portrait (the phone, our primary surface), l = landscape / tablet.
+   Both sets are ordered so the dashed trail joining them never crosses itself.
+   `land` paints the island under the disc; `deco` scatters scenery around it.
+   A world with no entry here still renders — it falls back to defaultSlot(). */
+const HUB_LAYOUT = {
+  num:    { p: [26, 18], l: [20, 30], land: "#cfe8ff", deco: [["🏔️", -.72, -.42], ["❄️", .68, .5]] },
+  shape:  { p: [72, 28], l: [50, 26], land: "#ffd7a0", deco: [["🌴", .7, -.44], ["🐚", -.68, .5]] },
+  brain:  { p: [27, 44], l: [80, 32], land: "#b6e5a2", deco: [["🌲", -.72, -.42], ["🍄", .68, .5]] },
+  animal: { p: [73, 55], l: [78, 70], land: "#f2dd93", deco: [["🌾", .7, -.44], ["🪨", -.68, .5]] },
+  pets:   { p: [30, 70], l: [50, 70], land: "#ffc6b0", deco: [["🏡", -.72, -.42], ["🦴", .68, .5]] },
+  create: { p: [72, 79], l: [22, 70], land: "#e6cdf7", deco: [["🌸", .7, -.44], ["🌈", -.68, .5]] }
+};
+// Island radii, in map-%. Sized per orientation to stay clear of each other while still
+// holding the whole disc + label + stars: the coord grids are spaced differently in each.
+const ISLAND = { p: { rx: 17, ry: 10.5 }, l: { rx: 13, ry: 15 } };
+// Wide screens get a 3-across snake; tall ones a 2-across zigzag.
+const hubLayoutMode = () => (innerWidth / innerHeight > 1.15 ? "l" : "p");
+// Fallback placement for a world that predates / postdates HUB_LAYOUT, so adding a
+// category to CATEGORIES can never leave a disc stacked at 0,0.
+function defaultSlot(i, n, mode) {
+  const perRow = mode === "l" ? 3 : 2;
+  const rows = Math.max(1, Math.ceil(n / perRow));
+  const row = Math.floor(i / perRow);
+  let col = i % perRow;
+  if (row % 2) col = perRow - 1 - col;                       // snake back along odd rows
+  const x = (100 / (perRow + 1)) * (col + 1);
+  const y = rows === 1 ? 50 : 20 + row * (58 / (rows - 1));
+  return [x, y];
+}
+const hubSlot = (cat, i, n, mode) => (HUB_LAYOUT[cat.id] || {})[mode] || defaultSlot(i, n, mode);
+
+/* ── Progress stars ──
+   Milestones on how many DIFFERENT games she has tried in a world. Deliberately an
+   absolute count and never a fraction: shipping a new game into a world must never
+   take a star away from her (the old rounded-average did exactly that). */
+const WORLD_STAR_STEPS = [1, 2, 3];
+const worldStars = games =>
+  WORLD_STAR_STEPS.filter(step => games.filter(gid => (completions[gid] || 0) > 0).length >= step).length;
+
+/* ── "New!" beacon ──
+   A game stays new for the release it shipped in plus the next one, and only until she
+   has played it. Tag a new game with `v: <APP_VERSION>` in GAMES and it expires by
+   itself on a later version bump — nothing to remember to switch off. */
+const NEW_FOR_VERSIONS = 2;
+const isNewGame = gid => (GAMES[gid].v || 0) > +APP_VERSION - NEW_FOR_VERSIONS && !(completions[gid] > 0);
+const newWorld = () => CATEGORIES.find(cat => visibleGames(cat).some(isNewGame));
+
 /* ── Narrator speech bubble ── */
 let _narratorTimer = null;
 function narratorSay(line) {
@@ -77,7 +127,12 @@ function gameCategory(gid) {
 }
 function hubGreeting() {
   const last = localStorage.getItem("fionaLastGame");
-  if (last) { localStorage.removeItem("fionaLastGame"); return t("narrator_postgame"); }
+  localStorage.removeItem("fionaLastGame");
+  // An unplayed new game is worth pointing at every time she passes through — the
+  // line stops by itself the moment she plays it.
+  const fresh = newWorld();
+  if (fresh) return t("narrator_new_world", { w: locName(fresh) });
+  if (last) return t("narrator_postgame");
   return rand([t("narrator_back"), t("narrator_ready")]);
 }
 
@@ -90,23 +145,55 @@ function launchGame(id) {
     else startLevel(id);
   }, 900);
 }
+// The "New!" pennant that plants itself above a disc. Empty string when nothing is new.
+const newFlag = show => (show ? `<span class="node-new">${t("new_badge")}</span>` : "");
+
+let hubMode = null;   // layout mode the map is currently drawn for
 function buildHub() {
-  $("mapPath").setAttribute("points", "");
-  const wrap = $("mapNodes"); wrap.className = "cats"; wrap.innerHTML = "";
-  CATEGORIES.forEach(cat => {
+  const mode = hubMode = hubLayoutMode();
+  const worlds = CATEGORIES.filter(cat => visibleGames(cat).length);
+  const pos = worlds.map((cat, i) => hubSlot(cat, i, worlds.length, mode));
+
+  // islands under the discs, each ringed by a paler surf line
+  const { rx, ry } = ISLAND[mode];
+  $("mapRegions").innerHTML = worlds.map((cat, i) => {
+    const [x, y] = pos[i], land = (HUB_LAYOUT[cat.id] || {}).land || "#cfe8ff";
+    return `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#fff" fill-opacity=".4"/>
+            <ellipse cx="${x}" cy="${y}" rx="${rx - 2.4}" ry="${ry - 1.5}" fill="${land}" fill-opacity=".95"/>`;
+  }).join("");
+
+  // the dashed trail joining every world, in map order
+  $("mapPath").setAttribute("points", pos.map(([x, y]) => `${x},${y}`).join(" "));
+
+  // scenery around each island (DOM, so it never distorts with the stretched viewBox)
+  $("mapDeco").innerHTML = worlds.map((cat, i) => {
+    const [x, y] = pos[i];
+    return ((HUB_LAYOUT[cat.id] || {}).deco || [])
+      .map(([e, fx, fy]) => `<span style="left:${x + fx * rx}%; top:${y + fy * ry}%">${e}</span>`).join("");
+  }).join("");
+
+  const wrap = $("mapNodes"); wrap.className = "worlds"; wrap.innerHTML = "";
+  worlds.forEach((cat, i) => {
     const games = visibleGames(cat);
-    if (!games.length) return;
-    const earned = games.reduce((s, gid) => s + Math.min(3, completions[gid] || 0), 0);
+    const [x, y] = pos[i];
     const b = document.createElement("button");
     b.className = "node";
-    b.innerHTML = `<div class="node-disc ${cat.cls}"><span>${cat.icon}</span></div>
+    b.style.left = x + "%"; b.style.top = y + "%";
+    b.innerHTML = `${newFlag(games.some(isNewGame))}
+                   <div class="node-disc ${cat.cls}"><span>${cat.icon}</span></div>
                    <div class="node-label">${locName(cat)}</div>
-                   <div class="node-stars">${"⭐".repeat(Math.min(3, Math.round(earned / games.length)))}</div>`;
+                   <div class="node-stars">${"⭐".repeat(worldStars(games))}</div>`;
     b.onclick = () => { sfx.tap(); openCategory(cat.id); };
     wrap.appendChild(b);
   });
   renderQuest();
 }
+// Percentage coords follow a resize on their own; only a portrait/landscape flip
+// needs a redraw, so the discs never re-pop while a desktop window is being dragged.
+addEventListener("resize", () => {
+  if ($("hub").classList.contains("hidden") || hubLayoutMode() === hubMode) return;
+  buildHub();
+});
 function openCategory(id) {
   audio();
   const cat = CATEGORIES.find(c => c.id === id);
@@ -120,7 +207,8 @@ function openCategory(id) {
     const g = GAMES[gid];
     const b = document.createElement("button");
     b.className = "node";
-    b.innerHTML = `<div class="node-disc b-${gid}"><span>${g.icon}</span></div>
+    b.innerHTML = `${newFlag(isNewGame(gid))}
+                   <div class="node-disc b-${gid}"><span>${g.icon}</span></div>
                    <div class="node-label">${locName(g)}</div>
                    <div class="node-stars">${"⭐".repeat(Math.min(3, completions[gid] || 0))}</div>`;
     b.onclick = () => { sfx.tap(); launchGame(gid); };

@@ -56,6 +56,92 @@ test("can launch a game from the hub map", async ({ page }) => {
   expect(errors, "console/page errors while playing:\n" + errors.join("\n")).toEqual([]);
 });
 
+test("every world keeps a fixed, non-overlapping spot on the map", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+  await expect(page.locator("#hub")).toBeVisible();
+
+  // One island and one trail point per world disc.
+  const drawn = await page.evaluate(() => ({
+    discs: document.querySelectorAll("#mapNodes .node").length,
+    islands: document.querySelectorAll("#mapRegions ellipse").length / 2,
+    trailPoints: document.getElementById("mapPath").getAttribute("points").trim().split(/\s+/).length,
+  }));
+  expect(drawn.islands).toBe(drawn.discs);
+  expect(drawn.trailPoints).toBe(drawn.discs);
+
+  // Discs must not collide, and must stay on screen — the map places them by
+  // coordinate, so a bad coord shows up as an overlap rather than a reflow.
+  const boxes = await page.evaluate(() =>
+    [...document.querySelectorAll("#mapNodes .node")].map((n) => {
+      const r = n.getBoundingClientRect();
+      return { x: r.x, y: r.y, w: r.width, h: r.height };
+    })
+  );
+  const vp = page.viewportSize();
+  for (const b of boxes) {
+    expect(b.x).toBeGreaterThanOrEqual(0);
+    expect(b.y).toBeGreaterThanOrEqual(0);
+    expect(b.x + b.w).toBeLessThanOrEqual(vp.width);
+    expect(b.y + b.h).toBeLessThanOrEqual(vp.height);
+  }
+  for (let i = 0; i < boxes.length; i++)
+    for (let j = i + 1; j < boxes.length; j++) {
+      const a = boxes[i], c = boxes[j];
+      const overlaps = a.x < c.x + c.w && c.x < a.x + a.w && a.y < c.y + c.h && c.y < a.y + a.h;
+      expect(overlaps, `world discs ${i} and ${j} overlap`).toBe(false);
+    }
+
+  expect(errors, "console/page errors on the map:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("shipping a new game into a world never removes a star she earned", async ({ page }) => {
+  await page.addInitScript(SKIP_INTRO);
+  await page.addInitScript(() => localStorage.setItem("fionaStars", JSON.stringify({ memory: 4 })));
+  await page.goto("/index.html?test=1");
+  await expect(page.locator("#hub")).toBeVisible();
+
+  // World stars are milestones on games tried, not a share of the world's size, so
+  // the count can only ever go up when next week's game lands.
+  const stars = await page.evaluate(() => {
+    const brain = CATEGORIES.find((c) => c.id === "brain");
+    const before = worldStars(visibleGames(brain));
+    GAMES.__test = { icon: "🆕", name: "Test", lvl: 0, v: +APP_VERSION };
+    brain.games.push("__test");
+    const after = worldStars(visibleGames(brain));
+    brain.games.pop();
+    delete GAMES.__test;
+    return { before, after };
+  });
+  expect(stars.before).toBeGreaterThan(0);
+  expect(stars.after).toBeGreaterThanOrEqual(stars.before);
+});
+
+test("a newly shipped game flies a New! flag until she plays it", async ({ page }) => {
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+  await expect(page.locator("#hub")).toBeVisible();
+
+  // Games are tagged with the release they shipped in and age out on their own.
+  expect(await page.evaluate(() => isNewGame("senses"))).toBe(true);
+  expect(await page.evaluate(() => isNewGame("snow"))).toBe(false);
+
+  // The world holding it flies the flag, and the narrator points her at it.
+  await expect(page.locator("#mapNodes .node-new")).toHaveCount(1);
+  expect(await page.evaluate(() => (newWorld() || {}).id)).toBe("brain");
+  expect(await page.evaluate(() => hubGreeting())).toContain("Brain Games");
+
+  // Playing it retires the flag — nothing to switch off by hand.
+  const afterPlaying = await page.evaluate(() => {
+    completions.senses = 1;
+    buildHub();
+    return { flags: document.querySelectorAll("#mapNodes .node-new").length, isNew: isNewGame("senses") };
+  });
+  expect(afterPlaying.isNew).toBe(false);
+  expect(afterPlaying.flags).toBe(0);
+});
+
 test("exactly one full-screen surface is visible at a time", async ({ page }) => {
   await page.addInitScript(SKIP_INTRO);
   await page.goto("/index.html?test=1");

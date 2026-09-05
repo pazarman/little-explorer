@@ -3,7 +3,10 @@
 ## Project Overview
 **Little Explorer's World** is a voice-guided educational game for toddlers (2–5). It is a **PWA** that
 runs entirely in the browser as static files — **no build step, no dependencies, no backend**. The whole
-app (HTML, CSS, JS, SVG art, audio synthesis) lives inline in `index.html`.
+app (HTML, CSS, JS, SVG art, audio synthesis) is hand-written static assets: `index.html` for markup,
+`css/style.css`, `js/core.js` (engine, i18n, audio, quest), `js/hub.js` (map, navigation, story, sticker
+book) and one file per game under `js/games/`. Scripts are plain `<script src>` tags — no modules, no
+bundler — so every top-level `const`/`function` shares one global scope.
 
 ## Quality system (read before building or reviewing)
 This repo has a hard quality bar. Use it; don't freelance.
@@ -14,9 +17,16 @@ This repo has a hard quality bar. Use it; don't freelance.
 - Slash commands: `/review-game <id>` (score a game), `/release-check` (pre-deploy gate).
 
 ## Architecture
-- **Hub** (`buildHub`): 8 world discs (`CATEGORIES`) → a world's game grid (`GAMES`) → a game.
+- **Hub** (`buildHub`): a world map of island discs (`CATEGORIES`) → a world's game grid (`GAMES`) → a game.
   Nodes are the self-contained `.node`/`.node-disc` system; navigation goes through `hideAllScreens()` +
   `animScreen()` (never leave two screens visible).
+- **World map**: each world has a **fixed spot** on the map from `HUB_LAYOUT` (percent coords, one set per
+  orientation), so a disc never moves between devices — she navigates by place, not by reading. `buildHub`
+  draws the islands, the dashed trail and the scenery from that same table; add a world by adding a
+  `HUB_LAYOUT` entry (without one it still renders, via `defaultSlot`).
+- **Hub progress**: `worldStars()` counts *distinct games tried*, never a fraction of the world's size —
+  shipping a game into a world must never take away a star. New games are tagged `v: <APP_VERSION>` in
+  `GAMES`; `isNewGame()` flies a "New!" flag until she plays it, and it ages out on the next version bump.
 - **~22 games** (`LEVELS` + specials `paint`/`story`/`dressup`). Each level object has `theme`, `rounds`,
   `startRound()`, and reads `state.tier` (0–2).
 - **Difficulty**: `tierFor(level)` — manual easy/med/hard force 0/1/2; **auto mode uses a performance model**
@@ -48,6 +58,9 @@ This repo has a hard quality bar. Use it; don't freelance.
 ## Deploy
 - Push to `main` → `.github/workflows/pages-deploy.yml` validates (required files, JSON, JS syntax) then
   auto-deploys to GitHub Pages. Don't push code that fails `/release-check`.
+- **Shipping a new game**: add it to `LEVELS`/`GAMES`/a `CATEGORIES` world as usual, tag its `GAMES` entry
+  with `v: <the APP_VERSION it ships in>` so it flies the "New!" flag on the map, and add its file to the
+  `sw.js` `ASSETS` list. Nothing needs switching off later — the flag expires on its own.
 
 ## Privacy
 - The child's name lives only in localStorage; it must not appear in any committed/public file

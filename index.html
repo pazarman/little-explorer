@@ -14,15 +14,15 @@
 
 <div id="hub" class="screen">
   <div id="map">
+    <!-- Islands and the trail between them are drawn by buildHub() from HUB_LAYOUT,
+         so the painted regions always sit under their world disc. -->
     <svg id="mapBg" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="20" cy="14" rx="24" ry="15" fill="#bfe3ff" fill-opacity=".5"/>
-      <ellipse cx="78" cy="20" rx="26" ry="16" fill="#aee59a" fill-opacity=".5"/>
-      <ellipse cx="24" cy="48" rx="24" ry="16" fill="#7fd4e8" fill-opacity=".45"/>
-      <ellipse cx="78" cy="60" rx="26" ry="18" fill="#ffd28f" fill-opacity=".5"/>
-      <ellipse cx="30" cy="82" rx="26" ry="16" fill="#dcc3f5" fill-opacity=".5"/>
-      <polyline id="mapPath" fill="none" stroke="#fff" stroke-opacity=".9"
-                stroke-width="1.1" stroke-dasharray="2.4 1.8" stroke-linecap="round"/>
+      <g id="mapRegions"></g>
+      <polyline id="mapPath" fill="none" stroke="#fff" stroke-opacity=".8"
+                stroke-width="3.5" stroke-dasharray="7 6" stroke-linecap="round"
+                stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
     </svg>
+    <div id="mapDeco"></div>
     <div class="sun">☀️</div>
     <div class="cloud" style="top:7%;  animation-duration:44s;">☁️</div>
     <div class="cloud" style="top:30%; animation-duration:60s; animation-delay:-28s;">☁️</div>
