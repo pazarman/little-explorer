@@ -91,7 +91,7 @@ const DICT = {
     blastoff: "Blast off!",
     well_done: "You did it, {n}!",
     hi_let_play: "Hi {n}! Let's play!",
-    hi_star_sparks: "Hi {n}! Let's find shiny Star Sparks to fix the rocket ship! Tap a world to play!",
+    hi_star_sparks: "Hi {n}! Find Star Sparks to fix the rocket. Tap a world!",
     narrator_back: "Welcome back, {n}! 🌈",
     narrator_ready: "Where to today, {n}? 🗺️",
     narrator_postgame: "Amazing! What's next, {n}? ⭐",
@@ -154,7 +154,7 @@ const DICT = {
     settings_title: "⚙️ Grown-up Settings",
     lang_en: "English", lang_es: "Español", lang_yue: "廣東話",
     diff_auto: "Auto ⬆️", diff_easy: "Easy", diff_med: "Medium", diff_hard: "Hard",
-    diff_title: "Grown-ups: pick a level!", diff_say: "Grown-ups, pick a level for your little one!",
+    diff_title: "Grown-ups: pick a level!", diff_say: "Pick a level for your little one.",
     diff_easy_age: "Ages 2-3", diff_med_age: "Ages 3-4", diff_hard_age: "Ages 4-5",
     voice_on: "On", voice_off: "Off",
     music_bouncy: "Bouncy", music_calm: "Calm", music_march: "March", music_off: "Off",
@@ -295,7 +295,7 @@ const DICT = {
     blastoff: "¡Despegue!",
     well_done: "¡Lo hiciste, {n}!",
     hi_let_play: "¡Hola {n}! ¡Vamos a jugar!",
-    hi_star_sparks: "¡Hola {n}! ¡Busquemos Chispas de Estrella para arreglar el cohete! ¡Toca un mundo!",
+    hi_star_sparks: "¡Hola {n}! Busca Chispas para arreglar el cohete. ¡Toca un mundo!",
     narrator_back: "¡Bienvenido de nuevo, {n}! 🌈",
     narrator_ready: "¿A dónde hoy, {n}? 🗺️",
     narrator_postgame: "¡Genial! ¿Qué sigue, {n}? ⭐",
@@ -358,7 +358,7 @@ const DICT = {
     settings_title: "⚙️ Ajustes para adultos",
     lang_en: "English", lang_es: "Español", lang_yue: "廣東話",
     diff_auto: "Auto ⬆️", diff_easy: "Fácil", diff_med: "Medio", diff_hard: "Difícil",
-    diff_title: "Adultos: ¡elijan un nivel!", diff_say: "Adultos, elijan un nivel para su pequeño.",
+    diff_title: "Adultos: ¡elijan un nivel!", diff_say: "Elijan un nivel para su pequeño.",
     diff_easy_age: "2-3 años", diff_med_age: "3-4 años", diff_hard_age: "4-5 años",
     voice_on: "Sí", voice_off: "No",
     music_bouncy: "Alegre", music_calm: "Tranquila", music_march: "Marcha", music_off: "No",
@@ -495,7 +495,7 @@ const DICT = {
     blastoff: "發射喇！",
     well_done: "你做到喇，{n}！",
     hi_let_play: "你好呀，{n}！我哋一齊玩啦！",
-    hi_star_sparks: "你好呀，{n}！我哋一齊搵啲閃亮嘅星星火花，整好火箭啦！撳一個世界開始玩！",
+    hi_star_sparks: "你好呀，{n}！搵星星火花整好火箭。撳個世界啦！",
     narrator_back: "歡迎返嚟，{n}！🌈",
     narrator_ready: "今日想去邊度玩呀，{n}？🗺️",
     narrator_postgame: "好犀利！下一個玩咩呀，{n}？⭐",
@@ -553,7 +553,7 @@ const DICT = {
     settings_title: "⚙️ 大人設定",
     lang_en: "English", lang_es: "Español", lang_yue: "廣東話",
     diff_auto: "自動 ⬆️", diff_easy: "簡單", diff_med: "中等", diff_hard: "困難",
-    diff_title: "大人：揀個難度！", diff_say: "大人，幫你嘅小朋友揀個難度啦！",
+    diff_title: "大人：揀個難度！", diff_say: "幫小朋友揀個難度啦。",
     diff_easy_age: "2-3歲", diff_med_age: "3-4歲", diff_hard_age: "4-5歲",
     voice_on: "開", voice_off: "關",
     music_bouncy: "活潑", music_calm: "寧靜", music_march: "進行曲", music_off: "關",
@@ -924,12 +924,18 @@ function mascotSVG() {
 function setMascots(cls, on) { document.querySelectorAll(".mascot").forEach(m => m.classList.toggle(cls, on)); }
 
 /* ================= Buddy (choosable guide character) ================= */
+// Names carry es/yue so locName() can speak them — a Spanish voice saying "Snowman"
+// is the same kind of wrong as the engine spelling out "grown-ups".
 const BUDDIES = [
-  { id: "snowman", e: "⛄", name: "Snowman" }, { id: "dino", e: "🦕", name: "Dino" },
-  { id: "puppy", e: "🐶", name: "Puppy" },     { id: "kitty", e: "🐱", name: "Kitty" },
-  { id: "princess", e: "👑", name: "Princess" }, { id: "unicorn", e: "🦄", name: "Unicorn" },
-  { id: "robot", e: "🤖", name: "Robot" },     { id: "bear", e: "🧸", name: "Bear" },
-  { id: "dragon", e: "🐉", name: "Dragon" }
+  { id: "snowman", e: "⛄", name: "Snowman", es: "Muñeco de Nieve", yue: "雪人" },
+  { id: "dino", e: "🦕", name: "Dino", es: "Dino", yue: "恐龍" },
+  { id: "puppy", e: "🐶", name: "Puppy", es: "Perrito", yue: "小狗" },
+  { id: "kitty", e: "🐱", name: "Kitty", es: "Gatito", yue: "小貓" },
+  { id: "princess", e: "👑", name: "Princess", es: "Princesa", yue: "公主" },
+  { id: "unicorn", e: "🦄", name: "Unicorn", es: "Unicornio", yue: "獨角獸" },
+  { id: "robot", e: "🤖", name: "Robot", es: "Robot", yue: "機械人" },
+  { id: "bear", e: "🧸", name: "Bear", es: "Osito", yue: "小熊" },
+  { id: "dragon", e: "🐉", name: "Dragon", es: "Dragón", yue: "龍" }
 ];
 let BUDDY = localStorage.getItem("fionaBuddy") || "snowman";
 let charTimer = null;

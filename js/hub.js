@@ -500,10 +500,10 @@ function showCharScreen(returnTo) {
   BUDDIES.forEach(b => {
     const btn = document.createElement("button");
     btn.className = "char-btn" + (b.id === BUDDY ? " sel" : "");
-    btn.innerHTML = `<span class="ch-e">${b.e}</span><span class="ch-n">${b.name}</span>`;
+    btn.innerHTML = `<span class="ch-e">${b.e}</span><span class="ch-n">${locName(b)}</span>`;
     btn.onclick = () => {
       BUDDY = b.id; localStorage.setItem("fionaBuddy", BUDDY); localStorage.setItem("fionaBuddySet", "1");
-      refreshBuddies(); sfx.tap(); speak(b.name + "!");
+      refreshBuddies(); sfx.tap(); speak(locName(b) + "!");
       grid.querySelectorAll(".char-btn").forEach(x => x.classList.remove("sel")); btn.classList.add("sel");
       clearTimeout(charTimer);                       // tapping a buddy auto-advances (no need to find the button)
       charTimer = setTimeout(() => { $("charDone").dataset.return === "settings" ? openSettings() : showHub(); }, 800);
@@ -608,6 +608,7 @@ $("setReset").onclick = () => {
   if (confirm("Reset all of " + NAME + "'s stars and stickers?")) {
     for (const k in completions) delete completions[k];
     stickers.length = 0; sparks = 0; trips = 0; questShown = 0;
+    localStorage.removeItem("fionaTrail");        // send the buddy back to each trailhead too
     saveCompletions(); saveStickers(); saveQuest(); buildHub();
   }
 };
