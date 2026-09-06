@@ -1,7 +1,7 @@
 # Design: "Three Cups" — find the hidden object after a shuffle
 
 Status: design (not yet built). Target branch: `claude/three-cup-shell-game-y15zsj`.
-Scored against `docs/skills/01` (7-axis bar) and mapped to `docs/skills/06` (STEM scope).
+Scored against `docs/skills/01` (the 7-axis bar, retired since v2 — this score predates it) and mapped to `docs/skills/06` (STEM scope).
 
 ## 1. What it is (and what it is NOT)
 

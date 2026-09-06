@@ -4,7 +4,7 @@ Use this after deployment and real-device testing.
 
 ---
 
-Run a post-release retrospective for fiona-game.
+Run a post-release retrospective for little-explorer.
 
 Focus areas:
 - Where children hesitated or repeated mistakes.

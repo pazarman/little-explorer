@@ -164,7 +164,6 @@
   .b-nightday { background:linear-gradient(#4ab3e8,#1a3366); }
   /* .b-body is also used as a balloon shape in bike.js; override to circle+color for hub disc */
   .node-disc.b-body { border-radius:50%; background:linear-gradient(#7fd4c0,#2f9e8a); }
-  .c-fantasy{ background:linear-gradient(#b57fe0,#6a3a9a); }
   .c-pets   { background:linear-gradient(#ffba6a,#e07a2e); }
   .c-num    { background:linear-gradient(#7fb6f7,#3a6fd0); }
   .c-shape  { background:linear-gradient(#ff9f4f,#e0701e); }
@@ -345,6 +344,14 @@
     width:clamp(44px,9vmin,66px); height:clamp(44px,9vmin,66px); font-size:clamp(20px,4.4vmin,32px);
     background:#fff; box-shadow:0 4px 0 rgba(0,0,0,.2); }
   .corner-btn:active { transform:scale(.92); }
+  /* The ⚙️ must be held, not tapped (see the parent gate in hub.js). The ring fills
+     over the hold so a grown-up can see the gesture working. */
+  #settingsBtn.holding { transform:scale(.92); box-shadow:0 0 0 3px rgba(255,255,255,.9); }
+  #settingsBtn.holding::after { content:""; position:absolute; inset:-5px; border-radius:50%;
+    border:3px solid rgba(255,255,255,.95); border-top-color:transparent;
+    animation:settingsHold .8s linear forwards; }
+  @keyframes settingsHold { from { transform:rotate(0deg); opacity:.35; }
+                            to   { transform:rotate(360deg); opacity:1; } }
   #bookBtn { top:1.4vmin; right:1.4vmin; }
   #settingsBtn { bottom:1.4vmin; left:1.4vmin; opacity:.85; }
 
@@ -430,9 +437,6 @@
   .snowdust { position:absolute; top:-6vh; color:#fff; z-index:1; pointer-events:none;
               animation:snowfall linear infinite; }
   @keyframes snowfall { to { transform:translateY(110vh); } }
-  .ice-spikes { position:absolute; bottom:0; left:0; width:100%; height:20%; z-index:0;
-    background:rgba(255,255,255,.35); pointer-events:none;
-    clip-path:polygon(0 100%,0 60%,6% 22%,12% 70%,18% 32%,24% 78%,30% 12%,36% 65%,44% 36%,50% 80%,56% 18%,62% 68%,70% 28%,76% 75%,82% 10%,88% 62%,94% 28%,100% 55%,100% 100%); }
   /* drawn winter scene + counting tray (Counting Critters) */
   .snow-scene { position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
   .snowfield { position:absolute; inset:0; z-index:2; }
@@ -733,10 +737,6 @@
   .cups-ball.pop { animation: ballPop .5s ease; }
   @keyframes ballPop { 0% { transform:translateY(0) scale(1); } 40% { transform:translateY(-30%) scale(1.15); } 100% { transform:translateY(0) scale(1); } }
 
-  /* ----- dino eggs (flash count / subitizing) ----- */
-  .dino-egg { position:absolute; border:none; background:none; font-size:clamp(46px,11vmin,86px); z-index:5;
-              animation:floaty 3s ease-in-out infinite; filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)); line-height:1; }
-  .dino-egg.hatched { animation:bounceIn .5s; }
   .flash-wrap { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
                 justify-content:center; gap:5vmin; z-index:5; }
   .flash-nest { position:relative; width:clamp(200px,46vmin,340px); height:clamp(200px,46vmin,340px); }

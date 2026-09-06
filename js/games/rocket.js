@@ -28,6 +28,10 @@ const rocketLevel = {
     const starts = [[3, 3, 3, 4, 5], [5, 5, 6, 7, 8], [5, 8, 10, 10, 10]][state.tier];
     this.start = starts[state.round];
     this.next = this.start;
+    this.mistakes = 0;                 // per round: it was only reset on a CORRECT tap,
+                                       // so on a first-ever round `undefined++` gave NaN
+                                       // and the hint ladder never fired for a child who
+                                       // was struggling from the very start.
     setInstruction("🚀 " + t("countdown_show", { next: this.next }), t("countdown_say", { next: this.next }));
     $("playArea").innerHTML = `<div class="space-bg" id="spaceBg"></div>
       <div class="rocket-pad"><div class="rocket" id="rocketEl">${ROCKET_ART}<div class="rk-flame" id="rkFlame"></div></div></div>

@@ -4,7 +4,7 @@ Use this in Copilot Chat before implementation.
 
 ---
 
-You are helping implement a new feature in fiona-game.
+You are helping implement a new feature in little-explorer.
 
 Feature:
 [Describe feature]

@@ -13,7 +13,7 @@ Read `docs/GAME_BACKLOG.md`. Scan for items in this order:
 
 Before writing any code, read:
 - `CLAUDE.md` — full project overview and conventions
-- `docs/skills/01-product-quality-bar.md` — quality bar (≥11/14, no auto-fail axis at 0)
+- `docs/skills/01-product-quality-bar.md` — quality bar (v2: ≥18/24, no auto-fail axis at 0)
 - `docs/skills/02-learning-design-skill.md` — how to design the learning loop
 - `js/core.js` — speak(), voice(), sfx, tierFor(), roundComplete(), state
 - `js/hub.js` — CATEGORIES, GAMES, buildHub() — how to wire a new game into the hub
@@ -51,7 +51,7 @@ Commit the wiring:
 
 ## Step 4 — Self-review against the quality bar
 
-Score your implementation on all 7 rubric axes. Fix any axis that would score 0 (auto-fail). If total < 11/14, fix the weakest axes before continuing.
+Score your implementation on all 12 rubric axes. Fix any axis that would score 0 (auto-fail). If total < 18/24, fix the weakest axes before continuing.
 
 ## Step 5 — Open a PR and update the backlog
 
@@ -59,6 +59,6 @@ In `docs/GAME_BACKLOG.md`, change the item status from `[IN_PROGRESS]` to `[IN_R
 
 Commit the backlog update, then open a pull request:
 - **Title:** `feat: <Game Name> — <STEM objective in 6 words or less>`
-- **Body:** STEM objective, self-review rubric scores (all 7 axes), how each tier works
+- **Body:** STEM objective, self-review rubric scores (all 12 axes), how each tier works
 
 Output the PR URL when done.

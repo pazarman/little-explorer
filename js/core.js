@@ -81,27 +81,41 @@ const core = {
     state.busy = false; // Safety reset for stuck busy states
   },
   
-  // Throttled persistence to avoid localStorage jank
-  save(key, val) {
-    this.pendingSaves.set(key, JSON.stringify(val));
-    if (this.saveTimer) return;
-    this.saveTimer = setTimeout(() => {
+  // Throttled persistence to avoid localStorage jank.
+  // Every write goes through writeNow(), because setItem THROWS on a full quota and in
+  // Safari private browsing. Un-caught inside the timer that throw skipped the two lines
+  // that reset saveTimer, and `if (this.saveTimer) return` then short-circuited every
+  // later save — one storage hiccup silently ended persistence for the whole session.
+  writeNow() {
+    try {
       this.pendingSaves.forEach((v, k) => localStorage.setItem(k, v));
       this.pendingSaves.clear();
-      this.saveTimer = null;
-    }, 2000); // 2s debounce: perfect for "quiet" moments
+    } catch (_) {
+      // Storage is unavailable or full. Keep the pending values so a later flush can
+      // retry, and never let it break the game she is in the middle of playing.
+    } finally {
+      if (this.saveTimer) { clearTimeout(this.saveTimer); this.saveTimer = null; }
+    }
   },
-  
-  // Force immediate save (e.g. before page unload)
+  save(key, val) {
+    try { this.pendingSaves.set(key, JSON.stringify(val)); } catch (_) { return; }
+    if (this.saveTimer) return;
+    this.saveTimer = setTimeout(() => this.writeNow(), 2000); // 2s debounce: for "quiet" moments
+  },
+
+  // Force immediate save (page hidden, backgrounded, or unloading)
   flush() {
-    if (!this.saveTimer) return;
-    this.pendingSaves.forEach((v, k) => localStorage.setItem(k, v));
-    this.pendingSaves.clear();
-    clearTimeout(this.saveTimer);
-    this.saveTimer = null;
+    if (!this.pendingSaves.size) return;
+    this.writeNow();
   }
 };
-window.addEventListener("beforeunload", () => core.flush());
+// A toddler ends a session by pressing home, not by closing a tab, and iOS Safari often
+// never fires beforeunload. pagehide and visibilitychange are the ones that actually
+// arrive, so without them the last up-to-2s of progress was routinely lost on the phone
+// this app is mainly played on.
+addEventListener("pagehide", () => core.flush());
+document.addEventListener("visibilitychange", () => { if (document.hidden) core.flush(); });
+addEventListener("beforeunload", () => core.flush());
 
 /* ================= Persistent state ================= */
 const completions = JSON.parse(localStorage.getItem("fionaStars") || "{}");
@@ -151,6 +165,9 @@ const DICT = {
     settings_reset: "Reset stars",
     settings_restart: "🔄 Start over",
     settings_restart_confirm: "This will erase all of {n}'s stars, stickers, and progress. Are you sure?",
+    settings_reset_confirm: "Reset all of {n}'s stars and stickers?",
+    settings_hold_hint: "Grown-ups: hold the button to open settings.",
+    parent_gate: "Grown-up check: what is {a} + {b}?",
     settings_done: "Done",
     back: "Back",
     next: "Next",
@@ -281,7 +298,7 @@ const DICT = {
     sticker_empty_say: "Play games to earn stickers!",
     sticker_hint: "Tap a sticker, then tap the picture to place it! 🎨",
     sticker_intro: "Here is your sticker book, {n}! Tap a sticker, then tap the picture to place it!",
-    sticker_belongs: "Perfect! The {x} belongs in the {scene}!",
+    sticker_belongs: "Perfect! {x} belongs in the {scene}!",
     off_slot: "Off",
     theme_animals: "animals", theme_food: "food", theme_frozen: "frozen things", theme_ocean: "sea things",
     kind_animal: "the animals", kind_food: "the yummy food", kind_vehicle: "the things that go",
@@ -316,9 +333,6 @@ const DICT = {
     measure_yes_shorter: "Yes! Shorter!",
     measure_no_taller: "That one is shorter! Find the taller one!",
     measure_no_shorter: "That one is taller! Find the shorter one!",
-    basket: { es: "canasta", g: "f" },
-    box: { es: "caja", g: "f" },
-    table: { es: "mesa", g: "f" }
   },
   es: {
     num: ["", "Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"],
@@ -355,6 +369,9 @@ const DICT = {
     settings_reset: "Reiniciar",
     settings_restart: "🔄 Empezar de nuevo",
     settings_restart_confirm: "Esto borrará todas las estrellas, pegatinas y progreso de {n}. ¿Estás seguro?",
+    settings_reset_confirm: "¿Borrar todas las estrellas y pegatinas de {n}?",
+    settings_hold_hint: "Adultos: mantén pulsado el botón para abrir los ajustes.",
+    parent_gate: "Comprobación para adultos: ¿cuánto es {a} + {b}?",
     settings_done: "Listo",
     back: "Atrás",
     next: "Siguiente",
@@ -555,6 +572,9 @@ const DICT = {
     settings_reset: "重設星星",
     settings_restart: "🔄 重新開始",
     settings_restart_confirm: "呢個會清除{n}所有嘅星星、貼紙同進度。你肯定嗎？",
+    settings_reset_confirm: "清除{n}所有嘅星星同貼紙？",
+    settings_hold_hint: "大人：撳住個掣先可以開設定。",
+    parent_gate: "大人核對：{a} + {b} 等於幾多？",
     settings_done: "完成",
     back: "返去", next: "下一個", home: "首頁", clear: "清除", done: "完成",
     big: "大！", small: "細！",
@@ -771,7 +791,16 @@ const VOC = {
   treat:{es:"premio",g:"m"}, scoop:{es:"bola",g:"f"}, flower:{es:"flor",g:"f"}, dino:{es:"dino",g:"m"},
   // buddies (used in hide & seek "put {buddy} …")
   snowman:{es:"muñeco de nieve",g:"m"}, princess:{es:"princesa",g:"f"}, unicorn:{es:"unicornio",g:"m"},
-  robot:{es:"robot",g:"m"}, bear:{es:"oso",g:"m"}, dragon:{es:"dragón",g:"m"}
+  robot:{es:"robot",g:"m"}, bear:{es:"oso",g:"m"}, dragon:{es:"dragón",g:"m"},
+  // hiding spots (hide & seek). These sat in DICT.en as objects, where word() and
+  // genderOf() never look, so Spanish said "el basket" instead of "la canasta".
+  basket:{es:"canasta",g:"f"}, box:{es:"caja",g:"f"}, table:{es:"mesa",g:"f"}
+,
+  // sticker nouns (sticker book "this belongs here" moment)
+  balloon:{es:"globo",g:"m"}, bike:{es:"bicicleta",g:"f"}, fox:{es:"zorro",g:"m"},
+  rainbow:{es:"arcoíris",g:"m"}, flamingo:{es:"flamenco",g:"m"}, rocket:{es:"cohete",g:"m"},
+  planet:{es:"planeta",g:"m"}, moon:{es:"luna",g:"f"}, bow:{es:"lazo",g:"m"},
+  parrot:{es:"loro",g:"m"}
 };
 const COLOR_ES = { red:"rojo", blue:"azul", yellow:"amarillo", green:"verde", orange:"naranja",
   purple:"morado", pink:"rosa", brown:"marrón", gray:"gris", black:"negro", white:"blanco" };
@@ -808,7 +837,11 @@ const VOC_YUE = {
   teeth:{cl:"隻",yue:"牙"}, neck:{cl:"個",yue:"頸"}, tongue:{cl:"條",yue:"脷"}, chin:{cl:"個",yue:"下巴"}, cheek:{cl:"個",yue:"面珠"},
   treat:{cl:"件",yue:"零食"}, scoop:{cl:"球",yue:"雪糕"}, flower:{cl:"朵",yue:"花"}, dino:{cl:"隻",yue:"恐龍"},
   princess:{cl:"位",yue:"公主"}, unicorn:{cl:"隻",yue:"獨角獸"}, robot:{cl:"個",yue:"機械人"}, bear:{cl:"隻",yue:"小熊"}, dragon:{cl:"條",yue:"龍"},
-  basket:{cl:"個",yue:"籃"}, box:{cl:"個",yue:"箱"}, table:{cl:"張",yue:"枱"}
+  basket:{cl:"個",yue:"籃"}, box:{cl:"個",yue:"箱"}, table:{cl:"張",yue:"枱"},
+  balloon:{cl:"個",yue:"氣球"}, bike:{cl:"架",yue:"單車"}, fox:{cl:"隻",yue:"狐狸"},
+  rainbow:{cl:"道",yue:"彩虹"}, flamingo:{cl:"隻",yue:"火烈鳥"}, rocket:{cl:"架",yue:"火箭"},
+  planet:{cl:"個",yue:"星球"}, moon:{cl:"個",yue:"月亮"}, bow:{cl:"個",yue:"蝴蝶結"},
+  parrot:{cl:"隻",yue:"鸚鵡"}
 };
 // Cantonese TTS depends on a device-installed zh-HK voice we can't bundle. Detect it; if it's
 // absent we fall back to English (text + voice) and prompt the parent to install one.
@@ -858,10 +891,6 @@ const genderOf = key => (VOC[key] ? VOC[key].g : "m");
 function theWord(key) {                                                                           // "the X"
   if (curLang() === "yue") return yueCls(key);            // 隻小狗 / 個鼻 / 張枱
   return curLang() === "es" ? (genderOf(key) === "f" ? "la " : "el ") + word(key) : "the " + key;
-}
-function aWord(key) {                                                                             // "a X"
-  if (curLang() === "yue") return yueCls(key);
-  return curLang() === "es" ? (genderOf(key) === "f" ? "una " : "un ") + word(key) : "a " + key;
 }
 const locName = o => !o ? "" : (curLang() === "es" && o.es) ? o.es : (curLang() === "yue" && o.yue) ? o.yue : o.name; // localized data-object name
 function applyI18n(root = document) {                                                             // translate static [data-i18n] markup
@@ -1220,6 +1249,36 @@ const COLOR_TIERS = [
   ["red", "blue", "yellow", "green", "orange", "purple", "pink", "brown"],
   ["red", "blue", "yellow", "green", "orange", "purple", "pink", "brown", "gray", "black", "white"]
 ];
+/* Which sticker is at home in which sticker-book scene, and the vocabulary key to say.
+   `hub.js` has read this table since the sticker book shipped; it was never defined, so
+   the "this belongs here!" moment has never once fired. A sticker with no entry simply
+   gets no bonus — the reward is a delight beat, not a completion mechanic, so a forced
+   fit would be worse than none. Keys are VOC keys, spoken through theWord(). */
+const STICKER_DATA = {
+  // the park
+  "🦋": { n: "butterfly", h: "park" },  "🌺": { n: "flower", h: "park" },
+  "🌸": { n: "flower", h: "park" },     "🌷": { n: "flower", h: "park" },
+  "🎈": { n: "balloon", h: "park" },    "🚲": { n: "bike", h: "park" },
+  "🐰": { n: "bunny", h: "park" },      "🦊": { n: "fox", h: "park" },
+  "🌈": { n: "rainbow", h: "park" },    "🦩": { n: "flamingo", h: "park" },
+  "🦜": { n: "parrot", h: "park" },
+  // the ocean
+  "🐬": { n: "dolphin", h: "ocean" },   "🐠": { n: "fish", h: "ocean" },
+  "🐙": { n: "octopus", h: "ocean" },   "🐢": { n: "turtle", h: "ocean" },
+  "🐧": { n: "penguin", h: "ocean" },
+  // space
+  "🚀": { n: "rocket", h: "space" },    "🪐": { n: "planet", h: "space" },
+  "🌙": { n: "moon", h: "space" },      "⭐": { n: "star", h: "space" },
+  "🌟": { n: "star", h: "space" },
+  // the castle
+  "👑": { n: "crown", h: "castle" },    "🦄": { n: "unicorn", h: "castle" },
+  "🐉": { n: "dragon", h: "castle" },   "🏰": { n: "castle", h: "castle" },
+  "💎": { n: "diamond", h: "castle" },  "🎀": { n: "bow", h: "castle" },
+  // the cozy room
+  "🐻": { n: "bear", h: "bed" },        "🐱": { n: "cat", h: "bed" },
+  "🐶": { n: "dog", h: "bed" }
+};
+
 const STICKER_POOL = ["🦄", "👑", "🦋", "🌈", "⛄", "🐬", "🌺", "🍦", "🎈", "🐠", "🍕", "💎", "🚲", "🌟", "🐧", "🦁", "🌸", "🍩",
   "🐉", "🦕", "🐶", "🐱", "🐰", "🦊", "🐻", "🐢", "🦩", "🐙", "🦜", "🌙", "⭐", "🍭", "🧁", "🎀", "🚀", "🪐", "🏰", "🦖", "🌷", "🍓"];
 

@@ -5,6 +5,52 @@ duplication and improvements. Findings are ordered by what they cost, not by whe
 Every claim below was verified against the running app or the file at the line cited — the
 "how I checked" line says how.
 
+> ## Status: fixed in v47
+>
+> Everything in P0-P3 below has been addressed, plus **three further live bugs the new
+> tests uncovered while being written** (see "Found while fixing"). The suite went from
+> **28 to 43 tests**. Line numbers in the findings refer to the code *before* the fix.
+>
+> | § | Finding | Fix |
+> |---|---|---|
+> | 1 | Deploy not gated on tests | `deploy: needs: [validate, smoke]`; the suite now blocks the live site |
+> | 2 | Settings + wipe were 3 child taps | ⚙️ must be **held** 800ms; destructive actions ask an arithmetic parent check |
+> | 3 | `save()` could kill persistence forever | `writeNow()` with try/catch + `finally` that always clears the timer |
+> | 4 | Progress lost when backgrounded | flushes on `pagehide` and `visibilitychange`, not just `beforeunload` |
+> | 5 | Spanish "el basket" | the three nouns moved from `DICT.en` into `VOC`; now "la canasta" |
+> | 6 | Hardcoded English confirm | `settings_reset_confirm` added in all three languages |
+> | 7 | `STICKER_DATA` undefined | defined: 30 of 40 stickers have a home scene and a spoken name |
+> | 8-11 | Testing gaps | difficulty model, reward loop, parent gate, persistence, reduced motion, Spanish render, and the core-curriculum games all covered |
+> | 12 | Rubric contradiction | all 8 stale references corrected to v2 (12 axes, 18/24) |
+> | 13 | "Auto-updated" docs stale since June | headers now say plainly that they are snapshots, not live |
+> | 14 | Child's name in 4 public files | `fiona-game` → `little-explorer` (7 occurrences) |
+> | 15 | Whole repo published | Pages now publishes only `index.html`, `css/`, `js/` and the PWA files |
+> | 16 | Dead code | `launchGame()`, `gameCategory()`, `aWord()` removed |
+> | 17 | Dead CSS | `.c-fantasy`, `.ice-spikes`, `.dino-egg` removed |
+> | 18 | Unreferenced sandbox pages | labelled with what they are and that the site does not serve them |
+> | 19 | README drift | corrected |
+>
+> ### Found while fixing — three bugs no one had reported
+>
+> **A. Ocean Colors' guided assist has never worked.** Two independent faults in the
+> same ladder: the fish carried their colour only in a click closure, so the
+> `[data-color]` lookup at `ocean.js:63,66` never found the right one — *and*
+> `this.mistakes` was never initialised, so `undefined++` gave `NaN` and neither
+> `=== 2` nor `>= 3` could ever match. Assist could not fire at any number of misses,
+> in one of the two oldest games, on the colour curriculum. Both fixed and guarded.
+>
+> **B. Numbers (`bike`) had the same uninitialised counter** — same dead ladder.
+>
+> **C. Countdown (`rocket`) and Ice Cream reset `mistakes` only on a _correct_ tap**, so
+> the ladder was dead through a child's first-ever round — precisely when someone
+> struggling needs it. All four now reset per round, and a sweep test fails if any
+> future game counts misses without initialising the counter.
+>
+> BAR-CONFIG's "auto-assist quickly / hint ladder by the third attempt" was therefore
+> unmet in four games, silently, for months. That is the clearest argument in this
+> document for why §8's coverage gap mattered.
+
+
 **Headline:** the code is in better shape than the process around it. The two most serious
 findings are not bugs in a game — they are that **the live site deploys without the tests
 passing**, and that **the app violates its own Core Bar on parent gating**.
