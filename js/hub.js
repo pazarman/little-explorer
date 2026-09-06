@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "44";
+const APP_VERSION = "45";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -149,6 +149,67 @@ function launchGame(id) {
 // The "New!" pennant that plants itself above a disc. Empty string when nothing is new.
 const newFlag = show => (show ? `<span class="node-new">${t("new_badge")}</span>` : "");
 
+/* ── Sea life ──
+   Drifts across the map and boings when tapped. Purely decorative and never a
+   target that matters — the hub twin of the world trail's wandering props, so the
+   map is as alive to poke at as the inside of a world. Rendered behind the world
+   discs (z-index), so a whale can pass an island without ever stealing her tap. */
+const MAP_PROPS = ["🐟", "⛵", "🐳", "🐦"];
+const ISLAND_SCATTER = 8;      // seeded scenery slots per island, on top of its anchors
+function paintMapProps(pos, rx, ry) {
+  const wrap = $("mapProps");
+  const mw = $("map").clientWidth || innerWidth;
+  const drift = 96 / mw * 100;              // the distance @keyframes mapWander travels
+  // Sea life belongs in the sea. A spot only counts if the prop clears every island
+  // at BOTH ends of its drift — a fish parked on a snow mountain reads as a bug, not
+  // as scenery. The 1.18 pads the island out past its white surf ring.
+  const atSea = (x, y) => pos.every(([ix, iy]) =>
+    Math.hypot((x - ix) / (rx * 1.18), (y - iy) / (ry * 1.18)) >= 1 &&
+    Math.hypot((x + drift - ix) / (rx * 1.18), (y - iy) / (ry * 1.18)) >= 1);
+  const spots = [];
+  for (let y = 10; y <= 90; y += 5)
+    for (let x = 4; x <= 86; x += 5) if (atSea(x, y)) spots.push([x, y]);
+  if (!spots.length) { wrap.innerHTML = ""; return; }   // no open water: skip them entirely
+  wrap.innerHTML = MAP_PROPS.map((e, i) => {
+    const [x, y] = spots[Math.floor(i * spots.length / MAP_PROPS.length)];
+    return `<button class="map-prop" style="left:${x}%; top:${y}%;
+             animation-duration:${11 + i * 4}s; animation-delay:-${i * 3.5}s"
+             aria-hidden="true" tabindex="-1">${e}</button>`;
+  }).join("");
+  wrap.querySelectorAll(".map-prop").forEach(el => {
+    el.onclick = ev => {
+      ev.stopPropagation();
+      el.classList.remove("boing"); void el.offsetWidth; el.classList.add("boing");
+      tone(520 + Math.random() * 320, 0, .16, "triangle", .1);
+      floaters(["✨"], ev.clientX, ev.clientY, 3);
+    };
+  });
+}
+
+/* What a placed world node actually occupies, measured from the live DOM rather than
+   re-derived from the CSS clamps. Offsets are px from the node's anchor point, which
+   is its centre — the disc sits above it, the label and stars below.
+
+   offsetWidth/offsetTop, NOT getBoundingClientRect: a node is measured the instant it
+   is appended, while its worldPop keyframe still holds it at scale(.3), and the rect
+   would report a third-size disc. Offsets are untransformed layout (see CLAUDE.md). */
+function nodeZone(wrap) {
+  const nodes = [...wrap.children];
+  if (!nodes.length) return { discR: 0, discDy: 0, labelW: 0, labelTop: 0 };
+  // One zone covering every world, not just the first: "Colors & Shapes" is far wider
+  // than "Pets", and a label that wraps to two lines starts higher.
+  let discR = 0, discDy = 0, labelW = 0, labelTop = Infinity;
+  nodes.forEach(node => {
+    const cy = node.offsetHeight / 2;
+    const d = node.querySelector(".node-disc"), l = node.querySelector(".node-label");
+    discR = Math.max(discR, d.offsetWidth / 2);
+    discDy = d.offsetTop + d.offsetHeight / 2 - cy;   // uniform: .node-stars reserves min-height
+    labelW = Math.max(labelW, l.offsetWidth);
+    labelTop = Math.min(labelTop, l.offsetTop - cy);
+  });
+  return { discR, discDy, labelW: Math.max(labelW, discR * 2), labelTop };
+}
+
 let hubMode = null;   // layout mode the map is currently drawn for
 function buildHub() {
   const mode = hubMode = hubLayoutMode();
@@ -163,15 +224,21 @@ function buildHub() {
             <ellipse cx="${x}" cy="${y}" rx="${rx - 2.4}" ry="${ry - 1.5}" fill="${land}" fill-opacity=".95"/>`;
   }).join("");
 
-  // the dashed trail joining every world, in map order
-  $("mapPath").setAttribute("points", pos.map(([x, y]) => `${x},${y}`).join(" "));
-
-  // scenery around each island (DOM, so it never distorts with the stretched viewBox)
-  $("mapDeco").innerHTML = worlds.map((cat, i) => {
-    const [x, y] = pos[i];
-    return ((HUB_LAYOUT[cat.id] || {}).deco || [])
-      .map(([e, fx, fy]) => `<span style="left:${x + fx * rx}%; top:${y + fy * ry}%">${e}</span>`).join("");
-  }).join("");
+  // The causeway joining every world, in map order. Drawn the same way the world
+  // trail draws its road — cream over a soft dark edge, with stepping stones — so
+  // the route between worlds and the route inside one are visibly the same road.
+  const pts = pos.map(([x, y]) => `${x},${y}`).join(" ");
+  $("mapPath").setAttribute("points", pts);
+  $("mapEdge").setAttribute("points", pts);
+  let dots = "";
+  for (let i = 0; i < pos.length - 1; i++)
+    for (let s = 1; s <= 3; s++) {
+      const k = s / 4;
+      const x = pos[i][0] + (pos[i + 1][0] - pos[i][0]) * k;
+      const y = pos[i][1] + (pos[i + 1][1] - pos[i][1]) * k;
+      dots += `<i style="left:${x.toFixed(2)}%; top:${y.toFixed(2)}%"></i>`;
+    }
+  $("mapDots").innerHTML = dots;
 
   const wrap = $("mapNodes"); wrap.className = "worlds"; wrap.innerHTML = "";
   worlds.forEach((cat, i) => {
@@ -187,6 +254,51 @@ function buildHub() {
     b.onclick = () => { sfx.tap(); openCategory(cat.id); };
     wrap.appendChild(b);
   });
+  // Scenery around each island: the hand-tuned HUB_LAYOUT anchors, plus a seeded
+  // scatter drawn from the SAME plants the world is planted with inside
+  // (TRAIL_SCENE.fixed), so an island reads as a small view of the place it opens
+  // into instead of two lonely emoji. Seeded, so it lands identically every repaint.
+  //
+  // Placed AFTER the nodes, because the exclusion zone has to be measured rather than
+  // assumed: a .node is a flex column, so its disc floats ABOVE the node's anchor
+  // point with the label and stars hanging below it. Clearance computed from the
+  // anchor put trees on the disc on every landscape viewport.
+  const deco = (e, x, y, sc) =>
+    `<span style="left:${x.toFixed(2)}%; top:${y.toFixed(2)}%;` +
+    ` transform:translate(-50%,-50%) scale(${sc.toFixed(2)})">${e}</span>`;
+  const mw = $("map").clientWidth || innerWidth, mh = $("map").clientHeight || innerHeight;
+  const zone = nodeZone(wrap);
+  const decoPx = clamp(15, Math.min(innerWidth, innerHeight) * .034, 30);
+  // Island radii are map-percentages but the disc is sized in pixels, so candidates
+  // are tested in pixels, offset from the node anchor the same way the disc is.
+  const free = (dx, dy) => {
+    const px = dx / 100 * mw, py = dy / 100 * mh;
+    if (Math.hypot(px, py - zone.discDy) < zone.discR + decoPx * .8) return false;
+    return !(Math.abs(px) < zone.labelW / 2 + decoPx * .6 && py > zone.labelTop - decoPx * .6);
+  };
+  $("mapDeco").innerHTML = worlds.map((cat, i) => {
+    const [x, y] = pos[i];
+    const anchors = (HUB_LAYOUT[cat.id] || {}).deco || [];
+    let html = anchors.filter(([, fx, fy]) => free(fx * rx, fy * ry))
+                      .map(([e, fx, fy]) => deco(e, x + fx * rx, y + fy * ry, 1)).join("");
+    const pool = ((typeof TRAIL_SCENE !== "undefined" && TRAIL_SCENE[cat.id]) || {}).fixed
+              || anchors.map(d => d[0]);
+    // Rejection sampling: try a few seeded spots per slot and keep the first that
+    // clears the disc and the label. A slot that never finds room just stays empty —
+    // on a small phone the disc fills its island, and that is the correct answer.
+    for (let k = 0; k < ISLAND_SCATTER && pool.length; k++)
+      for (let t = 0; t < 6; t++) {
+        const n = (i * ISLAND_SCATTER + k) * 6 + t;
+        const a = seeded(n + 3) * Math.PI * 2, r = .5 + seeded(n + 29) * .48;
+        const dx = Math.cos(a) * rx * r, dy = Math.sin(a) * ry * r;
+        if (!free(dx, dy)) continue;
+        html += deco(pool[Math.floor(seeded(n + 61) * pool.length)], x + dx, y + dy,
+                     .7 + seeded(n + 97) * .5);
+        break;
+      }
+    return html;
+  }).join("");
+  paintMapProps(pos, rx, ry);
   renderQuest();
 }
 // Percentage coords follow a resize on their own; only a portrait/landscape flip

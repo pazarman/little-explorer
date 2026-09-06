@@ -18,11 +18,20 @@
          so the painted regions always sit under their world disc. -->
     <svg id="mapBg" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <g id="mapRegions"></g>
-      <polyline id="mapPath" fill="none" stroke="#fff" stroke-opacity=".8"
-                stroke-width="3.5" stroke-dasharray="7 6" stroke-linecap="round"
-                stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+      <!-- The same road the world trail draws, at map scale: a soft dark edge under a
+           cream causeway. Non-scaling strokes, because the viewBox is stretched. -->
+      <polyline id="mapEdge" fill="none" stroke="#6b4f2a" stroke-opacity=".18"
+                stroke-width="21" stroke-linecap="round" stroke-linejoin="round"
+                vector-effect="non-scaling-stroke"/>
+      <polyline id="mapPath" fill="none" stroke="#fff3d8" stroke-opacity=".95"
+                stroke-width="14" stroke-linecap="round" stroke-linejoin="round"
+                vector-effect="non-scaling-stroke"/>
     </svg>
+    <!-- Stepping stones, island scenery and the wandering sea creatures are DOM, not
+         SVG: a circle in that stretched viewBox would come out an ellipse. -->
+    <div id="mapDots"></div>
     <div id="mapDeco"></div>
+    <div id="mapProps"></div>
     <div class="sun">☀️</div>
     <div class="cloud" style="top:7%;  animation-duration:44s;">☁️</div>
     <div class="cloud" style="top:30%; animation-duration:60s; animation-delay:-28s;">☁️</div>

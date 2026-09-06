@@ -132,10 +132,9 @@ const worldTrail = {
     // Fixed scenery, scattered with a seeded jitter so a world looks like somewhere
     // rather than a grid — and kept out of the path band so nothing sits under a node.
     const band = amp + this.geom.disc * 0.62 + 30;
-    const rnd = seed => { const x = Math.sin(seed * 12.9898) * 43758.5453; return x - Math.floor(x); };
     const slots = Math.ceil(w / 82);
     for (let i = 0; i < slots; i++) {
-      const r1 = rnd(i + 1), r2 = rnd(i + 41), r3 = rnd(i + 97), r4 = rnd(i + 163);
+      const r1 = seeded(i + 1), r2 = seeded(i + 41), r3 = seeded(i + 97), r4 = seeded(i + 163);
       if (r3 < 0.18) continue;                                  // leave clearings
       const e = scene.fixed[Math.floor(r4 * scene.fixed.length)];
       const above = r2 < 0.5;

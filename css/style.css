@@ -70,15 +70,39 @@
     font-size:clamp(22px, 5vmin, 46px); color:#fff; margin:0;
     text-shadow:0 3px 0 rgba(0,0,0,.25); pointer-events:none;
   }
-  /* a top-down sea the worlds sit in as islands, with clouds drifting over it */
+  /* A top-down sea the worlds sit in as islands, with clouds drifting over it.
+     The top/bottom vignette is the same one the world trail paints on its ground,
+     so the map and the inside of a world read as one place seen at two zooms. */
   #map { position:relative; width:100%; height:100%;
-         background:linear-gradient(#7ecdee, #a3ddf3 46%, #74c4e6); }
+         background:linear-gradient(180deg, rgba(0,0,0,.07), rgba(0,0,0,0) 20%,
+                                            rgba(0,0,0,0) 80%, rgba(0,0,0,.07)),
+                    linear-gradient(#7ecdee, #a3ddf3 46%, #74c4e6); }
   #mapBg { position:absolute; inset:0; width:100%; height:100%; }
-  /* island scenery: DOM, not SVG, so it never distorts with the stretched viewBox */
+  /* stepping stones along the causeway — the map-scale twin of #trailDots */
+  #mapDots { position:absolute; inset:0; z-index:1; pointer-events:none; }
+  #mapDots i { position:absolute; display:block; border-radius:50%;
+               width:clamp(4px,.9vmin,8px); height:clamp(4px,.9vmin,8px);
+               transform:translate(-50%,-50%); background:#c8a878; opacity:.55; }
+  /* island scenery: DOM, not SVG, so it never distorts with the stretched viewBox.
+     Sizing and shadow match .tr-fixed — the same trees at a smaller zoom. */
   #mapDeco { position:absolute; inset:0; z-index:1; pointer-events:none; }
-  #mapDeco span { position:absolute; transform:translate(-50%,-50%);
-                  font-size:clamp(15px,3.4vmin,30px); opacity:.75;
-                  filter:drop-shadow(0 1px 1px rgba(0,0,0,.18)); }
+  #mapDeco span { position:absolute; transform:translate(-50%,-50%); opacity:.85;
+                  font-size:clamp(15px,3.4vmin,30px);
+                  filter:drop-shadow(0 2px 2px rgba(0,0,0,.18)); }
+  /* Sea life that drifts across the map and boings when tapped — the hub twin of
+     .tr-prop, so the map is as alive to poke at as the inside of a world. */
+  #mapProps { position:absolute; inset:0; z-index:2; overflow:hidden; }
+  /* The centering transform is on the base rule, not only inside @keyframes mapWander:
+     reduced motion kills the animation, and a prop would otherwise jump half its own
+     size off the water it was placed in. */
+  .map-prop { position:absolute; transform:translate(-50%,-50%);
+              border:none; background:none; padding:6px; line-height:1;
+              font-size:clamp(20px,4.4vmin,38px); opacity:.9;
+              filter:drop-shadow(0 3px 3px rgba(0,0,0,.22));
+              animation:mapWander ease-in-out infinite alternate; }
+  @keyframes mapWander { from{transform:translate(-50%,-50%) scaleX(1);}
+                         to  {transform:translate(calc(-50% + 96px),-50%) scaleX(-1);} }
+  .map-prop.boing { animation:trBoing .5s ease-out; }
   .sun { position:absolute; top:1.5vmin; right:13vmin; font-size:clamp(34px,7.5vmin,68px);
          animation:spin 24s linear infinite; z-index:1; pointer-events:none; }
   @keyframes spin { to { transform:rotate(360deg); } }
@@ -212,7 +236,8 @@
               font-size:clamp(26px,6vmin,50px); filter:drop-shadow(0 2px 2px rgba(0,0,0,.22)); }
   .tr-fixed { position:absolute; transform:translate(-50%,-50%); z-index:2; opacity:.85;
               font-size:clamp(20px,4.6vmin,40px); filter:drop-shadow(0 2px 2px rgba(0,0,0,.18)); }
-  .tr-prop  { position:absolute; z-index:3; border:none; background:none; padding:6px;
+  .tr-prop  { position:absolute; transform:translate(-50%,-50%);   /* as .map-prop: survives reduced motion */
+              z-index:3; border:none; background:none; padding:6px;
               font-size:clamp(24px,5.4vmin,46px); line-height:1;
               filter:drop-shadow(0 3px 3px rgba(0,0,0,.22));
               animation:trWander ease-in-out infinite alternate; }
@@ -995,5 +1020,5 @@
     .node-new { animation: none !important; }
     /* world trail: scenery holds still and nodes don't pop in; the buddy still
        moves between games, it just teleports rather than walking (see worldtrail.js) */
-    .tr-prop, .tr-node { animation: none !important; }
+    .tr-prop, .tr-node, .map-prop { animation: none !important; }
   }

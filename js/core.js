@@ -6,6 +6,9 @@ const rand = arr => arr[Math.floor(Math.random() * arr.length)];
 const shuffle = arr => arr.slice().sort(() => Math.random() - .5);
 const randBetween = (a, b) => a + Math.random() * (b - a);
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+// Deterministic 0..1 from an integer seed. Scenery scatter uses it so a world looks
+// hand-placed but lands in the same spot on every repaint (and on every device).
+const seeded = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
 // honor the OS "reduce motion" setting — real-time games slow their scroll and skip ambient particles
 const reducedMotion = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const IRREGULAR = { snowman: "snowmen", reindeer: "reindeer" };
