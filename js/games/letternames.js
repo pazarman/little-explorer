@@ -221,5 +221,5 @@ const letternamesLevel = {
 
 registerGame({
   id: "letternames", world: "brain", icon: "🔤", name: "Letter Lights",
-  es: "Letras que Brillan", yue: "字母燈", lvl: 1, v: 41, level: letternamesLevel
+  es: "Letras que Brillan", yue: "字母燈", lvl: 1, cue: "bell", v: 41, level: letternamesLevel
 });

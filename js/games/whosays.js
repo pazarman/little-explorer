@@ -46,5 +46,5 @@ const whosaysLevel = {
 
 registerGame({
   id: "whosays", world: "animal", icon: "🔊", name: "Who Says?", es: "¿Quién Dice?",
-  yue: "邊個叫？", lvl: 0, level: whosaysLevel
+  yue: "邊個叫？", lvl: 0, cue: "chirp", level: whosaysLevel
 });

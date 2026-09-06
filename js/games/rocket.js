@@ -87,5 +87,5 @@ const rocketLevel = {
 
 registerGame({
   id: "rocket", world: "num", icon: "🚀", name: "Countdown", es: "Cuenta Atrás", yue: "倒數",
-  lvl: 2, level: rocketLevel
+  lvl: 2, cue: "rocket", level: rocketLevel
 });

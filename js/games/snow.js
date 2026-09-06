@@ -72,6 +72,6 @@ const snowLevel = {
 };
 
 registerGame({
-  id: "snow", world: "num", icon: "❄️", name: "Count", es: "Contar", yue: "數一數", lvl: 0,
+  id: "snow", world: "num", icon: "❄️", name: "Count", es: "Contar", yue: "數一數", lvl: 0, cue: "chime",
   level: snowLevel
 });

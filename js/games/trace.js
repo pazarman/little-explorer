@@ -180,6 +180,6 @@ const traceLevel = {
 };
 
 registerGame({
-  id: "trace", world: "shape", icon: "✨", name: "Tracing", es: "Trazar", yue: "描畫", lvl: 2,
+  id: "trace", world: "shape", icon: "✨", name: "Tracing", es: "Trazar", yue: "描畫", lvl: 2, cue: "sparkle",
   level: traceLevel
 });

@@ -116,5 +116,5 @@ const feelingsLevel = {
 
 registerGame({
   id: "feelings", world: "brain", icon: "💛", name: "Feelings", es: "Sentimientos", yue: "心情",
-  lvl: 0, level: feelingsLevel
+  lvl: 0, cue: "purr", level: feelingsLevel
 });

@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "51";
+const APP_VERSION = "52";
 /* ================= Worlds, games and levels =================
    None of this is written out by hand any more. Every game declares itself in its
    own file with registerGame() (see core.js), and every js/games/* script loads
@@ -446,6 +446,7 @@ function animScreen(id, cls) { const el = $(id); if (!el) return; el.classList.r
 function showHub() {
   cleanupLevel();
   worldParty.stop();                      // leaving mid-party ends it; nothing is held against her
+  ambience.start("reef");                 // the hub is an open sea — it gets a bed too
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   setMascots("talking", false);
   document.body.className = "";
@@ -462,6 +463,8 @@ function startLevel(name) {
   state.level = name; state.round = 0; state.busy = false; state.tier = tierFor(name);
   roundMistakes = 0;
   document.body.className = LEVELS[name].theme;
+  // the world's sound bed, from the same biome its scenery uses
+  ambience.start(scene.forLevel(name));
   hideAllScreens();
   $("game").classList.remove("hidden");
   animScreen("game", "fwd");
@@ -583,7 +586,8 @@ document.querySelectorAll("#segDiff button").forEach(b => b.onclick = () => { se
 document.querySelectorAll("#segVoice button").forEach(b => b.onclick = () => { settings.voice = +b.dataset.v; saveSettings(); openSettings(); });
 document.querySelectorAll("#segMusic button").forEach(b => b.onclick = () => {
   settings.music = b.dataset.m; saveSettings();
-  if (settings.music === "off") stopMusic(); else { stopMusic(); startMusic(); }
+  if (settings.music === "off") { stopMusic(); applyMusicSetting(); }
+  else { stopMusic(); startMusic(); ambience.start(state.level ? scene.forLevel(state.level) : "reef"); }
   openSettings();
 });
 $("setBuddy").onclick = () => { $("settings").classList.add("hidden"); showCharScreen("settings"); };

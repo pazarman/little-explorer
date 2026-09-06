@@ -174,5 +174,5 @@ const runwayLevel = {
 
 registerGame({
   id: "runway", world: "brain", icon: "✈️", name: "Plane Land", es: "Aterriza", yue: "降落",
-  lvl: 1, level: runwayLevel
+  lvl: 1, cue: "engine", level: runwayLevel
 });

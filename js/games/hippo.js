@@ -135,5 +135,5 @@ const hippoLevel = {
 
 registerGame({
   id: "hippo", world: "num", icon: "🦛", name: "Feed Hippo", es: "Alimenta", yue: "餵河馬",
-  lvl: 0, level: hippoLevel
+  lvl: 0, cue: "drum", level: hippoLevel
 });

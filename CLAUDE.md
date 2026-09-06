@@ -66,6 +66,17 @@ This repo has a hard quality bar. Use it; don't freelance.
   `layers` subset when a game already draws its own floor or sky. Seeded (identical on repaint),
   inert (`pointer-events:none`), and complete at frame 0. See `docs/ART-STYLE-GUIDE.md`.
 - **Audio**: `speak()` (Web Speech), `voice()`/`sfx` (Web Audio synth), `MUSIC` styles. No audio files.
+  - **Ambience** (`ambience` + `AMBIENCE` in core.js): a quiet continuous bed per world — filtered
+    noise that sways, plus sparse details (a bubble, a bird). It keys off the same 7 biomes as the
+    scene kit via `scene.forLevel(id)`, so a game gets its sound from its theme with no per-game work.
+    `startLevel` starts it, `showHub` moves it to the hub's sea, and **"Music: off" silences it** —
+    that control governs all background sound. It sits far under the speaking voice; per BAR-CONFIG
+    the calm path beats atmosphere, so ambience must never compete with an instruction.
+  - **Signature cues** (`CUES` in core.js): the sound a game makes on a correct round. Every game used
+    the same `good()` chime, so 38 activities were acoustically identical. A game now picks one by name
+    — `registerGame({ cue: "splash" })` — and `roundComplete()` plays it. **`cue` is required and must
+    come from the palette**; `registerGame` throws otherwise, so a game literally cannot ship silent.
+    Add to `CUES` rather than inventing a sound in a game file, or the family drifts.
 - **Quest**: collect Star Sparks (`sparks`) across any game to launch a rocket (`rocketLaunch`); `QUEST_GOAL`.
 - **Persistence** (localStorage): `fionaStars` (completions), `fionaStickers`, `fionaSettings`, `fionaSparks`/
   `fionaTrips`, `fionaPerf`, `fionaName`, `fionaBuddy`, `fionaDecor`, `fionaTrail` (where the buddy stands
@@ -101,6 +112,13 @@ This repo has a hard quality bar. Use it; don't freelance.
   3. `sw.js` — add the file to `ASSETS` and bump `CACHE`. A test fails if you forget the `ASSETS` entry,
      because that break only shows up offline, on her device, with nobody watching.
   Then update the world-order list in `tests/smoke.spec.mjs` to include it.
+
+  **A new game must also look and sound like the rest — both are enforced, not merely asked for:**
+  - **Sound:** `cue` is a required `registerGame` field and must name an entry in `CUES`. Ambience
+    comes free from the theme. There is nothing optional here; the registration throws.
+  - **Scenery:** compose the background from `scene.html(biome, opts)` (see `docs/ART-STYLE-GUIDE.md`).
+    A ratchet test pins how many games carry scenery and fails if that number ever drops, so coverage
+    can go up and never back down.
 
 ## Privacy
 - The child's name lives only in localStorage; it must not appear in any committed/public file

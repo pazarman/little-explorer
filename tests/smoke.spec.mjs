@@ -1637,3 +1637,124 @@ test("every biome draws without error", async ({ page }) => {
   expect(bad, "biomes that fail to draw").toEqual([]);
   expect(errors).toEqual([]);
 });
+
+
+/* ================= Audio =================
+   Audio was the coldest axis: five one-shot cues and three tunes across 38 games with
+   nothing in between. These guard the two things that replaced that, and — more
+   importantly — that every game shipped from here on carries its own sound. */
+
+test("every game declares a signature cue from the shared palette", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(() => ({
+    total: GAME_REGISTRY.length,
+    missing: GAME_REGISTRY.filter((g) => !g.cue).map((g) => g.id),
+    unknown: GAME_REGISTRY.filter((g) => g.cue && !CUES[g.cue]).map((g) => g.id),
+    distinct: new Set(GAME_REGISTRY.map((g) => g.cue)).size,
+    // the palette itself must be playable — a cue that throws is a silent game
+    throwing: Object.keys(CUES).filter((k) => { try { CUES[k](); return false; } catch (_) { return true; } }),
+  }));
+  expect(r.missing, "games with no signature cue").toEqual([]);
+  expect(r.unknown, "games naming a cue that does not exist").toEqual([]);
+  expect(r.throwing, "cues that throw when played").toEqual([]);
+  // a handful of sounds shared across 38 games would be no better than one
+  expect(r.distinct, "too few distinct cues to tell the worlds apart").toBeGreaterThanOrEqual(10);
+  expect(errors).toEqual([]);
+});
+
+test("a new game cannot ship without a sound", async ({ page }) => {
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // This is the enforcement, not the convention: registerGame refuses the game outright.
+  const r = await page.evaluate(() => {
+    const before = GAME_REGISTRY.length;
+    const attempt = (def) => { try { registerGame(def); return false; } catch (_) { return true; } };
+    const base = { world: "num", icon: "x", name: "N", level: { startRound() {} } };
+    return {
+      noCue: attempt({ ...base, id: "t1" }),
+      madeUpCue: attempt({ ...base, id: "t2", cue: "airhorn" }),
+      goodCue: attempt({ ...base, id: "t3", cue: "chime" }),   // this one should succeed
+      leaked: GAME_REGISTRY.length - before,
+    };
+  });
+  expect(r.noCue, "a game with no cue was accepted").toBe(true);
+  expect(r.madeUpCue, "a game inventing its own cue was accepted").toBe(true);
+  expect(r.goodCue, "a game with a valid cue was wrongly refused").toBe(false);
+  expect(r.leaked, "only the valid game should have registered").toBe(1);
+});
+
+test("each world has an ambience bed, and it starts, stops and never stacks", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(async () => {
+    const out = {};
+    // every biome the scene kit can pick must have a bed to match
+    out.biomesWithoutBed = Object.keys(BIOMES).filter((b) => !AMBIENCE[b]);
+    // and every game resolves to one
+    out.gamesWithoutBed = Object.keys(LEVELS).filter((id) => !AMBIENCE[scene.forLevel(id)]);
+
+    startLevel("ocean");
+    await new Promise((r) => setTimeout(r, 250));
+    out.startedForWorld = ambience.biome;
+
+    // cycling levels must leave exactly one bed running, never a pile of them
+    for (let i = 0; i < 10; i++) { startLevel("snow"); startLevel("ocean"); }
+    await new Promise((r) => setTimeout(r, 200));
+    out.oneBedRunning = !!ambience.src;
+
+    // a parent choosing a quiet app gets a quiet app
+    settings.music = "off"; applyMusicSetting();
+    await new Promise((r) => setTimeout(r, 150));
+    out.silentWhenMusicOff = !ambience.src;
+    // and it stays silent when she moves to another game
+    startLevel("dragon");
+    await new Promise((r) => setTimeout(r, 150));
+    out.staysSilent = !ambience.src;
+    settings.music = "bouncy";
+    showHub();
+    return out;
+  });
+
+  expect(r.biomesWithoutBed, "a scene biome with no matching ambience").toEqual([]);
+  expect(r.gamesWithoutBed, "games that resolve to no ambience bed").toEqual([]);
+  expect(r.startedForWorld).toBe("reef");
+  expect(r.oneBedRunning, "cycling levels should leave exactly one bed").toBe(true);
+  expect(r.silentWhenMusicOff, "'music: off' must silence the ambience too").toBe(true);
+  expect(r.staysSilent, "ambience came back after being switched off").toBe(true);
+  expect(errors).toEqual([]);
+});
+
+
+// Scenery coverage is a ratchet: it may go up, never down. 14 of 35 levels carry the
+// scene kit today (the rest are Play 4 in docs/CRAFT-BACKLOG.md). Raise this number
+// when you add more; it exists so a refactor can't quietly strip scenery back out.
+const SCENERY_FLOOR = 14;
+
+test("scenery coverage never goes backwards", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(async () => {
+    const withScene = [];
+    for (const id of Object.keys(LEVELS)) {
+      startLevel(id); state.tier = 0; state.round = 0;
+      await new Promise((r) => setTimeout(r, 90));
+      if (document.querySelectorAll("#playArea .sc-scene *").length > 15) withScene.push(id);
+      try { cleanupLevel(); } catch (_) {}
+    }
+    showHub();
+    return { count: withScene.length, games: withScene.sort(), total: Object.keys(LEVELS).length };
+  });
+
+  expect(r.count, `scenery coverage dropped to ${r.count} of ${r.total} (floor is ${SCENERY_FLOOR}). ` +
+    "If you added scenery, raise SCENERY_FLOOR; if you removed it, put it back.")
+    .toBeGreaterThanOrEqual(SCENERY_FLOOR);
+  expect(errors).toEqual([]);
+});

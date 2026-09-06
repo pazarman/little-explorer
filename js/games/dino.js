@@ -132,5 +132,5 @@ const dinoLevel = {
 
 registerGame({
   id: "dino", world: "animal", icon: "🦕", name: "Flash Count", es: "Cuenta Rápida", yue: "快數",
-  lvl: 0, level: dinoLevel
+  lvl: 0, cue: "roar", level: dinoLevel
 });

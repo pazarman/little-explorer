@@ -80,6 +80,18 @@ $("playArea").innerHTML = scene.html("reef", { seed: 3 + state.round * 5 }) + `�
   the same shapes read as violet hills and the green dragon becomes the hero again.
 
 
+## Sound belongs to the art direction too
+
+A game's look and its sound are one decision. Both are now required of every game:
+
+- **Pick a cue** from `CUES` in core.js — `registerGame({ cue: "splash" })`. Water games splash, creature
+  games use creature sounds, machines rumble, counting games ring. `registerGame` **throws** on a missing
+  or invented cue, so this cannot be skipped or drift.
+- **Ambience is automatic** — it follows the game's theme through the same biome map the scenery uses,
+  so a game that looks like a reef also sounds like one without asking.
+- Add new sounds **to the palette**, not inside a game file. The palette is what keeps 38 games in one
+  acoustic family and guarantees none of them is harsh.
+
 ## Non-negotiables (from CLAUDE.md)
 - Drawn SVG for hero objects; emoji only as **whole objects**, never fake-layered.
 - Tie number **symbol ↔ quantity** where counting is the goal.

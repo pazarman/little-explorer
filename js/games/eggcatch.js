@@ -245,5 +245,5 @@ const eggcatchLevel = {
 
 registerGame({
   id: "eggcatch", world: "shape", icon: "🥚", name: "Egg Catch", es: "Atrapa Huevos",
-  yue: "接雞蛋", lvl: 0, level: eggcatchLevel
+  yue: "接雞蛋", lvl: 0, cue: "pop", level: eggcatchLevel
 });

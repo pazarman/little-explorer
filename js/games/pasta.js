@@ -91,6 +91,6 @@ const pastaLevel = {
 };
 
 registerGame({
-  id: "pasta", world: "num", icon: "🍝", name: "Yum Count", es: "A Contar", yue: "數食物", lvl: 0,
+  id: "pasta", world: "num", icon: "🍝", name: "Yum Count", es: "A Contar", yue: "數食物", lvl: 0, cue: "wood",
   level: pastaLevel
 });

@@ -154,6 +154,6 @@ const pizzaLevel = {
 };
 
 registerGame({
-  id: "pizza", world: "shape", icon: "🍕", name: "Pizza", es: "Pizza", yue: "薄餅", lvl: 1,
+  id: "pizza", world: "shape", icon: "🍕", name: "Pizza", es: "Pizza", yue: "薄餅", lvl: 1, cue: "wood",
   level: pizzaLevel
 });

@@ -84,6 +84,6 @@ const oceanLevel = {
 };
 
 registerGame({
-  id: "ocean", world: "shape", icon: "🐠", name: "Colors", es: "Colores", yue: "顏色", lvl: 0,
+  id: "ocean", world: "shape", icon: "🐠", name: "Colors", es: "Colores", yue: "顏色", lvl: 0, cue: "bubble",
   level: oceanLevel
 });
