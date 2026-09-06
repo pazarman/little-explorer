@@ -96,6 +96,9 @@ but review it rather than inheriting it silently.
 `fatal error: unicode/uregex.h: No such file or directory` because the Dolt backend links
 against libicu. Fix: `apt-get install -y libicu-dev`, then reinstall.
 
+**Metrics are on by default.** `bd` reports which commands are run (not issue content).
+`bd metrics off` opts out; `bd metrics example` shows what is sent.
+
 ---
 
 ## How state actually travels (the part that surprised us)
@@ -142,8 +145,6 @@ Conclusion: running several builders concurrently is not a prompt change — it 
 hosted `dolt sql-server` that every agent can reach. Embedded-per-container defeats the
 whole point of the claim.
 
-**Metrics are on by default.** `bd` reports which commands are run (not issue content).
-`bd metrics off` opts out; `bd metrics example` shows what is sent.
 
 ---
 
