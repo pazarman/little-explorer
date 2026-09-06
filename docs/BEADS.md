@@ -96,9 +96,51 @@ but review it rather than inheriting it silently.
 `fatal error: unicode/uregex.h: No such file or directory` because the Dolt backend links
 against libicu. Fix: `apt-get install -y libicu-dev`, then reinstall.
 
-**Storage split:** the Dolt database is gitignored; `.beads/issues.jsonl` is the
-git-shared export (`bd export -o .beads/issues.jsonl`). Do not expect the `.db` to travel
-through git.
+---
+
+## How state actually travels (the part that surprised us)
+
+**The database is local. It does not travel through git.** The Dolt DB lives in
+`.beads/embeddeddolt/` and is gitignored. What git carries is `.beads/issues.jsonl` — and
+beads' own docs call that a *passive* export, not the sync channel.
+
+Beads' native remote sync uses a `refs/dolt/data` ref on the git remote. **We are not
+using it** — after our first push, `git ls-remote origin` showed no `refs/dolt/*` at all,
+locally or remotely. So the portable path here is the JSONL round-trip:
+
+```bash
+# machine / container that did the work
+bd export -o .beads/issues.jsonl && git add .beads/issues.jsonl && git commit && git push
+
+# anywhere else (fresh clone, new container, your laptop)
+bd import            # defaults to .beads/issues.jsonl; upsert semantics
+```
+
+Verified end to end: a brand-new empty database imported the committed JSONL and came back
+with all 52 issues, the same 4-item ready queue, and the `le-xgs blocks le-9s3` edge
+intact. Hash IDs are stable, so the import is idempotent and safe to re-run.
+
+### What this means for multiple agents — the real constraint
+
+`bd ready --claim` is atomic **within one database**. It is not a distributed lock.
+
+Two agents in two containers each have their *own* embedded Dolt DB. Both can claim the
+same issue, because neither DB knows about the other. You would only find out when both
+push a modified `issues.jsonl` and git reports a conflict on one file — which is precisely
+the failure mode we left markdown to escape.
+
+So the claim primitive only becomes real mutual exclusion when the agents **share one
+database**. The options, roughly in order of effort:
+
+| Approach | What it gives you |
+| --- | --- |
+| JSONL round-trip *(what we do now)* | Portability. Fine for **one** builder at a time. No cross-agent locking. |
+| `refs/dolt/data` sync | Dolt merges structurally rather than by text, so concurrent edits reconcile far better than a flat file. Still eventual — not mutual exclusion. |
+| Shared Dolt server (`bd init --server`, `--server-host/--server-port`, `BEADS_DOLT_PASSWORD`; or `--global`) | **The actual multi-agent answer.** One database every agent connects to, so `--claim` is a true lock. |
+
+Conclusion: running several builders concurrently is not a prompt change — it needs a
+hosted `dolt sql-server` that every agent can reach. Embedded-per-container defeats the
+whole point of the claim.
 
 **Metrics are on by default.** `bd` reports which commands are run (not issue content).
 `bd metrics off` opts out; `bd metrics example` shows what is sent.
