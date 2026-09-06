@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "48";
+const APP_VERSION = "49";
 /* ================= Worlds, games and levels =================
    None of this is written out by hand any more. Every game declares itself in its
    own file with registerGame() (see core.js), and every js/games/* script loads

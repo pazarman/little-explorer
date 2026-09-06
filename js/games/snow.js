@@ -15,12 +15,24 @@ const snowLevel = {
     const area = $("playArea");
     area.innerHTML = `
       <svg class="snow-scene" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="84" cy="15" r="11" fill="#fff7c0" opacity=".85"/>
+        <!-- the moon rides in its own uniformly-scaled layer (see .snow-moon) so it
+             stays round; in this stretched viewBox a circle came out an oval -->
         <path d="M0 67 Q26 53 52 65 Q76 77 100 61 L100 100 L0 100 Z" fill="#dcecff" opacity=".7"/>
         <path d="M0 83 Q30 70 58 81 Q82 90 100 79 L100 100 L0 100 Z" fill="#ffffff" opacity=".85"/>
       </svg>
+      <div class="snow-moon">
+        <svg viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="26" fill="#fff9d8" opacity=".18"/>
+          <circle cx="30" cy="30" r="19" fill="#fff9d8" opacity=".28"/>
+          <circle cx="30" cy="30" r="14" fill="#fffbe8"/>
+          <circle cx="25" cy="26" r="3.1" fill="#f0e9c8" opacity=".75"/>
+          <circle cx="34" cy="33" r="2.2" fill="#f0e9c8" opacity=".6"/>
+          <circle cx="30" cy="21" r="1.6" fill="#f0e9c8" opacity=".5"/>
+        </svg>
+      </div>
       <div class="snowfield" id="snowfield"></div>
-      <div class="count-tray"><div class="count-num" id="countNum">0</div><div class="count-slots" id="countSlots"></div></div>`;
+      <div class="count-tray"><div class="count-num" id="countNum">0</div><div class="count-slots" id="countSlots"></div></div>`
+      + scene.html("snow", { seed: 7 + state.round * 3, layers: ["canopy", "mid", "motes", "frame"] });
     const field = $("snowfield");
     for (let i = 0; i < 16; i++) {
       const d = document.createElement("span");

@@ -30,7 +30,11 @@ const oceanLevel = {
     this.target = rand(picks);
     setInstruction("🐠 " + t("tap_fish", { x: colorAdj(this.target, "m") }), t("tap_fish", { x: colorAdj(this.target, "m") }));
     const area = $("playArea");
-    area.innerHTML = `<div class="wave" style="animation-duration:7s;"></div>
+    // Reef scenery from the shared kit (js/scene.js), varied per round by the seed so
+    // five rounds are five slightly different corners of the same reef. The fish are
+    // drawn on top of it; nothing in the scene can take a tap.
+    area.innerHTML = scene.html("reef", { seed: 3 + state.round * 5 }) +
+                     `<div class="wave" style="animation-duration:7s;"></div>
                       <div class="wave" style="animation-duration:9.5s; height:18%; bottom:-4%;"></div>`;
     for (let i = 0; i < 9; i++) {
       const b = document.createElement("span");

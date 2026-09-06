@@ -54,7 +54,7 @@ the kit that fills them is L and makes each one S.
 
 ## Tier 0 — do these first
 
-### C1 · A shared scene kit  ·  effort L  ·  lifts Composition + Art
+### C1 · A shared scene kit  ·  effort L  ·  lifts Composition + Art  ·  ✅ **BUILT (v49)**
 The force multiplier for the whole list. A small set of reusable layers every game can
 compose from: a foreground frame (things at the screen edges, nearest the eye), a
 mid-ground prop band, a far parallax band, and a consistent ground line. One system, applied
@@ -64,6 +64,23 @@ Without this, C2 is 20 bespoke art jobs. With it, each is a few lines.
 
 **Done when:** a game can go from 8% to 35%+ occupancy by declaring which layers it wants,
 and three pilot games prove it.
+
+> **Shipped in v49** as `js/scene.js` — 7 biomes, 7 layers, one shape vocabulary, all drawn
+> SVG. Piloted on Ocean (8% → 21%), Egg Catch (2% → 15%) and Counting Critters. Adds ~110–160
+> nodes per screen at a measured 61fps, so the cost is not the constraint.
+>
+> **Partly done, honestly:** the target was 35%+ and the pilots reached ~20%. The kit fills the
+> canopy, the floor and the edges; the *middle* of a tall phone screen is where a game's own
+> objects live, and only the game can decide how many of those there are. Raising the pilots
+> further means denser game content, not more scenery.
+>
+> **Still weak and worth a second pass:** `space` reads thin (few forms suit it), and `snow`'s
+> frame is white-on-white so it barely registers. Both are recipe tweaks, not structural.
+>
+> **Measurement caveat:** the occupancy metric hit-tests, so it cannot see the kit unless
+> `pointer-events` is temporarily enabled, and it under-reports on any game with a full-bleed
+> overlay (Counting Critters' snowfield hides its gain entirely). Trust the screenshots over
+> the number on those.
 
 ### P1 · Close the dead air between rounds  ·  effort S  ·  lifts Pacing
 Measured: **2,676ms** from a correct answer to the next playable round, against ~2 taps of

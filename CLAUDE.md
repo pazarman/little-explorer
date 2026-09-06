@@ -54,6 +54,12 @@ This repo has a hard quality bar. Use it; don't freelance.
 - **Difficulty**: `tierFor(level)` — manual easy/med/hard force 0/1/2; **auto mode uses a performance model**
   (`fionaPerf`: `autoTierFor`, EMA of round quality, down-shift on ≥3 mistakes). Mistakes are counted via the
   wrapped `sfx.bad`; `roundComplete` records perf and can lower the next round's tier.
+- **Scene kit** (`scene.html(biome, opts)` in `js/scene.js`): the shared drawn-SVG scenery every
+  game composes its background from — 7 biomes, layers `canopy/far/drift/mid/ground/motes/frame`.
+  Built because measured foreground occupancy averaged 15% of the play area across all levels.
+  Call it *after* a game's own full-bleed backdrop or that backdrop paints over it; pass a
+  `layers` subset when a game already draws its own floor or sky. Seeded (identical on repaint),
+  inert (`pointer-events:none`), and complete at frame 0. See `docs/ART-STYLE-GUIDE.md`.
 - **Audio**: `speak()` (Web Speech), `voice()`/`sfx` (Web Audio synth), `MUSIC` styles. No audio files.
 - **Quest**: collect Star Sparks (`sparks`) across any game to launch a rocket (`rocketLaunch`); `QUEST_GOAL`.
 - **Persistence** (localStorage): `fionaStars` (completions), `fionaStickers`, `fionaSettings`, `fionaSparks`/

@@ -96,6 +96,7 @@ const eggcatchLevel = {
         .eg-basket{position:absolute;width:clamp(92px,25vmin,180px);height:auto;transform:translate(-50%,-50%);z-index:6;pointer-events:none;filter:drop-shadow(0 5px 5px rgba(0,0,0,.28))}
       </style>
       <div class="eg-stage" id="egStage">
+        ${scene.html("meadow", { seed: 11 + state.round * 4, layers: ["canopy", "far", "drift", "mid", "motes", "frame"] })}
         <div class="eg-ground"></div>
         <div class="eg-perch"></div>
         <div class="eg-hen">🐔</div>

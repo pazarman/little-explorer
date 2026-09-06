@@ -1454,3 +1454,80 @@ test("walking to the party takes the buddy to the end of the road", async ({ pag
   expect(r.saved, "the party must not be saved as the buddy's spot").not.toBe(undefined + "");
   expect(errors).toEqual([]);
 });
+
+
+/* ================= Scene kit =================
+   Shared scenery (js/scene.js). Its two non-negotiables: it can never take a tap from
+   the game, and it must look complete without animation. */
+
+test("scenery is inert and never steals a tap", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(async () => {
+    startLevel("ocean"); state.tier = 0; state.round = 0;
+    await new Promise((r) => setTimeout(r, 150));
+    const nodes = [...document.querySelectorAll(".sc-scene, .sc-scene *")];
+    const clickable = nodes.filter((n) => getComputedStyle(n).pointerEvents !== "none");
+    // and the fish must still be reachable everywhere they sit
+    const fish = [...document.querySelectorAll(".fish-btn")];
+    const blocked = fish.filter((f) => {
+      const b = f.getBoundingClientRect();
+      const hit = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+      return !(hit === f || f.contains(hit));
+    });
+    return { nodes: nodes.length, clickable: clickable.length, fish: fish.length, blocked: blocked.length };
+  });
+  expect(r.nodes, "the scene should actually be drawn").toBeGreaterThan(20);
+  expect(r.clickable, "a scenery layer became clickable").toBe(0);
+  expect(r.blocked, "scenery covered a game target").toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test("scenery is deterministic and survives reduced motion", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html");
+
+  const r = await page.evaluate(async () => {
+    // same seed twice must give the same scene, so a repaint never reshuffles the world
+    const a = scene.html("reef", { seed: 5 });
+    const b = scene.html("reef", { seed: 5 });
+    const c = scene.html("reef", { seed: 6 });
+    startLevel("ocean");
+    await new Promise((r) => setTimeout(r, 250));
+    const animated = [...document.querySelectorAll(".sc-mote, .sc-drift")]
+      .filter((n) => getComputedStyle(n).animationName !== "none").length;
+    return { stable: a === b, varies: a !== c, animated,
+             painted: document.querySelectorAll(".sc-scene *").length };
+  });
+  expect(r.stable, "the same seed drew a different scene").toBe(true);
+  expect(r.varies, "different seeds drew the same scene").toBe(true);
+  expect(r.animated, "scenery should hold still under reduced motion").toBe(0);
+  expect(r.painted, "the scene should still be drawn under reduced motion").toBeGreaterThan(20);
+  expect(errors).toEqual([]);
+});
+
+test("every biome draws without error", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const bad = await page.evaluate(() => {
+    const out = [];
+    for (const name of Object.keys(BIOMES)) {
+      try {
+        const html = scene.html(name, { seed: 3 });
+        const el = document.createElement("div");
+        el.innerHTML = html;
+        if (el.querySelectorAll("*").length < 15) out.push({ name, why: "drew almost nothing" });
+        if (/undefined|NaN/.test(html)) out.push({ name, why: "hole in the recipe (undefined/NaN in the markup)" });
+      } catch (e) { out.push({ name, why: e.message }); }
+    }
+    return out;
+  });
+  expect(bad, "biomes that fail to draw").toEqual([]);
+  expect(errors).toEqual([]);
+});

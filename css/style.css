@@ -972,6 +972,53 @@
     .settings-version { margin:.4vmin 0 0; }
   }
 
+  /* Snow's moon: its own layer so it keeps a uniform aspect. The scene SVG behind it
+     is preserveAspectRatio=none, which turned a circle into an oval. */
+  .snow-moon { position:absolute; top:4%; right:8%; width:clamp(52px,15vmin,104px); z-index:1;
+               pointer-events:none; }
+  .snow-moon svg { width:100%; height:auto; display:block; }
+
+  /* ================= SCENE KIT =================
+     Shared drawn-SVG scenery layers (js/scene.js). Every layer is decorative and
+     inert — nothing here can take a tap from the game sitting on top of it. */
+  .sc-scene { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .sc-scene * { pointer-events:none; }
+  .sc-band { position:absolute; left:-2%; right:-2%; }
+  .sc-band svg { width:100%; height:100%; display:block; }
+  /* far silhouettes sit on the horizon and are allowed to stretch — a wider hill
+     is still a hill, and it keeps the band seamless on any screen */
+  .sc-canopy { top:0; height:22%; opacity:.55; }
+  .sc-far { bottom:19%; height:17%; opacity:.5; }
+  /* mid props keep their aspect: each is its own small SVG placed by percentage,
+     the same trick the world map uses for island scenery */
+  .sc-mid { position:absolute; left:0; right:0; bottom:15%; height:20%; opacity:.9; }
+  .sc-prop { position:absolute; bottom:0; display:block; }
+  .sc-prop svg { width:100%; height:auto; display:block;
+                 filter:drop-shadow(0 2px 2px rgba(0,0,0,.14)); }
+  .sc-ground { position:absolute; left:0; right:0; bottom:0; height:17%; }
+  .sc-groundline { position:absolute; left:0; right:0; top:0; height:2px; opacity:.22; }
+  /* the foreground frame — nearest the eye, cropped by the screen edges on purpose */
+  .sc-frame { position:absolute; bottom:0; height:30%; width:21%; opacity:.9; }
+  .sc-frame svg { width:100%; height:100%; display:block;
+                  filter:drop-shadow(0 3px 4px rgba(0,0,0,.18)); }
+  .sc-frame-l { left:0; }
+  .sc-frame-r { right:0; }
+  .sc-drifts { position:absolute; inset:0; }
+  .sc-drift { position:absolute; left:-12%; display:block; animation:scSwim linear infinite; }
+  .sc-drift svg { width:100%; height:auto; display:block; }
+  @keyframes scSwim { from{transform:translateX(0)} to{transform:translateX(125vw)} }
+  .sc-motes { position:absolute; inset:0; }
+  .sc-mote { position:absolute; display:block; border-radius:50%; }
+  .sc-bubble  { animation:scRise linear infinite; }
+  .sc-snow    { animation:scFall linear infinite; }
+  .sc-pollen  { animation:scDrift ease-in-out infinite alternate; }
+  .sc-dust    { animation:scDrift ease-in-out infinite alternate; opacity:.7; }
+  .sc-sparkle { animation:scTwinkle ease-in-out infinite; }
+  @keyframes scRise    { 0%{transform:translateY(0); opacity:.6} 100%{transform:translateY(-70vh); opacity:0} }
+  @keyframes scFall    { 0%{transform:translateY(-10vh); opacity:.9} 100%{transform:translateY(80vh); opacity:.2} }
+  @keyframes scDrift   { from{transform:translate(0,0)} to{transform:translate(14px,-18px)} }
+  @keyframes scTwinkle { 0%,100%{opacity:.25; transform:scale(.7)} 50%{opacity:1; transform:scale(1.15)} }
+
   /* ================= CELEBRATE ================= */
   #celebrate {
     position:fixed; inset:0; background:rgba(20,20,60,.55); z-index:80;
@@ -1063,4 +1110,8 @@
        moves between games, it just teleports rather than walking (see worldtrail.js) */
     .tr-prop, .tr-node, .map-prop { animation: none !important; }
     .tr-party .party-disc::before { animation: none !important; }
+    /* scenery holds still; it was drawn to look complete without motion */
+    .sc-mote, .sc-drift { animation: none !important; }
+    .sc-drift { left:auto; right:22%; }
+    .sc-sparkle { opacity: .7 !important; }
   }
