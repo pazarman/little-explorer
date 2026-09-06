@@ -249,6 +249,61 @@ test("a newly shipped game sits at the end of the path and the camera travels th
   expect(reveal.after).toBeGreaterThan(reveal.landed);   // the camera showed her the way there
 });
 
+test("the grown-up panel keeps every control on screen and tappable", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const IDS = ["setBuddy", "setName", "setDash", "setReset", "setRestart", "setDone"];
+  // Six buttons used to sit in one un-wrapping row: on a phone it overflowed the card
+  // and pushed Done off the right edge. Check both a tall phone and a short landscape one.
+  for (const vp of [{ width: 393, height: 727 }, { width: 727, height: 393 }, { width: 320, height: 568 }]) {
+    await page.setViewportSize(vp);
+    await page.evaluate(() => openSettings());
+    await page.waitForTimeout(150);
+    const bad = await page.evaluate((ids) => {
+      const out = [];
+      for (const id of ids) {
+        const el = document.getElementById(id), r = el.getBoundingClientRect();
+        const onScreen = r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight;
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        // nothing (like the pinned Done bar) may cover another control
+        const tappable = hit === el || el.contains(hit);
+        if (!onScreen || !tappable || r.height < 44) out.push({ id, onScreen, tappable, h: Math.round(r.height) });
+      }
+      return out;
+    }, IDS);
+    expect(bad, `settings controls unreachable at ${vp.width}x${vp.height}`).toEqual([]);
+  }
+
+  expect(errors, "console/page errors in settings:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("spoken lines avoid words the speech engine spells out", async ({ page }) => {
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // "Grown-ups" came out of the speech engine as "grown-U-P-S". The heading may still
+  // say it — it is only ever read by an adult — but nothing spoken may contain it.
+  const spokenKeys = ["diff_say", "hi_star_sparks", "hi_let_play", "narrator_back", "narrator_ready"];
+  const offenders = await page.evaluate((keys) => {
+    const bad = [];
+    for (const lang of Object.keys(DICT))
+      for (const k of keys) {
+        const v = DICT[lang][k];
+        if (typeof v === "string" && /grown[\s-]?ups?/i.test(v)) bad.push(`${lang}.${k}: ${v}`);
+      }
+    return bad;
+  }, spokenKeys);
+  expect(offenders).toEqual([]);
+
+  // A buddy's name is spoken aloud when she picks it, so it has to exist in her language
+  // rather than saying "Snowman" in the middle of a Spanish sentence.
+  const missing = await page.evaluate(() =>
+    BUDDIES.filter((b) => !b.es || !b.yue).map((b) => b.id));
+  expect(missing).toEqual([]);
+});
+
 test("exactly one full-screen surface is visible at a time", async ({ page }) => {
   await page.addInitScript(SKIP_INTRO);
   await page.goto("/index.html?test=1");
