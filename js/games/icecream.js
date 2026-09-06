@@ -8,7 +8,9 @@ const icecreamLevel = {
     this.need = k; this.on = 0; this.capped = false;
     this.mistakes = 0;                 // as rocket.js: previously only reset on success,
                                        // leaving the first round's ladder unable to fire.
-    $("playArea").innerHTML = `<div class="ice-stage">
+    $("playArea").innerHTML =
+      scene.html("meadow", { seed: 28 + state.round * 4, tint: "#e79ab8" }) +
+      `<div class="ice-stage">
         <div class="ice-stack" id="iceStack"><div class="ice-cone"></div></div>
         <button class="ice-cherry hidden" id="iceCherry">🍒 Cherry!</button>
         <div class="tub-row" id="tubRow"></div></div>`;

@@ -74,6 +74,11 @@ $("playArea").innerHTML = scene.html("reef", { seed: 3 + state.round * 5 }) + `â
 - Everything is seeded, so a scene lands identically on every repaint; vary `seed` per round
   for variety within one game.
 - Everything is `pointer-events:none` and looks complete at frame 0. Both are covered by tests.
+- **Tint when the biome fights the theme.** `{ tint: "#8d5bb0" }` keeps every form and its
+  relative lightness but adopts one hue, so the scene reads as depth in the game's own palette.
+  Forest greens over Dragon Feed's purple sky looked like scenery from a different app; tinted,
+  the same shapes read as violet hills and the green dragon becomes the hero again.
+
 
 ## Non-negotiables (from CLAUDE.md)
 - Drawn SVG for hero objects; emoji only as **whole objects**, never fake-layered.

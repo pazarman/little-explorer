@@ -1510,6 +1510,36 @@ test("scenery is deterministic and survives reduced motion", async ({ page }) =>
   expect(errors).toEqual([]);
 });
 
+test("scenery never covers a game's own targets", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // Sweep every game carrying scenery: each one's real buttons must still be the thing
+  // under your finger. This is the failure that would be invisible in a screenshot.
+  const bad = await page.evaluate(async () => {
+    const out = [];
+    for (const id of Object.keys(LEVELS)) {
+      startLevel(id); state.tier = 0; state.round = 0;
+      await new Promise((r) => setTimeout(r, 120));
+      if (document.querySelectorAll("#playArea .sc-scene *").length === 0) { cleanupLevel(); continue; }
+      const targets = [...document.querySelectorAll("#playArea button, #playArea [onclick]")]
+        .filter((t) => { const b = t.getBoundingClientRect(); return b.width > 8 && b.height > 8; });
+      for (const t of targets) {
+        const b = t.getBoundingClientRect();
+        const hit = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+        if (!(hit === t || t.contains(hit) || t.contains(hit?.parentElement)))
+          out.push({ id, blockedBy: hit && hit.className ? String(hit.className).slice(0, 40) : "?" });
+      }
+      cleanupLevel();
+    }
+    showHub();
+    return out;
+  });
+  expect(bad, "scenery is sitting on top of something tappable").toEqual([]);
+  expect(errors).toEqual([]);
+});
+
 test("every biome draws without error", async ({ page }) => {
   const errors = watchErrors(page);
   await page.addInitScript(SKIP_INTRO);

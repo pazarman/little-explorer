@@ -9,7 +9,9 @@ const whosaysLevel = {
     const picks = shuffle(Object.keys(ANIMALS)).slice(0, nChoices);
     this.target = rand(picks);
     setInstruction("🔊 " + t("who_show"), t("who_say"));
-    $("playArea").innerHTML = `<div class="ws-wrap">
+    $("playArea").innerHTML =
+      scene.html("meadow", { seed: 25 + state.round * 4 }) +
+      `<div class="ws-wrap">
         <button id="wsListen">🔊</button>
         <div class="ws-choices" id="wsChoices"></div></div>`;
     $("wsListen").onclick = () => speakAnimal(this.target);

@@ -90,7 +90,9 @@ const fuelupLevel = {
 
     setInstruction(fuL(FU_TXT[key].show), fuL(FU_TXT[key].say));
 
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      scene.html("space", { seed: 20 + state.round * 4 }) +
+      `
       <style>
         .fu-stage{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;overflow:hidden}
         .fu-row{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:clamp(10px,5vmin,52px);padding:3vmin 2vmin 0}

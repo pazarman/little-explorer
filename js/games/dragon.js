@@ -28,7 +28,9 @@ const dragonLevel = {
     const need = counts[state.round];
     this.need = need; this.fed = 0;
     setInstruction("🐉 " + t("feed_dragon_show", { count: need, x: words("treat", need) }), t("feed_dragon_show", { count: need, x: words("treat", need) }));
-    $("playArea").innerHTML = `<div class="dragon-wrap">
+    $("playArea").innerHTML =
+      scene.html("forest", { seed: 38 + state.round * 4, tint: "#8d5bb0" }) +
+      `<div class="dragon-wrap">
         <div class="count-badge" id="dragonCount">0</div>
         <div class="dragon" id="dragonEl">${DRAGON_ART}</div>
         <div class="treat-row" id="treatRow"></div></div>`;

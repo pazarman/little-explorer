@@ -82,6 +82,30 @@ const SCENE_SHAPE = {
     return `<g opacity=".95">${p}</g>`;
   },
 
+  // Indoor props. The cozy biome was flowers and boulders, which is a meadow.
+  pot: (x, base, h, fill, leaf) =>
+    `<g>
+       <path d="M${x - h * .3} ${base - h * .34} L${x + h * .3} ${base - h * .34}
+                L${x + h * .22} ${base} L${x - h * .22} ${base} Z" fill="${fill}"/>
+       <rect x="${x - h * .34}" y="${base - h * .42}" width="${h * .68}" height="${h * .12}" rx="${h * .05}" fill="${fill}"/>
+       <ellipse cx="${x - h * .16}" cy="${base - h * .62}" rx="${h * .17}" ry="${h * .26}" fill="${leaf}"/>
+       <ellipse cx="${x + h * .17}" cy="${base - h * .58}" rx="${h * .15}" ry="${h * .23}" fill="${leaf}" opacity=".8"/>
+       <ellipse cx="${x}" cy="${base - h * .76}" rx="${h * .14}" ry="${h * .24}" fill="${leaf}"/>
+     </g>`,
+
+  block: (x, base, h, fill, light) =>
+    `<g>
+       <rect x="${x - h * .3}" y="${base - h * .58}" width="${h * .6}" height="${h * .58}" rx="${h * .09}" fill="${fill}"/>
+       <rect x="${x - h * .18}" y="${base - h * .5}" width="${h * .2}" height="${h * .2}" rx="${h * .05}" fill="${light}" opacity=".8"/>
+       <circle cx="${x + h * .34}" cy="${base - h * .18}" r="${h * .18}" fill="${light}"/>
+     </g>`,
+
+  crystal: (x, base, h, fill, light) =>
+    `<g>
+       <path d="M${x} ${base - h} L${x + h * .26} ${base - h * .34} L${x + h * .14} ${base} L${x - h * .16} ${base} L${x - h * .28} ${base - h * .36} Z" fill="${fill}"/>
+       <path d="M${x} ${base - h} L${x - h * .28} ${base - h * .36} L${x - h * .16} ${base} Z" fill="${light}" opacity=".55"/>
+     </g>`,
+
   star: (x, y, r, fill) =>
     `<path d="M${x} ${y - r} L${x + r * .3} ${y - r * .3} L${x + r} ${y} L${x + r * .3} ${y + r * .3}
               L${x} ${y + r} L${x - r * .3} ${y + r * .3} L${x - r} ${y} L${x - r * .3} ${y - r * .3} Z"
@@ -89,6 +113,21 @@ const SCENE_SHAPE = {
 
   // Flat and wide with a level underside. Three tall lobes read as a snowy hill
   // floating in the sky, which is what the first build looked like.
+  // A planet with a terminator and a couple of maria — the space biome had nothing
+  // with mass in it, so it read as a dark screen with sparkles.
+  planet: (x, y, r, fill, dark, ring) =>
+    `<g>
+       ${ring ? `<ellipse cx="${x}" cy="${y}" rx="${r * 1.75}" ry="${r * .42}" fill="none"
+                   stroke="${ring}" stroke-width="${r * .13}" opacity=".7"/>` : ""}
+       <circle cx="${x}" cy="${y}" r="${r}" fill="${fill}"/>
+       <path d="M${x} ${y - r} A${r} ${r} 0 0 1 ${x} ${y + r} A${r * .55} ${r} 0 0 0 ${x} ${y - r} Z"
+             fill="${dark}" opacity=".45"/>
+       <circle cx="${x - r * .34}" cy="${y - r * .22}" r="${r * .17}" fill="${dark}" opacity=".35"/>
+       <circle cx="${x + r * .18}" cy="${y + r * .34}" r="${r * .11}" fill="${dark}" opacity=".3"/>
+       ${ring ? `<path d="M${x - r * 1.75} ${y} A${r * 1.75} ${r * .42} 0 0 0 ${x + r * 1.75} ${y}"
+                   fill="none" stroke="${ring}" stroke-width="${r * .13}" opacity=".9"/>` : ""}
+     </g>`,
+
   cloud: (x, y, r, fill, o = .9) =>
     `<g opacity="${o}">
        <ellipse cx="${x}" cy="${y}" rx="${r * .74}" ry="${r * .40}" fill="${fill}"/>
@@ -110,7 +149,7 @@ const BIOMES = {
     ground:{ top: "rgba(255,255,255,0)", bottom: "#eaf4ff", line: "#dceaf8" },
     props: ["pine", "rock"],
     palette: { pine: "#5b9e77", pineDark: "#3f7d5c", rock: "#c8d6e4", rockLight: "#e8f0f8" },
-    frame: { kind: "tuft", fill: "#b9d4ee" },
+    frame: { kind: "drift", fill: "#cfe3f7" },
     motes: { kind: "snow", fill: "rgba(255,255,255,.9)" },
   },
   reef: {
@@ -155,12 +194,12 @@ const BIOMES = {
     motes: { kind: "pollen", fill: "rgba(215,245,180,.8)" },
   },
   space: {
-    drift:{ kind:"leaf", fill:"rgba(180,170,230,.25)" },
+    drift:{ kind:"rock", fill:"rgba(150,140,205,.30)" },
     canopy:{ kind:"stars", fill:"#ffe98a" },
     far:   { fill: "#2b2560", alt: "#241f52" },
     ground:{ top: "rgba(60,50,110,0)", bottom: "#3a3170", line: "#4a3f88" },
-    props: ["rock", "star"],
-    palette: { rock: "#5a4f96", rockLight: "#7b6fbd", star: "#ffe98a" },
+    props: ["rock", "star", "crystal"],
+    palette: { rock: "#5a4f96", rockLight: "#8578c7", star: "#ffe98a", crystal: "#9b86e0", crystalLight: "#cdbcff" },
     frame: { kind: "rockline", fill: "#3a3170" },
     motes: { kind: "sparkle", fill: "rgba(255,240,170,.9)" },
   },
@@ -168,9 +207,10 @@ const BIOMES = {
     drift:{ kind:"leaf", fill:"rgba(180,150,120,.18)" },
     canopy:{ kind:"cloud", fill:"#fff2e4" },
     far:   { fill: "#e8d3bd", alt: "#dcc4ab" },
-    ground:{ top: "rgba(214,178,146,0)", bottom: "#d8b492", line: "#c79f7c" },
-    props: ["rock", "flower"],
-    palette: { rock: "#c9a98f", rockLight: "#e2c9b3", flower: "#ffb3c9", flowerHeart: "#ffe08a" },
+    ground:{ top: "rgba(214,178,146,0)", bottom: "#e0bb96", line: "#b98a63" },
+    props: ["pot", "block", "rock"],
+    palette: { rock: "#cbb39c", rockLight: "#e6d5c3", pot: "#d98b63", leaf: "#6aab6f",
+               block: "#f0b840", blockLight: "#ffd98a" },
     frame: { kind: "cushion", fill: "#caa285" },
     motes: { kind: "dust", fill: "rgba(255,240,215,.7)" },
   },
@@ -188,6 +228,32 @@ const THEME_BIOME = {
   "theme-nightday": "space", "theme-measure": "meadow", "theme-sort": "reef",
   "theme-cups": "cozy", "theme-dragon": "forest",
 };
+
+/* Tinting.
+   A biome's own palette is right when it matches the game's backdrop, and obviously
+   pasted-on when it doesn't — forest greens over Dragon Feed's purple sky looked like
+   scenery from another app. `tint` keeps each colour's relative lightness but adopts a
+   single hue, so the scene reads as depth in the game's own palette instead of
+   competing with it. */
+function hexToRgb(h) {
+  const v = h.replace("#", "");
+  const n = v.length === 3 ? v.split("").map(c => c + c).join("") : v;
+  return [parseInt(n.slice(0, 2), 16), parseInt(n.slice(2, 4), 16), parseInt(n.slice(4, 6), 16)];
+}
+function tintColor(hex, base) {
+  if (typeof hex !== "string" || hex[0] !== "#") return hex;   // rgba() drifters pass through
+  const [r, g, b] = hexToRgb(hex), [br, bg, bb] = hexToRgb(base);
+  const l = (0.299 * r + 0.587 * g + 0.114 * b) / 255;         // keep the original lightness
+  const mix = (c) => Math.round(l > .5 ? c + (255 - c) * (l - .5) * 2 : c * (l * 2));
+  return `rgb(${mix(br)},${mix(bg)},${mix(bb)})`;
+}
+function tintBiome(b, base) {
+  const walk = (o) => Array.isArray(o) ? o.slice()
+    : (o && typeof o === "object")
+      ? Object.fromEntries(Object.entries(o).map(([k, v]) => [k, walk(v)]))
+      : (typeof o === "string" ? tintColor(o, base) : o);
+  return walk(b);
+}
 
 const scene = {
   // 400x100 bands; props positioned in percentages so nothing is squashed.
@@ -225,6 +291,9 @@ const scene = {
       if (kind === "stalk")  art = S.stalk(30, 58, 44 + r2 * 12, p.stalk, 8 + r1 * 8);
       if (kind === "flower") art = S.flower(30, 40, 12 + r1 * 5, p.flower, p.flowerHeart);
       if (kind === "star")   art = S.star(30, 34, 12 + r1 * 6, p.star);
+      if (kind === "crystal") art = S.crystal(30, 58, 40 + r1 * 16, p.crystal, p.crystalLight);
+      if (kind === "pot")    art = S.pot(30, 58, 40 + r1 * 12, p.pot, p.leaf);
+      if (kind === "block")  art = S.block(30, 58, 38 + r1 * 12, p.block, p.blockLight);
       if (!art) continue;
       // stagger depth: props nearer the front sit lower and draw a little larger, so the
       // band reads as ground receding rather than a row of stamps on one line
@@ -252,7 +321,14 @@ const scene = {
         // full-opacity slabs read as UI panels, which is what the first build looked like.
         out += `<path d="M${i * 96 - 10} 0 L${i * 96 + 16 + r1 * 14} 0 L${i * 96 + 40 + r2 * 26} 100 L${i * 96 + 6} 100 Z"
                  fill="url(#scShaft)" opacity="${(.30 + r1 * .22).toFixed(2)}"/>`;
-      if (c.kind === "stars") out += S.star(20 + i * 82 + r1 * 50, 18 + r2 * 46, 5 + r1 * 5, c.fill);
+      if (c.kind === "stars") {
+        // a spread of small stars, and one body with actual mass among them
+        out += S.star(20 + i * 82 + r1 * 50, 14 + r2 * 50, 3 + r1 * 6, c.fill);
+        out += `<circle cx="${(52 + i * 78 + r2 * 40).toFixed(0)}" cy="${(30 + r1 * 44).toFixed(0)}"
+                  r="${(1 + r2 * 2).toFixed(1)}" fill="${c.fill}" opacity="${(.4 + r1 * .5).toFixed(2)}"/>`;
+        if (i === 1) out += S.planet(84, 44, 26, "#7d63c9", "#4a3690", "#c9b6ff");
+        if (i === 3) out += S.planet(300, 30, 15, "#e0885f", "#a25436", null);
+      }
       if (c.kind === "leaves")
         out += `<ellipse cx="${16 + i * 84 + r1 * 40}" cy="${-6 + r2 * 26}" rx="${34 + r1 * 22}" ry="${26 + r2 * 14}"
                  fill="${c.fill}" opacity="${(.5 + r1 * .3).toFixed(2)}"/>`;
@@ -285,6 +361,8 @@ const scene = {
         art = `<path d="M2 9 Q8 2 14 9 Q20 2 26 9" fill="none" stroke="${d.fill}" stroke-width="2" stroke-linecap="round"/>`;
       if (d.kind === "leaf")
         art = `<ellipse cx="14" cy="8" rx="9" ry="5" fill="${d.fill}" transform="rotate(${(r1 * 60 - 30).toFixed(0)} 14 8)"/>`;
+      if (d.kind === "rock")
+        art = `<path d="M4 11 L8 3 L17 2 L24 8 L21 13 L9 14 Z" fill="${d.fill}"/>`;
       if (!art) continue;
       out += `<span class="sc-drift" style="top:${y.toFixed(1)}%; width:${sz.toFixed(1)}%;
                  animation-duration:${dur}s; animation-delay:-${(r2 * 20).toFixed(1)}s">
@@ -304,7 +382,12 @@ const scene = {
   frame(b, seed) {
     const S = SCENE_SHAPE, f = b.frame;
     const draw = (x, base, h) =>
-      f.kind === "stalk"    ? S.stalk(x, base, h, f.fill, 12)
+      // snow has no grass: rounded drifts with a shaded underside read as banked snow,
+      // and unlike pale tufts they are actually visible against a white floor
+      f.kind === "drift"    ? `<g><ellipse cx="${x}" cy="${base}" rx="${h * .72}" ry="${h * .5}" fill="${f.fill}"/>
+                                  <ellipse cx="${x - h * .18}" cy="${base - h * .12}" rx="${h * .42}" ry="${h * .28}"
+                                    fill="#ffffff" opacity=".75"/></g>`
+    : f.kind === "stalk"    ? S.stalk(x, base, h, f.fill, 12)
       // indoors there is no grass: soft rounded forms read as a cushion or a rug edge
     : f.kind === "cushion"  ? `<rect x="${x - h * .42}" y="${base - h * .6}" width="${h * .84}"
                                  height="${h * .8}" rx="${h * .28}" fill="${f.fill}"/>`
@@ -339,7 +422,8 @@ const scene = {
      opts.layers — defaults to everything; pass a subset to keep a busy game readable.
      opts.seed   — vary the scene between rounds without changing biome. */
   html(biome, opts = {}) {
-    const b = BIOMES[biome] || BIOMES[THEME_BIOME[biome] || "meadow"] || BIOMES.meadow;
+    let b = BIOMES[biome] || BIOMES[THEME_BIOME[biome] || "meadow"] || BIOMES.meadow;
+    if (opts.tint) b = tintBiome(b, opts.tint);        // adopt the game's hue, keep the forms
     const seed = opts.seed || 1;
     const want = opts.layers || ["canopy", "far", "drift", "mid", "ground", "motes", "frame"];
     const has = k => want.includes(k);

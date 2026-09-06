@@ -120,9 +120,27 @@ cosy scenes. Cheap in code — the synth engine already exists — and it fills 
 as art does. Correcting my own review here: the *palette* is well made (layered voices, real
 filter envelopes); it is the **coverage** that is thin.
 
-### C2 · Fill the eight emptiest games  ·  effort M (with C1)  ·  lifts Composition
+### C2 · Fill the eight emptiest games  ·  effort M (with C1)  ·  ✅ **DONE (v49) — 14 games**
 `trace, dolphin, eggcatch, music, petmatch, ocean, whosays, petfeed` — all under 9%.
-Dolphin Dive matters most: it is the reference build every new game is told to imitate.
+
+> **Shipped in v49.** The kit is now in **14 games**: ocean, snow, eggcatch, pasta, icecream,
+> measure, fuelup, senses, dragon, pizza, dino, hideseek, whosays, music. Four of them
+> (dragon, music, pasta, icecream) pass a `tint` so the scenery adopts their theme's hue.
+>
+> **Deliberately skipped, with reasons:**
+> - **dolphin** — it scrolls, with its own parallax marquees. Static bands would slide wrong
+>   against them; it needs a scroll-aware variant of the kit. Still the most important one to do.
+> - **trace** — a tracing canvas needs maximum contrast on the guide path, and it writes to
+>   `area.innerHTML` with a different shape from every other game.
+> - **feelings** — a calm-down check-in. Busy scenery is the wrong feeling for that screen.
+> - **petmatch / petcare / petfeed** — all three live in `pets.js` and share one surface; worth
+>   doing together rather than piecemeal.
+>
+> **On the occupancy metric: stop trusting it here.** It hit-tests, and almost every game wraps
+> its content in a full-bleed transparent `-wrap` div at a higher z-index, so the probe hits the
+> wrap and the scenery underneath is invisible to it. Twelve of the fourteen show "no gain" while
+> carrying 105–182 scenery nodes each and looking obviously fuller. The metric was right for
+> finding the problem and is the wrong tool for confirming the fix — screenshots are.
 
 ### C3 · Retire the flat primitives  ·  effort S  ·  lifts Art
 Specific offenders found while playing: the "moon" in Counting Critters is an untextured pale

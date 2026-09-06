@@ -53,7 +53,9 @@ const sensesLevel = {
       `<button class="se-zone" data-s="${s}"><span class="se-emo">${SENSES[s].emo}</span><span class="se-lbl">${seL(SENSES[s].name)}</span></button>`
     ).join("");
 
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      scene.html("cozy", { seed: 20 + state.round * 4 }) +
+      `
       <style>
         .se-stage{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(16px,5vmin,46px);padding:2vmin;box-sizing:border-box}
         .se-obj{font-size:clamp(80px,26vmin,210px);line-height:1;animation:seBob 2.8s ease-in-out infinite;filter:drop-shadow(0 6px 10px rgba(0,0,0,.2))}

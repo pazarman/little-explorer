@@ -56,7 +56,9 @@ const measureLevel = {
       askTaller ? t("measure_say_taller") : t("measure_say_shorter")
     );
 
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      scene.html("meadow", { seed: 37 + state.round * 4 }) +
+      `
       <style>
         .mz-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
         .mz-row{display:flex;align-items:flex-end;justify-content:center;gap:clamp(20px,8vmin,80px)}
