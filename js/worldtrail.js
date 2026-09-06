@@ -37,10 +37,10 @@ const worldTrail = {
     this.paint();
     // Land where she left off. If a new game is waiting here, the camera then
     // travels the path to it — she watches the way there instead of hunting.
-    this.center(this.ptAt(this.at).x, false);
+    this.center(this.along(this.ptAt(this.at)), false);
     const fresh = this.gids.findIndex(isNewGame);
     if (fresh >= 0 && fresh !== this.at) {
-      core.wait(() => this.center(this.pts[fresh].x, true), 620);
+      core.wait(() => this.center(this.along(this.pts[fresh]), true), 620);
     }
   },
 
@@ -58,33 +58,60 @@ const worldTrail = {
     core.save("fionaTrail", store);
   },
 
-  /* ── geometry: one long horizontal wander, sized to the viewport ── */
+  /* ── geometry ──
+     The path runs along the screen's LONG axis: down a portrait phone, across a
+     landscape one. Portrait was measured at 18% of a 12-game world visible at once
+     (5.7 screens of horizontal scrolling) while using 33% of the available height —
+     the wrong axis on a 2.17:1 screen, and the wrong gesture for a phone.
+
+     Everything downstream works in {x, y}; only this function and `center()` know
+     which way the road runs. */
   measure() {
     const view = $("trailView");
     const vw = view.clientWidth || innerWidth, vh = view.clientHeight || innerHeight;
     const n = this.gids.length;
-    const gap = Math.max(120, Math.min(215, vw * 0.42));
-    const amp = Math.min(105, vh * 0.15);
-    const padL = Math.max(96, vw * 0.34);
-    const midY = vh * 0.5;
-    // A sine that doesn't repeat every two nodes, so the path wanders instead of zigzagging.
-    this.pts = this.gids.map((_, i) => ({ x: padL + i * gap, y: midY + amp * Math.sin(i * 0.9 + 0.4) }));
-    this.head = { x: padL - gap * 0.62, y: midY + amp * Math.sin(0.4) };
-    const lastX = n ? this.pts[n - 1].x : padL;
-    const endX = lastX + gap * 0.92;
+    const vertical = vh > vw * 1.15;                  // same threshold the hub uses
+    this.vertical = vertical;
+
+    // `run` is along the road, `cross` is side to side — whichever way round that is.
+    const runLen  = vertical ? vh : vw;
+    const crossLen = vertical ? vw : vh;
+    const gap = Math.max(120, Math.min(215, runLen * (vertical ? 0.26 : 0.42)));
+    const amp = Math.min(105, crossLen * (vertical ? 0.22 : 0.15));
+    // Running downhill, the trailhead has to clear the world title and the home button
+    // at the top of the screen — at 0.20 the buddy and the signpost sat under them.
+    const pad = vertical ? Math.max(150 + gap * 0.62, runLen * 0.20)
+                         : Math.max(96, runLen * 0.34);
+    const mid = crossLen * 0.5;
     const disc = Math.max(72, Math.min(124, vh * 0.18, vw * 0.18));
-    // The buddy walks ON the road, holding back a fraction of a step from the node
-    // it is standing at, so it never covers the picture of the game.
+
+    // A sine that doesn't repeat every two nodes, so the path wanders instead of zigzagging.
+    const at = (i) => {
+      const along = pad + i * gap, across = mid + amp * Math.sin(i * 0.9 + 0.4);
+      return vertical ? { x: across, y: along } : { x: along, y: across };
+    };
+    this.pts = this.gids.map((_, i) => at(i));
+    this.head = at(-0.62);
+    const endAlong = (n ? pad + (n - 1) * gap : pad) + gap * 0.92;
+    const tailAcross = n ? (vertical ? this.pts[n - 1].x : this.pts[n - 1].y) : mid;
     // The party sits at the end of the road, one index past the last game, so the buddy
     // walks to it exactly as it walks to anything else.
-    this.partyPt = { x: endX, y: n ? this.pts[n - 1].y : midY };
-    this.geom = { vw, vh, gap, amp, midY, endX, disc,
+    this.partyPt = vertical ? { x: tailAcross, y: endAlong } : { x: endAlong, y: tailAcross };
+
+    const canvasRun = Math.ceil(Math.max(runLen, endAlong + runLen * 0.34));
+    this.geom = { vw, vh, gap, amp, disc, vertical,
+                  midY: vertical ? vh * 0.5 : mid,          // kept: scenery reads it
+                  mid, endX: endAlong,
                   lag: Math.min(0.42, (disc * 0.5 + 34) / gap),
-                  w: Math.ceil(Math.max(vw, endX + vw * 0.34)), h: vh };
+                  w: vertical ? vw : canvasRun,
+                  h: vertical ? canvasRun : vh };
     const c = $("trailCanvas");
     c.style.width = this.geom.w + "px";
     c.style.height = this.geom.h + "px";
   },
+
+  // The coordinate that scrolls, for whichever way the road runs.
+  along(pt) { return this.vertical ? pt.y : pt.x; },
 
   // Position at a fractional node index; -1 is the trailhead. Segments are
   // straight, so lerping the index walks exactly along the drawn path.
@@ -106,8 +133,10 @@ const worldTrail = {
       `linear-gradient(180deg, rgba(0,0,0,.07), rgba(0,0,0,0) 20%,
                                rgba(0,0,0,0) 80%, rgba(0,0,0,.07)), ${land}`;
 
-    // the path itself: a dashed ribbon with stepping stones between the nodes
-    const all = [this.head, ...this.pts, { x: endX, y: this.pts.length ? this.pts[this.pts.length - 1].y : this.head.y }];
+    // the path itself: a dashed ribbon with stepping stones between the nodes.
+    // It runs head -> games -> past the party, whichever way the road is laid out.
+    const tail = this.partyPt || this.head;
+    const all = [this.head, ...this.pts, tail];
     const pts = all.map(p => `${p.x},${p.y}`).join(" ");
     $("trailPath").setAttribute("points", pts);
     $("trailEdge").setAttribute("points", pts);
@@ -129,33 +158,42 @@ const worldTrail = {
 
   // Scenery is decoration only — tapping it wiggles and chirps and changes nothing.
   paintScenery(scene) {
-    const { w, h, midY, amp } = this.geom;
+    const g = this.geom, { w, h, amp } = g;
+    const vert = g.vertical;
     const deco = $("trailDeco");
-    const tailY = this.pts.length ? this.pts[this.pts.length - 1].y : this.head.y;
-    // The trailhead keeps its signpost; the far end is now the party node itself
-    // (paintNodes), so the decorative tent that used to sit there is gone.
-    let html = `<span class="tr-mark" style="left:${this.head.x - 6}px; top:${this.head.y - this.geom.disc * 0.66}px">🪧</span>`;
+    // Scenery is laid out the same way whichever axis the road runs: scattered ALONG it,
+    // held clear of the path band on both sides.
+    const runLen  = vert ? h : w;                       // length of the road
+    const crossLen = vert ? w : h;                      // width of the world
+    const mid = g.mid;
+    const place = (along, across) => vert ? { x: across, y: along } : { x: along, y: across };
+
+    let html = `<span class="tr-mark" style="left:${vert ? this.head.x - g.disc * 0.62 : this.head.x - 6}px;
+                  top:${vert ? this.head.y - 6 : this.head.y - g.disc * 0.66}px">🪧</span>`;
+
     // Fixed scenery, scattered with a seeded jitter so a world looks like somewhere
     // rather than a grid — and kept out of the path band so nothing sits under a node.
-    const band = amp + this.geom.disc * 0.62 + 30;
-    const slots = Math.ceil(w / 82);
+    const band = amp + g.disc * 0.62 + 30;
+    const slots = Math.ceil(runLen / 82);
     for (let i = 0; i < slots; i++) {
       const r1 = seeded(i + 1), r2 = seeded(i + 41), r3 = seeded(i + 97), r4 = seeded(i + 163);
       if (r3 < 0.18) continue;                                  // leave clearings
       const e = scene.fixed[Math.floor(r4 * scene.fixed.length)];
-      const above = r2 < 0.5;
-      const x = i * 82 + r1 * 60;
+      const near = r2 < 0.5;                                    // which side of the road
+      const along = i * 82 + r1 * 60;
       const spread = r2 * 2 % 1;
-      const y = above ? Math.max(30, midY - band - spread * (midY - band - 34))
-                      : Math.min(h - 34, midY + band + spread * (h - 34 - midY - band));
+      const across = near ? Math.max(30, mid - band - spread * (mid - band - 34))
+                          : Math.min(crossLen - 34, mid + band + spread * (crossLen - 34 - mid - band));
+      const pt = place(along, across);
       const scale = (0.72 + r1 * 0.6).toFixed(2);
-      html += `<span class="tr-fixed" style="left:${x}px; top:${y}px; transform:translate(-50%,-50%) scale(${scale})">${e}</span>`;
+      html += `<span class="tr-fixed" style="left:${pt.x}px; top:${pt.y}px; transform:translate(-50%,-50%) scale(${scale})">${e}</span>`;
     }
     // a few wanderers that drift back and forth across the world
     scene.props.forEach((e, i) => {
-      const x = 140 + i * (w / (scene.props.length + 0.6));
-      const y = midY + (i % 2 ? amp + 46 : -amp - 46);
-      html += `<button class="tr-prop" style="left:${x}px; top:${y}px; animation-duration:${9 + i * 3}s; animation-delay:-${i * 2.5}s"
+      const along = 140 + i * (runLen / (scene.props.length + 0.6));
+      const across = mid + (i % 2 ? amp + 46 : -amp - 46);
+      const pt = place(along, across);
+      html += `<button class="tr-prop" style="left:${pt.x}px; top:${pt.y}px; animation-duration:${9 + i * 3}s; animation-delay:-${i * 2.5}s"
                        aria-hidden="true" tabindex="-1">${e}</button>`;
     });
     deco.innerHTML = html;
@@ -213,11 +251,15 @@ const worldTrail = {
   },
 
   /* ── camera ── */
-  center(x, smooth) {
-    const view = $("trailView");
-    const left = Math.max(0, Math.min(this.geom.w - this.geom.vw, x - this.geom.vw / 2));
-    if (smooth && !reducedMotion()) view.scrollTo({ left, behavior: "smooth" });
-    else view.scrollLeft = left;
+  center(v, smooth) {
+    const view = $("trailView"), g = this.geom;
+    const span = g.vertical ? g.h - g.vh : g.w - g.vw;
+    const half = (g.vertical ? g.vh : g.vw) / 2;
+    const pos = Math.max(0, Math.min(span, v - half));
+    if (smooth && !reducedMotion()) view.scrollTo(g.vertical ? { top: pos, behavior: "smooth" }
+                                                             : { left: pos, behavior: "smooth" });
+    else if (g.vertical) view.scrollTop = pos;
+    else view.scrollLeft = pos;
   },
 
   /* ── the walk: buddy travels the path, camera follows, then the game starts ── */
@@ -233,7 +275,7 @@ const worldTrail = {
       if (!isParty) this.saveAt(i);      // the party is not a game, so it isn't "where she left off"
       core.wait(() => (isParty ? worldParty.start(this.cat) : startGameNow(gid)), 140);
     };
-    if (steps === 0 || reducedMotion()) { this.center(this.ptAt(i).x, true); core.wait(arrive, 260); return; }
+    if (steps === 0 || reducedMotion()) { this.center(this.along(this.ptAt(i)), true); core.wait(arrive, 260); return; }
 
     // The walk fits inside the beat the narrator line already took, so travelling
     // the path costs her no extra waiting before the game starts.
@@ -245,7 +287,7 @@ const worldTrail = {
       const k = Math.min(1, (now - t0) / dur);
       const f = from + (i - from) * k;
       this.placeBuddy(f);
-      this.center(this.ptAt(f).x, false);
+      this.center(this.along(this.ptAt(f)), false);
       const crossed = Math.round(f);
       if (crossed !== lastStep) { lastStep = crossed; tone(400 + crossed * 18, 0, .07, "sine", .05); }
       if (k < 1) this.raf = requestAnimationFrame(step);
@@ -265,7 +307,7 @@ const worldTrail = {
     this.stop();
     this.measure();
     this.paint();
-    this.center(this.ptAt(this.at).x, false);
+    this.center(this.along(this.ptAt(this.at)), false);
   }
 };
 

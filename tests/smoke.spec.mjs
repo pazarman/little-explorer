@@ -164,25 +164,34 @@ test("a world is one scrollable path with every game on it and nothing locked", 
     nodes: document.querySelectorAll("#gameNodes .node:not(.tr-party)").length,
     // the world party closes the path — one node, past the last game
     partyNodes: document.querySelectorAll("#gameNodes .tr-party").length,
+    // The road runs along the screen's long axis — down a portrait phone, across a
+    // landscape one — so everything here is measured along whichever that is.
+    vertical: worldTrail.geom.vertical,
     // the path is longer than the screen — that is the point, she scrolls it
-    canvas: Math.round(worldTrail.geom.w),
-    view: worldTrail.geom.vw,
-    scrollable: document.getElementById("trailView").scrollWidth > worldTrail.geom.vw,
+    canvas: Math.round(worldTrail.geom.vertical ? worldTrail.geom.h : worldTrail.geom.w),
+    view: worldTrail.geom.vertical ? worldTrail.geom.vh : worldTrail.geom.vw,
+    scrollable: (() => { const v = document.getElementById("trailView"), g = worldTrail.geom;
+      return g.vertical ? v.scrollHeight > g.vh : v.scrollWidth > g.vw; })(),
     // and the scroll extent matches the drawn world exactly, so she can't scroll off it
-    overscroll: document.getElementById("trailView").scrollWidth - Math.round(worldTrail.geom.w),
+    overscroll: (() => { const v = document.getElementById("trailView"), g = worldTrail.geom;
+      return g.vertical ? v.scrollHeight - Math.round(g.h) : v.scrollWidth - Math.round(g.w); })(),
     // every game is reachable from the very first visit: no gates, no fail state
     disabled: [...document.querySelectorAll("#gameNodes .node")].filter((n) => n.disabled).length,
   }));
   expect(world.nodes).toBe(world.games);
   expect(world.partyNodes, "every world should end in exactly one party node").toBe(1);
+  // the test viewport is a portrait phone, so the road should be running downhill
+  expect(world.vertical, "a portrait phone should scroll the trail vertically").toBe(true);
   expect(world.canvas).toBeGreaterThan(world.view);
   expect(world.scrollable).toBe(true);
   expect(world.overscroll).toBe(0);
   expect(world.disabled).toBe(0);
 
   // games keep their order along the path, so the newest is always furthest along
+  // order is monotonic ALONG the road, whichever axis that is
   const order = await page.evaluate(() =>
-    worldTrail.gids.every((_, i) => i === 0 || worldTrail.pts[i].x > worldTrail.pts[i - 1].x));
+    worldTrail.gids.every((_, i) =>
+      i === 0 || worldTrail.along(worldTrail.pts[i]) > worldTrail.along(worldTrail.pts[i - 1])));
   expect(order).toBe(true);
 
   expect(errors, "console/page errors on the world trail:\n" + errors.join("\n")).toEqual([]);
@@ -205,11 +214,14 @@ test("tapping a game walks the buddy along the path, then starts it", async ({ p
   // walking is real movement along the path, with the camera following it
   const walk = await page.evaluate(async () => {
     const view = document.getElementById("trailView"), bud = document.getElementById("trailBuddy");
-    const from = { x: parseFloat(bud.style.left), scroll: view.scrollLeft };
+    const vert = worldTrail.geom.vertical;
+    const pos = () => vert ? parseFloat(bud.style.top) : parseFloat(bud.style.left);
+    const scrolled = () => vert ? view.scrollTop : view.scrollLeft;
+    const from = { x: pos(), scroll: scrolled() };
     document.querySelector('#gameNodes .node[data-gid="nightday"]').click();
     const seen = [];
     for (let i = 0; i < 10; i++) {
-      seen.push({ x: parseFloat(bud.style.left), scroll: view.scrollLeft });
+      seen.push({ x: pos(), scroll: scrolled() });
       await new Promise((r) => setTimeout(r, 70));
     }
     const last = seen[seen.length - 1];
@@ -239,11 +251,12 @@ test("a newly shipped game sits at the end of the path and the camera travels th
     openCategory("brain");
     const view = document.getElementById("trailView");
     await new Promise((r) => setTimeout(r, 150));
-    const landed = view.scrollLeft;              // lands where she left off
+    const scrolled = () => worldTrail.geom.vertical ? view.scrollTop : view.scrollLeft;
+    const landed = scrolled();                   // lands where she left off
     await new Promise((r) => setTimeout(r, 1800));
     const i = worldTrail.gids.findIndex(isNewGame);
     return {
-      landed, after: view.scrollLeft,
+      landed, after: scrolled(),
       isLast: i === worldTrail.gids.length - 1,
       flags: document.querySelectorAll("#gameNodes .node-new").length,
     };
@@ -251,6 +264,67 @@ test("a newly shipped game sits at the end of the path and the camera travels th
   expect(reveal.isLast).toBe(true);              // newest game is furthest along the path
   expect(reveal.flags).toBe(1);
   expect(reveal.after).toBeGreaterThan(reveal.landed);   // the camera showed her the way there
+});
+
+test("the trail turns with the phone", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.addInitScript(() => {
+    localStorage.setItem("fionaStars", JSON.stringify({ memory: 2 }));
+    localStorage.setItem("fionaTrail", JSON.stringify({ brain: "memory" }));
+  });
+  await page.goto("/index.html?test=1");
+
+  // A 12-game world was 2235px of horizontal road on a 393px portrait screen: 18% of it
+  // visible, 5.7 screens of scrolling, and only a third of the height used. The road now
+  // runs along whichever axis is longer.
+  const read = () => page.evaluate(() => {
+    const g = worldTrail.geom, v = document.getElementById("trailView");
+    const runLen = g.vertical ? g.h : g.w, screenRun = g.vertical ? g.vh : g.vw;
+    return {
+      vertical: g.vertical,
+      visible: screenRun / runLen,
+      scrollAxis: getComputedStyle(v).overflowY === "auto" ? "y" : "x",
+      overscroll: g.vertical ? v.scrollHeight - Math.round(g.h) : v.scrollWidth - Math.round(g.w),
+      buddyOnRoad: (() => {                      // the buddy must still stand on the path
+        const b = document.getElementById("trailBuddy").getBoundingClientRect();
+        const p = worldTrail.ptAt(worldTrail.at);
+        const c = document.getElementById("trailCanvas").getBoundingClientRect();
+        return Math.abs((b.left + b.width / 2) - (c.left + p.x)) < 90;
+      })(),
+      headerClear: (() => {                      // and nothing sits under the world title
+        const t = document.getElementById("gamesTitle").getBoundingClientRect();
+        const b = document.getElementById("trailBuddy").getBoundingClientRect();
+        return b.top > t.bottom;
+      })(),
+    };
+  });
+
+  await page.setViewportSize({ width: 393, height: 851 });
+  await page.evaluate(() => openCategory("brain"));
+  await expect(page.locator("#games")).toBeVisible();
+  await page.waitForTimeout(300);
+  const portrait = await read();
+
+  // turn the phone
+  await page.setViewportSize({ width: 851, height: 393 });
+  await page.waitForTimeout(400);
+  const landscape = await read();
+
+  expect(portrait.vertical, "a tall screen should run the road downhill").toBe(true);
+  expect(portrait.scrollAxis, "portrait should scroll vertically").toBe("y");
+  expect(landscape.vertical, "a wide screen should keep the road horizontal").toBe(false);
+  expect(landscape.scrollAxis, "landscape should scroll horizontally").toBe("x");
+
+  // the whole point: more of her world on screen than the 18% it used to be
+  expect(portrait.visible, "portrait should show more of the path than before").toBeGreaterThan(0.22);
+
+  for (const [name, r] of [["portrait", portrait], ["landscape", landscape]]) {
+    expect(r.overscroll, `${name}: scroll extent should match the drawn world`).toBe(0);
+    expect(r.buddyOnRoad, `${name}: the buddy came off the road`).toBe(true);
+    expect(r.headerClear, `${name}: the buddy is under the world title`).toBe(true);
+  }
+  expect(errors, "console/page errors turning the phone:\n" + errors.join("\n")).toEqual([]);
 });
 
 test("the grown-up panel keeps every control on screen and tappable", async ({ page }) => {
@@ -1438,8 +1512,10 @@ test("walking to the party takes the buddy to the end of the road", async ({ pag
 
   const r = await page.evaluate(async () => {
     const n = worldTrail.gids.length;
-    const partyX = worldTrail.ptAt(n).x;
-    const lastGameX = worldTrail.ptAt(n - 1).x;
+    // "furthest along" means along the road — down the screen in portrait, across it
+    // in landscape — so ask the trail which coordinate that is.
+    const partyX = worldTrail.along(worldTrail.ptAt(n));
+    const lastGameX = worldTrail.along(worldTrail.ptAt(n - 1));
     document.querySelector("#gameNodes .tr-party").click();
     await new Promise((r) => setTimeout(r, 1400));
     return {

@@ -203,9 +203,15 @@
   /* ---- The world trail: one long path she scrolls along, Super Mario 3 style.
          Sized in pixels by worldtrail.js against the live viewport, so the wander has
          real distance to it rather than squeezing to fit. ---- */
+  /* The road runs along the screen's long axis, so the scroll axis flips with it:
+     down a portrait phone, across a landscape one (see worldTrail.measure). */
   #trailView { position:absolute; inset:0; overflow-x:auto; overflow-y:hidden;
                -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
-  #trailView::-webkit-scrollbar { height:0; }
+  #trailView::-webkit-scrollbar { height:0; width:0; }
+  @media (max-aspect-ratio: 100/115) {
+    #trailView { overflow-x:hidden; overflow-y:auto; overscroll-behavior-y:contain;
+                 overscroll-behavior-x:auto; }
+  }
   #trailCanvas { position:relative; height:100%; }
   #trailBg { position:absolute; left:0; top:0; }
   /* clipped so a wandering prop can't stretch the scrollable width past the canvas */

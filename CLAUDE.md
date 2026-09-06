@@ -25,7 +25,12 @@ This repo has a hard quality bar. Use it; don't freelance.
   draws the islands, the dashed trail and the scenery from that same table; add a world by adding a
   `HUB_LAYOUT` entry (without one it still renders, via `defaultSlot`).
 - **World trail** (`js/worldtrail.js`, the `worldTrail` object — *not* `trail`, which core.js already owns
-  for the pointer sparkle): a world is one long horizontal path she scrolls, Super Mario 3 style. Her buddy
+  for the pointer sparkle): a world is one long path she scrolls, Super Mario 3 style. **The road runs
+  along the screen's LONG axis** — down a portrait phone, across a landscape one (`geom.vertical`, same
+  1.15 threshold the hub uses, mirrored by a `max-aspect-ratio` rule that flips the scroll axis). It was
+  horizontal everywhere, which on a 2.17:1 phone showed 18% of a 12-game world at a time over 5.7 screens
+  of scrolling while using a third of the height. Only `measure()` and `center()` know the axis;
+  everything else works in `{x, y}` and asks `along(pt)` for the coordinate that scrolls. Her buddy
   stands on the game she last played there (`fionaTrail`), walks the road to whatever she taps, and the
   camera follows it. Games keep `cat.games` order, so the newest is always furthest along; when a world
   holds an unplayed new game the camera travels the path to it on entry. Geometry is **pixels** measured
