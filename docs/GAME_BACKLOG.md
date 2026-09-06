@@ -1,5 +1,10 @@
 # Game Backlog
 
+> **Last reconciled against shipped code: 2026-09-06.** Two entries sat at `IN_REVIEW`
+> pointing at branches for games that had already shipped, and one `PROPOSED` entry claimed to fill
+> a gap that a shipped game had closed. Statuses here are only useful if they are checked against
+> `js/games/` — the registry (`GAME_REGISTRY`) is the source of truth for what exists.
+
 This file is the shared state between the agents and you:
 - **Backlog Curator** proposes new games (status: PROPOSED)
 - **You** review, reorder, and mark items READY
@@ -116,7 +121,7 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Low-Medium — 3 synthesised percussion sounds via existing Web Audio sfx; 3 SVG instrument buttons; rhythm sequence engine (array of sound IDs + playback timer with rAF); pattern display strip showing previous beats as colored icons; hint-glow at tier 0; the design challenge is making the "listen first, then respond" structure feel natural rather than passive
 - **File:** `js/games/rhythm.js`
 
-### [IN_REVIEW] Letter Lights  ⟵ built on branch `claude/compassionate-franklin-lip8fx` (js/games/letternames.js — review & merge to ship)
+### [DONE] Letter Lights  ⟵ shipped (js/games/letternames.js, in the Brain Games trail)
 - **STEM:** Phonological awareness / literacy · letter name recognition + symbol-sound link · age 3–4
 - **Success:** Child can see a glowing letter ("A") on screen, hear the voice say its name and sound ("This is A — it says /a/ like in apple"), and tap the picture from a choice of three whose name starts with that letter — demonstrating they can connect a printed letter symbol to both its name and its beginning sound
 - **Fills gap:** Phonological awareness, 3–4 age band — Sound Safari covers phoneme matching (auditory /b/ → tap ball); Clap the Beat covers syllable segmentation; Blend-It! covers onset-rime blending; but **letter NAME recognition** — connecting the visual letter SYMBOL to its spoken name AND phoneme — is the explicit "letter names" sub-concept listed in the STEM doc alongside "letter sounds" for ages 3–4 and is the foundational bridge between phoneme awareness and actual reading. Zero backlog and zero game-file coverage for this specific symbol-to-name-to-sound triple mapping.
@@ -132,7 +137,7 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Low — 3 SVG animal characters with simple keyframe animations (wiggle, clap, wave); an animated "waiting" indicator (e.g. gentle pulsing ring) so the wait is visually engaging; voice carries all narration; no drag; design challenge is making the WAIT feel exciting rather than empty — animals hold an "anticipation" pose with eyes wide, not frozen
 - **File:** `js/games/turntake.js`
 
-### [IN_REVIEW] My Five Senses  ⟵ built on branch `feat/senses` (review & merge to ship)
+### [DONE] My Five Senses  ⟵ shipped (js/games/senses.js, in the Brain Games trail)
 - **STEM:** Scientific thinking · observation — naming and matching the five senses to how we explore objects · age 2–4
 - **Success:** Child can tap or drag an object (fluffy bunny, ringing bell, bright flower, tangy lemon, warm soup) onto the sense icon it corresponds to (touch, hear, see, smell, taste) — demonstrating that each sense is a distinct tool for exploring the world and that different objects are explored with different senses
 - **Fills gap:** Scientific thinking, 2–3 and 3–4 age bands — the STEM doc's 2–3 tier is "name + observe" and the 3–4 tier includes observing natural phenomena; Alive or Not! covers living/nonliving (READY); Seasons Wheel, Weather Dresser, Sink or Float? address environmental prediction. **The five senses as an observation framework** — naming which sense you'd use to explore each object — is the canonical 2–4 preschool science concept present in every early-childhood curriculum and is completely absent from the backlog and all existing games. Who Says? (whosays.js) uses animal sounds but teaches animal identity, not hearing as a sense.
@@ -310,10 +315,10 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Medium — new game with SVG picture cards; audio-first (no reading); needs curated rhyme word pairs
 - **File:** `js/games/rhyme.js`
 
-### [PROPOSED] Feelings Friends
+### [PROPOSED] Feelings Friends  ⟵ rationale corrected: SEL is no longer zero-coverage, and the target file is taken
 - **STEM:** Social-emotional learning (SEL) · emotion naming → cause of feelings · age 2–4
 - **Success:** Child can point to the face that shows "happy" / "sad" / "surprised" / "scared" and, at tier 1, match an emotion to its cause ("Bunny dropped her ice cream — how does she feel?")
-- **Fills gap:** SEL — zero explicit coverage; Daniel Tiger, PBS Kids, and Sago Mini all treat this as a first-class domain
+- **Fills gap:** SEL — *not* zero coverage any more: `feelings.js` shipped and covers naming **her own** state plus a calming breath. What is still open is reading a feeling on **someone else's** face and its cause, which is what this game is for. Narrow it to that, and pick a new filename — `js/games/feelings.js` is taken.
 - **Rubric focus:** Learning efficacy (emotion word spoken + face shown simultaneously), Emotional safety (all feelings are valid — no wrong answer path, gentle correction only), Pacing (tier 0=2 emotions, tier 1=4 emotions with cause scene, tier 2=self-regulation choice)
 - **Estimated complexity:** Medium — SVG character faces with animated expressions; scenario scenes at tier 1; voice-first
 - **File:** `js/games/feelings.js`

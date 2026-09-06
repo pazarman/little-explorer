@@ -38,7 +38,9 @@ const pastaLevel = {
     const { item, base, noun } = this.food;
     const x = words(noun, need);
     setInstruction(t("put_base", { count: need, x, base: theWord(base) }), t("put_base", { count: need, x, base: theWord(base) }));
-    $("playArea").innerHTML = `<div class="pasta-wrap">
+    $("playArea").innerHTML =
+      scene.html("meadow", { seed: 20 + state.round * 4, tint: "#c96a5a" }) +
+      `<div class="pasta-wrap">
         <div class="yum-badge" id="yumCount">0</div>
         <div class="food-row" id="foodRow"></div>
         <div id="plateHolder">${plateSVG(base)}</div></div>`;

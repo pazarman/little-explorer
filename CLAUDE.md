@@ -25,7 +25,12 @@ This repo has a hard quality bar. Use it; don't freelance.
   draws the islands, the dashed trail and the scenery from that same table; add a world by adding a
   `HUB_LAYOUT` entry (without one it still renders, via `defaultSlot`).
 - **World trail** (`js/worldtrail.js`, the `worldTrail` object — *not* `trail`, which core.js already owns
-  for the pointer sparkle): a world is one long horizontal path she scrolls, Super Mario 3 style. Her buddy
+  for the pointer sparkle): a world is one long path she scrolls, Super Mario 3 style. **The road runs
+  along the screen's LONG axis** — down a portrait phone, across a landscape one (`geom.vertical`, same
+  1.15 threshold the hub uses, mirrored by a `max-aspect-ratio` rule that flips the scroll axis). It was
+  horizontal everywhere, which on a 2.17:1 phone showed 18% of a 12-game world at a time over 5.7 screens
+  of scrolling while using a third of the height. Only `measure()` and `center()` know the axis;
+  everything else works in `{x, y}` and asks `along(pt)` for the coordinate that scrolls. Her buddy
   stands on the game she last played there (`fionaTrail`), walks the road to whatever she taps, and the
   camera follows it. Games keep `cat.games` order, so the newest is always furthest along; when a world
   holds an unplayed new game the camera travels the path to it on entry. Geometry is **pixels** measured
@@ -43,9 +48,23 @@ This repo has a hard quality bar. Use it; don't freelance.
 - **38 games** (35 `LEVELS` + specials `paint`/`story`/`dressup`, which own a whole screen and are
   dispatched by `startGameNow`). Each level object has `theme`, `rounds`, `startRound()`, and reads
   `state.tier` (0–2).
+- **World party** (`worldParty` in core.js): the node closing each world's trail. It plays **one round
+  each from three games she has already played in that world** — interleaved retrieval practice, the
+  one well-evidenced lever the app lacked, since every game otherwise drills its concept alone. It
+  reuses the normal round engine through three hooks: `totalRounds()` returns 1 while a party is
+  active, `levelComplete()` hands on to `worldParty.next()` instead of celebrating, and
+  `drawProgress()` tracks the party rather than the game inside it. **Never a gate** — tappable from
+  the first visit, and an unplayed world tops the queue up from its other games, so it is a sampler
+  early and real review later. `showHub()` stops it; the party is not saved as the buddy's spot.
 - **Difficulty**: `tierFor(level)` — manual easy/med/hard force 0/1/2; **auto mode uses a performance model**
   (`fionaPerf`: `autoTierFor`, EMA of round quality, down-shift on ≥3 mistakes). Mistakes are counted via the
   wrapped `sfx.bad`; `roundComplete` records perf and can lower the next round's tier.
+- **Scene kit** (`scene.html(biome, opts)` in `js/scene.js`): the shared drawn-SVG scenery every
+  game composes its background from — 7 biomes, layers `canopy/far/drift/mid/ground/motes/frame`.
+  Built because measured foreground occupancy averaged 15% of the play area across all levels.
+  Call it *after* a game's own full-bleed backdrop or that backdrop paints over it; pass a
+  `layers` subset when a game already draws its own floor or sky. Seeded (identical on repaint),
+  inert (`pointer-events:none`), and complete at frame 0. See `docs/ART-STYLE-GUIDE.md`.
 - **Audio**: `speak()` (Web Speech), `voice()`/`sfx` (Web Audio synth), `MUSIC` styles. No audio files.
 - **Quest**: collect Star Sparks (`sparks`) across any game to launch a rocket (`rocketLaunch`); `QUEST_GOAL`.
 - **Persistence** (localStorage): `fionaStars` (completions), `fionaStickers`, `fionaSettings`, `fionaSparks`/

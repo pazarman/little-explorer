@@ -50,6 +50,36 @@ target hue. Add life with **neutral/white overlays only** (white belly sheen,
 black-at-low-opacity gill/smile). Never tint a sub-part a different color, or you
 break the "what color is it?" learning goal.
 
+## Backgrounds: use the scene kit, don't hand-roll one
+
+`js/scene.js` is the shared scenery library — drawn SVG layers every game composes its
+screen from. It exists because measured occupancy across all 35 levels averaged **15%** of
+the play area, with 20 games under 15%: objects floating in a gradient.
+
+```js
+$("playArea").innerHTML = scene.html("reef", { seed: 3 + state.round * 5 }) + `…the game…`;
+```
+
+- **Biomes:** `snow, reef, meadow, savanna, forest, space, cozy`. Most games can pass their
+  body theme instead and let `THEME_BIOME` pick.
+- **Layers**, back to front: `canopy, far, drift, mid, ground, motes, frame`. Pass a subset
+  via `{ layers: [...] }` when a game already paints its own floor or sky — doubling up looks
+  worse than nothing.
+- **Order matters.** If a game draws its own full-bleed backdrop, put the kit call *after* it
+  or the backdrop paints straight over it (this happened to Counting Critters).
+- **The frame is the important one.** Something nearest the eye at the screen edges is what
+  makes a flat screen read as a place. Skip it last.
+- **Drifters stay neutral.** In colour-naming games the tappable objects carry the answer, so
+  background shapes are silhouettes only — never a nameable colour.
+- Everything is seeded, so a scene lands identically on every repaint; vary `seed` per round
+  for variety within one game.
+- Everything is `pointer-events:none` and looks complete at frame 0. Both are covered by tests.
+- **Tint when the biome fights the theme.** `{ tint: "#8d5bb0" }` keeps every form and its
+  relative lightness but adopts one hue, so the scene reads as depth in the game's own palette.
+  Forest greens over Dragon Feed's purple sky looked like scenery from a different app; tinted,
+  the same shapes read as violet hills and the green dragon becomes the hero again.
+
+
 ## Non-negotiables (from CLAUDE.md)
 - Drawn SVG for hero objects; emoji only as **whole objects**, never fake-layered.
 - Tie number **symbol ↔ quantity** where counting is the goal.

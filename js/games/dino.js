@@ -44,7 +44,9 @@ const dinoLevel = {
     const eggs = grid.map(([x, y]) =>
       `<div class="flash-egg" style="left:${x}%;top:${y}%;">🥚</div>`
     ).join("");
-    $("playArea").innerHTML = `<div class="flash-wrap">
+    $("playArea").innerHTML =
+      scene.html("forest", { seed: 29 + state.round * 4 }) +
+      `<div class="flash-wrap">
       <div class="flash-nest" id="flashNest">
         <div class="flash-eggs" id="flashEggs">${eggs}</div>
         <div class="flash-cover" id="flashCover"></div>

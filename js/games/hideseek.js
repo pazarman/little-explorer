@@ -84,7 +84,9 @@ const hideseekLevel = {
       return `<div class="hs-zone" data-rel="${r}" style="left:${z.x}%; top:${z.y}%;"></div>`;
     }).join("");
 
-    $("playArea").innerHTML = `<div class="hideseek-wrap" id="hideseekWrap">
+    $("playArea").innerHTML =
+      scene.html("cozy", { seed: 37 + state.round * 4 }) +
+      `<div class="hideseek-wrap" id="hideseekWrap">
       <div class="hideseek-stage"><div class="hide-spot">${spot.svg()}${zonesHtml}</div></div>
       <div class="hideseek-buddy" id="buddyActor">${bObj.e}</div>
     </div>`;

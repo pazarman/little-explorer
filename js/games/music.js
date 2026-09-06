@@ -12,7 +12,9 @@ const musicLevel = {
     this.toPlay = this.seq.slice();
     this.listening = false;
     setInstruction("🥁 " + t("listen_show"), t("listen_say"));
-    $("playArea").innerHTML = `<div class="music-stage"><div class="music-keys" id="musicKeys"></div></div>`;
+    $("playArea").innerHTML =
+      scene.html("forest", { seed: 28 + state.round * 4, tint: "#9a5fc0" }) +
+      `<div class="music-stage"><div class="music-keys" id="musicKeys"></div></div>`;
     this.keys.forEach((k, i) => {
       const b = document.createElement("button");
       b.className = "mkey"; b.textContent = ANIMALS[k].e; b.dataset.i = i;

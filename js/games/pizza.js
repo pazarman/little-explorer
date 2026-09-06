@@ -30,7 +30,9 @@ const pizzaLevel = {
     else this.startColor();
   },
   shell(holderInner) {
-    $("playArea").innerHTML = `<div class="pizza-wrap">
+    $("playArea").innerHTML =
+      scene.html("meadow", { seed: 41 + state.round * 4 }) +
+      `<div class="pizza-wrap">
         <div id="pizzaHolder">${holderInner}</div>
         <div class="choice-row" id="pizChoices"></div>
       </div>`;
