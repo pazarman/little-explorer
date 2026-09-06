@@ -24,6 +24,13 @@ This repo has a hard quality bar. Use it; don't freelance.
   orientation), so a disc never moves between devices — she navigates by place, not by reading. `buildHub`
   draws the islands, the dashed trail and the scenery from that same table; add a world by adding a
   `HUB_LAYOUT` entry (without one it still renders, via `defaultSlot`).
+- **World trail** (`js/worldtrail.js`, the `worldTrail` object — *not* `trail`, which core.js already owns
+  for the pointer sparkle): a world is one long horizontal path she scrolls, Super Mario 3 style. Her buddy
+  stands on the game she last played there (`fionaTrail`), walks the road to whatever she taps, and the
+  camera follows it. Games keep `cat.games` order, so the newest is always furthest along; when a world
+  holds an unplayed new game the camera travels the path to it on entry. Geometry is **pixels** measured
+  against the live viewport (`measure()`), so it is rebuilt on resize — unlike the hub's percent coords.
+  Nothing on the trail is ever locked; the path is wayfinding and story, never gating.
 - **Hub progress**: `worldStars()` counts *distinct games tried*, never a fraction of the world's size —
   shipping a game into a world must never take away a star. New games are tagged `v: <APP_VERSION>` in
   `GAMES`; `isNewGame()` flies a "New!" flag until she plays it, and it ages out on the next version bump.
@@ -35,7 +42,8 @@ This repo has a hard quality bar. Use it; don't freelance.
 - **Audio**: `speak()` (Web Speech), `voice()`/`sfx` (Web Audio synth), `MUSIC` styles. No audio files.
 - **Quest**: collect Star Sparks (`sparks`) across any game to launch a rocket (`rocketLaunch`); `QUEST_GOAL`.
 - **Persistence** (localStorage): `fionaStars` (completions), `fionaStickers`, `fionaSettings`, `fionaSparks`/
-  `fionaTrips`, `fionaPerf`, `fionaName`, `fionaBuddy`, `fionaDecor`.
+  `fionaTrips`, `fionaPerf`, `fionaName`, `fionaBuddy`, `fionaDecor`, `fionaTrail` (where the buddy stands
+  in each world).
 
 ## Conventions
 - Drawn SVG for hero objects (rocket, dragon, fish, dress-up character); emoji only as **whole objects**,

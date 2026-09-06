@@ -171,15 +171,57 @@
   .node:nth-child(4n+3) { animation-delay:0s, 2.5s; }   .node:nth-child(4n)   { animation-delay:0s, 3.4s; }
   @keyframes catFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-1vmin);} }
   @keyframes nodePop  { 0%{opacity:0; transform:scale(.3);} 100%{opacity:1; transform:scale(1);} }
-  #games { padding-top:9vmin; }
-  #games #gamesHome { position:absolute; top:2vmin; left:2vmin; z-index:10; }
+  #games { padding:0; overflow:hidden; }
+  #games #gamesHome { position:absolute; top:2vmin; left:2vmin; z-index:12; }
   #gamesTitle { position:absolute; top:2.5vmin; width:100%; text-align:center; color:#fff;
-                font-size:clamp(22px,5vmin,40px); text-shadow:0 3px 0 rgba(0,0,0,.25); pointer-events:none; padding:0 2vmin; }
-  #gameNodes { display:grid; grid-template-columns:repeat(auto-fit, minmax(clamp(104px,28vmin,160px), 1fr));
-               gap:3.4vmin 2vmin; align-content:center; justify-items:center; padding:2vmin; width:100%;
-               max-width:680px; max-height:100%; overflow-y:auto; }
-  @media (max-width:520px) { #gameNodes { grid-template-columns:repeat(2,1fr); } }
-  #gameNodes .node-disc { width:clamp(72px,18vmin,124px); height:clamp(72px,18vmin,124px); font-size:clamp(34px,9.5vmin,64px); }
+                font-size:clamp(22px,5vmin,40px); text-shadow:0 3px 0 rgba(0,0,0,.25); pointer-events:none;
+                padding:0 2vmin; z-index:11; }
+
+  /* ---- The world trail: one long path she scrolls along, Super Mario 3 style.
+         Sized in pixels by worldtrail.js against the live viewport, so the wander has
+         real distance to it rather than squeezing to fit. ---- */
+  #trailView { position:absolute; inset:0; overflow-x:auto; overflow-y:hidden;
+               -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
+  #trailView::-webkit-scrollbar { height:0; }
+  #trailCanvas { position:relative; height:100%; }
+  #trailBg { position:absolute; left:0; top:0; }
+  /* clipped so a wandering prop can't stretch the scrollable width past the canvas */
+  #trailDeco { position:absolute; inset:0; overflow:hidden; }
+  #gameNodes { position:absolute; inset:0; }
+  /* nodes sit ON the path — the same disc system as the map, just placed by pixel */
+  .tr-node { position:absolute; transform:translate(-50%,-50%); width:max-content; z-index:4; }
+  .tr-node .node-disc { width:clamp(72px,18vmin,124px); height:clamp(72px,18vmin,124px);
+                        font-size:clamp(34px,9.5vmin,64px); }
+  .tr-node .node-label { max-width:34vmin; }
+  /* keyframes carry the centering transform, as on the world map */
+  .tr-node { animation-name:trNodePop; }
+  @keyframes trNodePop { 0%{opacity:0; transform:translate(-50%,-50%) scale(.4);}
+                         100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
+
+  /* her buddy, standing on the path and walking it when she picks a game */
+  /* The buddy is placed by pixel and centred with a transform, so it must NOT run
+     .mascot's bob/talk keyframes — those set `transform` outright and would throw
+     it off the path. Its inner .buddy span keeps the idle wiggle and talk squash. */
+  #trailBuddy { position:absolute; z-index:6; width:clamp(46px,10vmin,84px);
+                font-size:clamp(40px,9vmin,74px); transform:translate(-50%,-100%);
+                pointer-events:none; filter:drop-shadow(0 4px 5px rgba(0,0,0,.3));
+                animation:none !important; }
+
+  /* scenery — decoration only, never a target that matters */
+  .tr-mark  { position:absolute; transform:translate(-50%,-50%); z-index:3;
+              font-size:clamp(26px,6vmin,50px); filter:drop-shadow(0 2px 2px rgba(0,0,0,.22)); }
+  .tr-fixed { position:absolute; transform:translate(-50%,-50%); z-index:2; opacity:.85;
+              font-size:clamp(20px,4.6vmin,40px); filter:drop-shadow(0 2px 2px rgba(0,0,0,.18)); }
+  .tr-prop  { position:absolute; z-index:3; border:none; background:none; padding:6px;
+              font-size:clamp(24px,5.4vmin,46px); line-height:1;
+              filter:drop-shadow(0 3px 3px rgba(0,0,0,.22));
+              animation:trWander ease-in-out infinite alternate; }
+  @keyframes trWander { from{transform:translate(-50%,-50%) scaleX(1);}
+                        to  {transform:translate(calc(-50% + 78px),-50%) scaleX(-1);} }
+  .tr-prop.boing { animation:trBoing .5s ease-out; }
+  @keyframes trBoing { 0%{transform:translate(-50%,-50%) scale(1);}
+                       40%{transform:translate(-50%,-64%) scale(1.28);}
+                       100%{transform:translate(-50%,-50%) scale(1);} }
 
   /* name entry */
   #namescreen { background:linear-gradient(#8fd5f7,#c9efb0 70%,#8fd06a); z-index:78; }
@@ -951,4 +993,7 @@
        pill still reads as new without pulsing) */
     #mapNodes.worlds .node { animation: none !important; }
     .node-new { animation: none !important; }
+    /* world trail: scenery holds still and nodes don't pop in; the buddy still
+       moves between games, it just teleports rather than walking (see worldtrail.js) */
+    .tr-prop, .tr-node { animation: none !important; }
   }

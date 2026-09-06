@@ -54,16 +54,25 @@ Implementer builds the approved ones. Dated research briefs live in `docs/resear
   nodes; portrait↔landscape flip redraws, an in-orientation resize does not; reduced-motion honoured;
   18/18 smoke tests (3 new: fixed placement, star monotonicity, the New! flag lifecycle).
 
-### [PROPOSED] World map — Layer 2: a trail inside each world
-- **What:** Replace a world's flat game grid with a winding path of stepping stones, oldest → newest, so a
-  weekly game arrives as a new stone at the end of the trail. No locks — the path is wayfinding, not gating.
-- **Blocked on a real problem:** Brain Games already holds 12 games. A trail through 12 stones does not fit
-  a phone screen, and making her *scroll* to reach a familiar game is a straight regression on the one
-  thing the current hub does well. Split the oversized worlds first (the "Feelings & Me" item below is
-  exactly that split) and only then trail the smaller worlds.
-- **Open question:** newest-at-the-far-end keeps every existing game's position stable but puts the game we
-  most want tried furthest from the entrance. Current lean: keep order stable and let the Layer 1 hub
-  beacon carry discovery instead of position.
+### [DONE] World map — Layer 2: a trail inside each world (v44)  ⭐ owner-requested
+- **What:** A world is no longer a grid — it is one long horizontal path she scrolls, Super Mario 3 style
+  (`js/worldtrail.js`). Her buddy stands on the game she last played there, **walks the road** to whatever
+  she taps while the camera follows, and then that game starts. Games keep their order, so the newest is
+  always furthest along the path. Per-world scenery, plus wandering critters that boing when tapped.
+- **What unblocked it:** the previous entry called this blocked because a 12-node trail cannot fit a phone
+  and scrolling to reach a familiar game would regress findability. That is no longer true — she has since
+  learned to scroll, and the trail restores her place on entry (the camera lands on the buddy), so the
+  familiar game is where she left it. Splitting Brain Games is therefore **no longer a prerequisite**.
+- **How a new game gets found:** it sits at the end of the path, and on entering a world that holds an
+  unplayed new one the camera *travels the road to it* — she watches the way there rather than hunting.
+  This resolves the open question from the previous entry: order stays stable (positions never shuffle),
+  and discovery is carried by the hub beacon plus that camera move, never by moving games around.
+- **Still no gating:** every node is tappable from the first visit; the path is story, not a lock.
+- **Verified:** 393/727/820/1180 viewports both orientations, scroll extent exactly matches the drawn world
+  (no overscroll), buddy position persists per world and survives a difficulty change hiding the saved game,
+  reduced-motion walks without animating. 21/21 smoke tests (3 new).
+- **Known nit:** there is no explicit "you can scroll" affordance in a world with no new game — the camera
+  travel only happens when something new is waiting. Watch whether she finds the far end on her own.
 
 ### [PROPOSED] World map — Layer 3: a map that accumulates
 - **What:** Give the map a visible record of the journey, so it looks different after six weeks than on day
@@ -78,5 +87,7 @@ Implementer builds the approved ones. Dated research briefs live in `docs/resear
 ### [PROPOSED] Dedicated "Feelings & Me" world
 - **What:** Give the SEL / well-being games their own hub category. Right now **Feelings** and **Go Find It** live in Brain Games; add a category disc (e.g., 💛 "Feelings") and move them there, with room for Wind-Down and Build-a-Buddy.
 - **Why:** SEL is a first-class developmental domain; a dedicated world signals it and keeps Brain Games from overflowing.
-- **Fit/effort:** Low-Medium — a new `CATEGORIES` entry + a `c-*` color class; no new art required.
+- **Fit/effort:** Low-Medium — a new `CATEGORIES` entry + a `c-*` color class, plus a `HUB_LAYOUT` entry
+  and a `TRAIL_SCENE` entry. No new art required. No longer a prerequisite for anything — Layer 2 shipped
+  without it — so this is now a curriculum-shape decision, not a layout one.
 - **Route:** platform (hub/navigation).

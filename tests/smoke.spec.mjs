@@ -123,11 +123,20 @@ test("a newly shipped game flies a New! flag until she plays it", async ({ page 
   await page.goto("/index.html?test=1");
   await expect(page.locator("#hub")).toBeVisible();
 
-  // Games are tagged with the release they shipped in and age out on their own.
-  expect(await page.evaluate(() => isNewGame("senses"))).toBe(true);
-  expect(await page.evaluate(() => isNewGame("snow"))).toBe(false);
+  // Games are tagged with the release they shipped in and age out on their own, so
+  // this drops a game into the current release rather than naming a real one (which
+  // would start failing the moment that game got old enough).
+  const tagged = await page.evaluate(() => {
+    GAMES.senses.v = +APP_VERSION;
+    GAMES.pattern.v = +APP_VERSION - 5;          // several releases back
+    return { fresh: isNewGame("senses"), aged: isNewGame("pattern"), untagged: isNewGame("snow") };
+  });
+  expect(tagged.fresh).toBe(true);
+  expect(tagged.aged).toBe(false);
+  expect(tagged.untagged).toBe(false);
 
   // The world holding it flies the flag, and the narrator points her at it.
+  await page.evaluate(() => buildHub());
   await expect(page.locator("#mapNodes .node-new")).toHaveCount(1);
   expect(await page.evaluate(() => (newWorld() || {}).id)).toBe("brain");
   expect(await page.evaluate(() => hubGreeting())).toContain("Brain Games");
@@ -140,6 +149,104 @@ test("a newly shipped game flies a New! flag until she plays it", async ({ page 
   });
   expect(afterPlaying.isNew).toBe(false);
   expect(afterPlaying.flags).toBe(0);
+});
+
+test("a world is one scrollable path with every game on it and nothing locked", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+  await page.evaluate(() => openCategory("brain"));
+  await expect(page.locator("#games")).toBeVisible();
+
+  const world = await page.evaluate(() => ({
+    games: worldTrail.gids.length,
+    nodes: document.querySelectorAll("#gameNodes .node").length,
+    // the path is longer than the screen — that is the point, she scrolls it
+    canvas: Math.round(worldTrail.geom.w),
+    view: worldTrail.geom.vw,
+    scrollable: document.getElementById("trailView").scrollWidth > worldTrail.geom.vw,
+    // and the scroll extent matches the drawn world exactly, so she can't scroll off it
+    overscroll: document.getElementById("trailView").scrollWidth - Math.round(worldTrail.geom.w),
+    // every game is reachable from the very first visit: no gates, no fail state
+    disabled: [...document.querySelectorAll("#gameNodes .node")].filter((n) => n.disabled).length,
+  }));
+  expect(world.nodes).toBe(world.games);
+  expect(world.canvas).toBeGreaterThan(world.view);
+  expect(world.scrollable).toBe(true);
+  expect(world.overscroll).toBe(0);
+  expect(world.disabled).toBe(0);
+
+  // games keep their order along the path, so the newest is always furthest along
+  const order = await page.evaluate(() =>
+    worldTrail.gids.every((_, i) => i === 0 || worldTrail.pts[i].x > worldTrail.pts[i - 1].x));
+  expect(order).toBe(true);
+
+  expect(errors, "console/page errors on the world trail:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("tapping a game walks the buddy along the path, then starts it", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.addInitScript(() => {
+    localStorage.setItem("fionaStars", JSON.stringify({ memory: 2 }));
+    localStorage.setItem("fionaTrail", JSON.stringify({ brain: "memory" }));
+  });
+  await page.goto("/index.html?test=1");
+  await page.evaluate(() => openCategory("brain"));
+  await expect(page.locator("#games")).toBeVisible();
+
+  // the buddy starts standing on the game she last played here
+  expect(await page.evaluate(() => worldTrail.gids[worldTrail.at])).toBe("memory");
+
+  // walking is real movement along the path, with the camera following it
+  const walk = await page.evaluate(async () => {
+    const view = document.getElementById("trailView"), bud = document.getElementById("trailBuddy");
+    const from = { x: parseFloat(bud.style.left), scroll: view.scrollLeft };
+    document.querySelector('#gameNodes .node[data-gid="nightday"]').click();
+    const seen = [];
+    for (let i = 0; i < 10; i++) {
+      seen.push({ x: parseFloat(bud.style.left), scroll: view.scrollLeft });
+      await new Promise((r) => setTimeout(r, 70));
+    }
+    const last = seen[seen.length - 1];
+    return { movedForward: last.x > from.x, cameraFollowed: last.scroll > from.scroll };
+  });
+  expect(walk.movedForward).toBe(true);
+  expect(walk.cameraFollowed).toBe(true);
+
+  // and the game it walked to is the one that opens
+  await expect(page.locator("#game")).toBeVisible({ timeout: 9000 });
+  expect(await page.evaluate(() => state.level)).toBe("nightday");
+  expect(await page.evaluate(() => worldTrail.gids[worldTrail.at])).toBe("nightday");
+
+  expect(errors, "console/page errors while walking:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("a newly shipped game sits at the end of the path and the camera travels there", async ({ page }) => {
+  await page.addInitScript(SKIP_INTRO);
+  await page.addInitScript(() => {
+    localStorage.setItem("fionaStars", JSON.stringify({ memory: 2 }));
+    localStorage.setItem("fionaTrail", JSON.stringify({ brain: "memory" }));
+  });
+  await page.goto("/index.html?test=1");
+
+  const reveal = await page.evaluate(async () => {
+    GAMES.senses.v = +APP_VERSION;               // as if Five Senses shipped this release
+    openCategory("brain");
+    const view = document.getElementById("trailView");
+    await new Promise((r) => setTimeout(r, 150));
+    const landed = view.scrollLeft;              // lands where she left off
+    await new Promise((r) => setTimeout(r, 1800));
+    const i = worldTrail.gids.findIndex(isNewGame);
+    return {
+      landed, after: view.scrollLeft,
+      isLast: i === worldTrail.gids.length - 1,
+      flags: document.querySelectorAll("#gameNodes .node-new").length,
+    };
+  });
+  expect(reveal.isLast).toBe(true);              // newest game is furthest along the path
+  expect(reveal.flags).toBe(1);
+  expect(reveal.after).toBeGreaterThan(reveal.landed);   // the camera showed her the way there
 });
 
 test("exactly one full-screen surface is visible at a time", async ({ page }) => {
