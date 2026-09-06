@@ -890,7 +890,8 @@
   /* ================= SETTINGS ================= */
   #settings { background:rgba(20,20,60,.6); z-index:75; }
   .settings-card { background:#fff; border-radius:24px; padding:3vmin 4vmin; max-width:92%;
-                   box-shadow:0 8px 0 rgba(0,0,0,.2); display:flex; flex-direction:column; gap:2.4vmin; }
+                   box-shadow:0 8px 0 rgba(0,0,0,.2); display:flex; flex-direction:column; gap:2.4vmin;
+                   max-height:94%; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   .settings-card h2 { font-size:clamp(20px,4.5vmin,32px); color:#444; text-align:center; }
   .settings-card .row { display:flex; flex-direction:column; gap:.8vmin; }
   .settings-card .row > span { font-size:clamp(14px,3vmin,20px); color:#666; font-weight:bold; }
@@ -898,13 +899,39 @@
   .seg button { border:none; border-radius:14px; padding:1.4vmin 2.4vmin; font-size:clamp(14px,3vmin,20px);
                 font-weight:bold; background:#eee; color:#555; box-shadow:0 3px 0 rgba(0,0,0,.12); }
   .seg button.sel { background:#7444c4; color:#fff; }
-  .settings-card .closeRow { display:flex; gap:2vmin; justify-content:center; margin-top:1vmin; }
-  .settings-card .closeRow button { border:none; border-radius:18px; padding:1.6vmin 4vmin;
-    font-size:clamp(16px,3.4vmin,24px); font-weight:bold; box-shadow:0 4px 0 rgba(0,0,0,.18); }
+  /* Actions wrap instead of overflowing the card, and Done takes a full-width row of
+     its own so the way out of settings is always the big obvious thing at the bottom. */
+  .settings-card .closeRow { display:flex; flex-wrap:wrap; gap:1.4vmin; justify-content:center; }
+  .settings-card .closeRow + .closeRow { margin-top:-1vmin; }   /* rows read as one block */
+  .settings-card .settings-version + .closeRow { margin-top:0; }
+  .settings-card .closeRow button { border:none; border-radius:18px; padding:1.5vmin 3vmin;
+    font-size:clamp(15px,3.2vmin,22px); font-weight:bold; box-shadow:0 4px 0 rgba(0,0,0,.18);
+    flex:0 1 auto; min-height:44px; }
+  /* the destructive pair sits apart from the harmless buttons, and reads quieter */
+  .settings-card .closeRow.danger { margin-top:.4vmin; }
+  .settings-card .closeRow.danger button { font-size:clamp(13px,2.8vmin,18px); padding:1.2vmin 2.4vmin; }
+  #setDone { flex:1 0 100%; }
+  /* Done is pinned to the bottom of the card, so however tall the panel gets — a long
+     language list, a short landscape screen — the way out is never scrolled off. */
+  .settings-card .closeRow.done { position:sticky; bottom:0; z-index:2;
+    background:#fff; padding-top:1.4vmin; margin-top:0;
+    box-shadow:0 -8px 10px -6px rgba(255,255,255,.95); }
   #setDone { background:#ffd23e; color:#5b3c00; }
   #setReset { background:#f0a0a0; color:#7a1f1f; }
   #setRestart { background:#f0c8a0; color:#7a3c00; }
   .settings-version { font-size:clamp(11px,2.2vmin,15px); color:#bbb; text-align:center; margin:1.5vmin 0 0; letter-spacing:.04em; }
+  /* A short screen (a phone held sideways) has width to spare and no height. Put each
+     label beside its buttons instead of above, and let the card use the width — that
+     keeps the whole panel on one screen instead of behind a scrollbar. */
+  @media (max-height:560px) and (orientation:landscape) {
+    .settings-card { width:min(96%,720px); max-width:none; padding:2vmin 3vmin; gap:1.2vmin; }
+    .settings-card h2 { font-size:clamp(17px,4vmin,24px); }
+    .settings-card .row { flex-direction:row; align-items:center; gap:2vmin; }
+    .settings-card .row > span { flex:0 0 clamp(88px,20%,150px); text-align:right; }
+    .settings-card .row > .seg { flex:1 1 auto; }
+    .settings-card .closeRow { gap:1.2vmin; }
+    .settings-version { margin:.4vmin 0 0; }
+  }
 
   /* ================= CELEBRATE ================= */
   #celebrate {
