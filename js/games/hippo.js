@@ -61,7 +61,10 @@ const hippoLevel = {
     const slots = Array.from({ length: this.target }, (_, i) => `<span class="hp-slot" data-i="${i}">◯</span>`).join("");
     const trayFood = Array.from({ length: 5 }, () => `<button class="hp-food">${food.e}</button>`).join("");
 
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      // no "ground": .hp-ground already paints the grass the hippo stands on
+      scene.html("savanna", { seed: 16 + state.round * 4,
+                              layers: ["canopy", "far", "drift", "mid", "motes", "frame"] }) + `
       <style>
         .hp-stage{position:absolute;inset:0;overflow:hidden;z-index:5;display:flex;flex-direction:column;align-items:center}
         .hp-ground{position:absolute;left:0;right:0;bottom:0;height:16%;background:linear-gradient(#c8e89a,#8fc85a);pointer-events:none;z-index:1}

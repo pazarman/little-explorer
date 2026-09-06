@@ -18,10 +18,12 @@ const bikeLevel = {
     this.speedMul = [1, 1.25, 1.5][state.tier];
     this.maxBalloons = [3, 4, 5][state.tier];
     setInstruction("🎈 " + t("pop_balloon_show", { target: this.target }), t("pop_balloon_say", { target: this.target }));
-    const trees = "🌳 🌲 🌳 🛝 🌳 🌷 🌲 🌳 ⛲ 🌳 ";
-    $("playArea").innerHTML = `
-      <div class="treeline far"><div class="marquee" style="animation-duration:26s;">${trees.repeat(2)}${trees.repeat(2)}</div></div>
-      <div class="treeline"><div class="marquee" style="animation-duration:13s;">${trees}${trees}</div></div>
+    const far  = scene.strip("meadow", { band: "far",  seed: 6 }).repeat(6);
+    const near = scene.strip("meadow", { band: "near", seed: 6 }).repeat(6);
+    $("playArea").innerHTML =
+      scene.html("meadow", { seed: 12 + state.round * 4, layers: ["canopy", "drift", "motes"] }) + `
+      <div class="treeline far"><div class="marquee" style="animation-duration:26s;">${far}</div></div>
+      <div class="treeline"><div class="marquee" style="animation-duration:13s;">${near}</div></div>
       <div class="road"></div>
       <div class="rider">🚴</div>
       <div id="balloonField"></div>`;

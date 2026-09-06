@@ -11,7 +11,6 @@ const MO_TXT = {
           yue: "㩒下畫面，等馬騮盪高啲，接住香蕉！" }
 };
 
-const MO_TREES = "🌴 🌳 🌿 🌴 🍃 🌳 ";
 
 const monkeyLevel = {
   theme: "theme-zoo", rounds: 5, raf: null,
@@ -30,11 +29,17 @@ const monkeyLevel = {
     setInstruction(moL(MO_TXT.show), moL(MO_TXT.say));
 
     const pips = Array.from({ length: this.goal }, (_, i) => `<span class="mo-pip" data-i="${i}">◯</span>`).join("");
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      // drift + motes only: the jungle floor and canopy are scrolling strips, and the
+      // sky in between is where she jumps, so it stays walkable
+      scene.html("forest", { seed: 14 + state.round * 4, layers: ["drift", "motes"] }) + `
       <style>
         .mo-stage{position:absolute;inset:0;overflow:hidden;z-index:5;touch-action:none;cursor:pointer}
-        .mo-canopy{position:absolute;top:0;left:0;right:0;height:16%;overflow:hidden;white-space:nowrap;font-size:clamp(30px,9vmin,64px);z-index:1;opacity:.9}
-        .mo-far{position:absolute;bottom:20%;left:0;right:0;overflow:hidden;white-space:nowrap;font-size:clamp(20px,6vmin,44px);opacity:.5;z-index:1}
+        /* vmin, not %: a strip tile is 6:1, so the band's height is what sets tree size */
+        .mo-canopy{position:absolute;top:0;left:0;right:0;height:clamp(40px,13vmin,104px);overflow:hidden;white-space:nowrap;z-index:1;opacity:.9}
+        .mo-far{position:absolute;bottom:19%;left:0;right:0;height:clamp(56px,18vmin,140px);overflow:hidden;white-space:nowrap;opacity:.85;z-index:1}
+        .mo-near{position:absolute;bottom:11%;left:0;right:0;height:clamp(64px,21vmin,165px);overflow:hidden;white-space:nowrap;opacity:.95;z-index:2}
+        .mo-canopy .marquee, .mo-far .marquee, .mo-near .marquee{height:100%;white-space:nowrap;display:inline-block}
         .mo-ground{position:absolute;left:0;right:0;bottom:0;height:20%;background:linear-gradient(#c8e89a,#8fc85a 55%,#6fb23f);pointer-events:none;z-index:1}
         .mo-hud{position:absolute;top:17%;left:50%;transform:translateX(-50%);display:flex;gap:clamp(3px,1vmin,7px);z-index:9;background:rgba(30,80,20,.32);padding:clamp(3px,1vmin,7px) clamp(8px,2.4vmin,16px);border-radius:999px}
         .mo-pip{font-size:clamp(15px,4vmin,26px);line-height:1;color:#eafbe0}
@@ -45,11 +50,12 @@ const monkeyLevel = {
         .mo-monkey{position:absolute;font-size:clamp(56px,16vmin,120px);line-height:1;transform:translate(-50%,-50%);z-index:6;pointer-events:none;filter:drop-shadow(0 5px 6px rgba(0,0,0,.3));will-change:top,transform}
       </style>
       <div class="mo-stage" id="moStage">
-        <div class="mo-canopy"><span class="marquee" style="animation-duration:${(18 / this.speedMul).toFixed(1)}s">${MO_TREES.repeat(6)}</span></div>
-        <div class="mo-far"><span class="marquee" style="animation-duration:${(26 / this.speedMul).toFixed(1)}s">${MO_TREES.repeat(6)}</span></div>
+        <div class="mo-canopy"><span class="marquee" style="animation-duration:${(18 / this.speedMul).toFixed(1)}s">${scene.strip("forest", { band: "canopy", seed: 9 }).repeat(6)}</span></div>
+        <div class="mo-far"><span class="marquee" style="animation-duration:${(26 / this.speedMul).toFixed(1)}s">${scene.strip("forest", { band: "far", seed: 9 }).repeat(6)}</span></div>
         <div class="mo-ground"></div>
+        <div class="mo-near"><span class="marquee" style="animation-duration:${(16 / this.speedMul).toFixed(1)}s">${scene.strip("forest", { band: "near", seed: 9 }).repeat(6)}</span></div>
         <div class="mo-hud" id="moHud">${pips}</div>
-        <div class="mo-bananas" id="moBananas"></div>
+        <div class=.mo-bananas" id="moBananas"></div>
         <div class="mo-monkey" id="moMonkey">🐒</div>
       </div>`;
 

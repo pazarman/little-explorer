@@ -167,8 +167,8 @@ const BIOMES = {
     canopy:{ kind:"cloud", fill:"#ffffff" },
     far:   { fill: "#9ed48a", alt: "#8ac77a" },
     ground:{ top: "rgba(140,200,110,0)", bottom: "#8fc96f", line: "#7cb85e" },
-    props: ["pine", "flower"],
-    palette: { pine: "#57a06f", pineDark: "#3d8055", flower: "#ff8fc0", flowerHeart: "#ffd23e" },
+    props: ["pine", "flower", "tuft"],
+    palette: { pine: "#57a06f", pineDark: "#3d8055", flower: "#ff8fc0", flowerHeart: "#ffd23e", tuft: "#6cb35a" },
     frame: { kind: "tuft", fill: "#6cb35a" },
     motes: { kind: "pollen", fill: "rgba(255,240,170,.85)" },
   },
@@ -177,8 +177,8 @@ const BIOMES = {
     canopy:{ kind:"cloud", fill:"#fff6e0" },
     far:   { fill: "#e6cf95", alt: "#d9bf80" },
     ground:{ top: "rgba(226,201,140,0)", bottom: "#e0c383", line: "#cfae6c" },
-    props: ["rock", "stalk"],
-    palette: { stalk: "#c9a44f", rock: "#b9a189", rockLight: "#d8c6b2" },
+    props: ["rock", "stalk", "tuft"],
+    palette: { stalk: "#c9a44f", rock: "#b9a189", rockLight: "#d8c6b2", tuft: "#c4a054" },
     frame: { kind: "tuft", fill: "#c4a054" },
     motes: { kind: "pollen", fill: "rgba(255,236,180,.7)" },
   },
@@ -187,9 +187,9 @@ const BIOMES = {
     canopy:{ kind:"leaves", fill:"#3f8f5f" },
     far:   { fill: "#7fb976", alt: "#6aa663" },
     ground:{ top: "rgba(122,166,96,0)", bottom: "#7aa660", line: "#68914f" },
-    props: ["pine", "rock", "flower"],
+    props: ["pine", "rock", "flower", "tuft"],
     palette: { pine: "#3f8f5f", pineDark: "#2c6e46", rock: "#a9a293", rockLight: "#c9c3b5",
-               flower: "#ff9ec7", flowerHeart: "#fff0a8" },
+               flower: "#ff9ec7", flowerHeart: "#fff0a8", tuft: "#4f9350" },
     frame: { kind: "tuft", fill: "#4f9350" },
     motes: { kind: "pollen", fill: "rgba(215,245,180,.8)" },
   },
@@ -240,12 +240,22 @@ function hexToRgb(h) {
   const n = v.length === 3 ? v.split("").map(c => c + c).join("") : v;
   return [parseInt(n.slice(0, 2), 16), parseInt(n.slice(2, 4), 16), parseInt(n.slice(4, 6), 16)];
 }
-function tintColor(hex, base) {
-  if (typeof hex !== "string" || hex[0] !== "#") return hex;   // rgba() drifters pass through
-  const [r, g, b] = hexToRgb(hex), [br, bg, bb] = hexToRgb(base);
+function tintColor(col, base) {
+  if (typeof col !== "string") return col;
+  // rgb()/rgba() too, keeping the alpha: drifters and motes are written that way, and
+  // leaving them out of the tint left green pollen floating over Memory's orange sky
+  let r, g, b, a = null;
+  if (col[0] === "#") { [r, g, b] = hexToRgb(col); }
+  else {
+    const m = col.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$/);
+    if (!m) return col;
+    r = +m[1]; g = +m[2]; b = +m[3]; a = m[4] === undefined ? null : +m[4];
+  }
+  const [br, bg, bb] = hexToRgb(base);
   const l = (0.299 * r + 0.587 * g + 0.114 * b) / 255;         // keep the original lightness
   const mix = (c) => Math.round(l > .5 ? c + (255 - c) * (l - .5) * 2 : c * (l * 2));
-  return `rgb(${mix(br)},${mix(bg)},${mix(bb)})`;
+  return a === null ? `rgb(${mix(br)},${mix(bg)},${mix(bb)})`
+                    : `rgba(${mix(br)},${mix(bg)},${mix(bb)},${a})`;
 }
 function tintBiome(b, base) {
   const walk = (o) => Array.isArray(o) ? o.slice()
@@ -296,6 +306,7 @@ const scene = {
       if (kind === "crystal") art = S.crystal(30, 58, 40 + r1 * 16, p.crystal, p.crystalLight);
       if (kind === "pot")    art = S.pot(30, 58, 40 + r1 * 12, p.pot, p.leaf);
       if (kind === "block")  art = S.block(30, 58, 38 + r1 * 12, p.block, p.blockLight);
+      if (kind === "tuft")   art = S.tuft(30, 58, 30 + r1 * 12, p.tuft);
       if (!art) continue;
       // stagger depth: props nearer the front sit lower and draw a little larger, so the
       // band reads as ground receding rather than a row of stamps on one line
@@ -464,9 +475,26 @@ const scene = {
     const tint = opts.tint || (near ? null : b.far.fill);
     if (tint) b = tintBiome(b, tint);
     const S = SCENE_SHAPE, p = b.palette;
-    const seed = (opts.seed || 1) + (near ? 500 : 0);
+    const canopy = opts.band === "canopy";
+    const seed = (opts.seed || 1) + (near ? 500 : 0) + (canopy ? 900 : 0);
     const W = 600, H = 100, count = near ? 5 : 7;
     let out = "";
+
+    // A canopy hangs from the top edge instead of growing from the bottom one. Flipping a
+    // ground band with scaleY(-1) does not stand in for it: an upside-down pine reads as a
+    // dark arrow pointing at the child, which is exactly how the first attempt looked.
+    if (canopy) {
+      const c = b.canopy || { fill: "rgba(255,255,255,.5)" };
+      for (let i = 0; i < 6; i++) {
+        const r1 = seeded(seed + i * 17 + 5), r2 = seeded(seed + i * 29 + 9);
+        const x = 60 + i * ((W - 120) / 6) + r1 * 30;
+        out += `<ellipse cx="${x.toFixed(0)}" cy="${(-14 + r2 * 26).toFixed(0)}"
+                 rx="${(46 + r1 * 30).toFixed(0)}" ry="${(38 + r2 * 22).toFixed(0)}"
+                 fill="${c.fill}" opacity="${(.55 + r1 * .35).toFixed(2)}"/>`;
+      }
+      return `<svg class="sc-strip" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMin meet"
+                   style="opacity:.9">${out}</svg>`;
+    }
     for (let i = 0; i < count; i++) {
       const r1 = seeded(seed + i * 13 + 3), r2 = seeded(seed + i * 19 + 7), r3 = seeded(seed + i * 23 + 11);
       if (r3 < 0.14) continue;                                   // gaps, so it is not a fence
@@ -481,8 +509,11 @@ const scene = {
       if (kind === "rock")    art = S.rock(x, H - h * .28, h * .42, p.rock, p.rockLight);
       if (kind === "coral")   art = S.coral(x, H, h, p.coral, p.coralLight);
       if (kind === "stalk")   art = S.stalk(x, H, h, p.stalk, 8 + r1 * 10);
-      if (kind === "flower")  art = S.flower(x, H - h * .5, h * .22, p.flower, p.flowerHeart);
-      if (kind === "star")    art = S.star(x, H - h * .6, h * .22, p.star);
+      // a bloom is a disc, not a silhouette: at the far band's .22 it disappears up close,
+      // so the near band draws it half again as big
+      if (kind === "flower")  art = S.flower(x, H - h * .5, h * (near ? .34 : .22), p.flower, p.flowerHeart);
+      if (kind === "star")    art = S.star(x, H - h * .6, h * (near ? .34 : .22), p.star);
+      if (kind === "tuft")    art = S.tuft(x, H, h * .7, p.tuft);
       if (kind === "crystal") art = S.crystal(x, H, h, p.crystal, p.crystalLight);
       if (kind === "pot")     art = S.pot(x, H, h, p.pot, p.leaf);
       if (kind === "block")   art = S.block(x, H, h, p.block, p.blockLight);

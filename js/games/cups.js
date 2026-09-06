@@ -62,7 +62,9 @@ const cupsLevel = {
   },
 
   render() {
-    $("playArea").innerHTML = `<div class="cups-stage no-slide" id="cupsStage">
+    $("playArea").innerHTML =
+      scene.html("cozy", { seed: 31 + state.round * 4, layers: ["canopy", "far", "drift", "motes"] }) +
+      `<div class="cups-stage no-slide" id="cupsStage">
       <div class="cups-shadow"></div>
       <div class="cups-ball" id="cupsBall">${ballSVG()}</div>
       ${[0, 1, 2].map(id => `<button class="cup-slot" data-cup="${id}" aria-label="cup ${id + 1}">

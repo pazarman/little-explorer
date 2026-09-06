@@ -48,7 +48,10 @@ const feelingsLevel = {
       `<button class="fe-face" data-emo="${id}"><span class="fe-svg">${FE_FACE[id]}</span><span class="fe-lbl">${feL(FE_EMO[id].name)}</span></button>`
     ).join("");
 
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      // no mid/ground/frame: the face row is centred and low, and this is the one screen
+      // where nothing should compete for her eye
+      scene.html("cozy", { seed: 26 + state.round * 4, layers: ["canopy", "far", "drift", "motes"] }) + `
       <style>
         .fe-stage{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,3vmin,26px);padding:2vmin}
         .fe-buddy{font-size:clamp(40px,11vmin,88px);line-height:1;animation:feBob 2.6s ease-in-out infinite}

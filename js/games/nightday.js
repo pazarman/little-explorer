@@ -115,7 +115,10 @@ const nightdayLevel = {
       "將日頭嘅嘢放喺藍色天空，夜晚嘅嘢放喺黑色天空！");
     setInstruction(showTxt, sayTxt);
 
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      // drift + motes only: the two sky bins own the top of this screen and the tray the
+      // bottom, so a band anywhere would land on something she has to hit
+      scene.html("space", { seed: 33 + state.round * 4, tint: "#3f74b4", layers: ["drift", "motes"] }) + `
       <style>
         .nd-stage{position:absolute;inset:0;z-index:5}
         .nd-bins{position:absolute;top:3%;left:2vmin;right:2vmin;display:flex;gap:2vmin}

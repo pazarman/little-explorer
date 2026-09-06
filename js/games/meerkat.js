@@ -64,8 +64,14 @@ const meerkatLevel = {
          <div class="mk-mound"></div>
        </div>`).join("");
 
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      // no mid/ground/frame: .mk-ground owns the bottom 62% and the burrows are placed
+      // across it, so anything the kit drew down there would be buried or in her way
+      scene.html("savanna", { seed: 22 + state.round * 4, layers: ["canopy", "far", "drift", "motes"] }) + `
       <style>
+        /* this screen's horizon is high — .mk-ground owns the bottom 62% — so the far hills
+           are lifted to sit on it instead of at the kit's default height */
+        #playArea .sc-far{bottom:57%;height:13%;opacity:.5}
         .mk-stage{position:absolute;inset:0;overflow:hidden;z-index:5}
         .mk-sun{position:absolute;top:5%;right:8%;width:clamp(40px,11vmin,86px);height:clamp(40px,11vmin,86px);border-radius:50%;background:radial-gradient(circle,#fff3ad,#ffd23e 65%,rgba(255,210,62,0) 72%);pointer-events:none}
         .mk-ground{position:absolute;left:0;right:0;bottom:0;height:62%;background:linear-gradient(#c8e89a,#8fc85a 40%,#6fb23f);pointer-events:none;z-index:1}

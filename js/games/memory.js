@@ -19,7 +19,11 @@ const memoryLevel = {
     const total = deck.length;
     const cols = total <= 6 ? 3 : 4;
     const rows = Math.ceil(total / cols);
-    $("playArea").innerHTML = `<div class="mem-grid" id="memGrid"></div>`;
+    $("playArea").innerHTML =
+      // no mid/frame: the grid is sized to fill the play area, so the floor is hers
+      scene.html("forest", { seed: 24 + state.round * 4, tint: "#e08a4b",
+                             layers: ["canopy", "far", "drift", "motes"] }) +
+      `<div class="mem-grid" id="memGrid"></div>`;
     const grid = $("memGrid");
     // size the cards from the ACTUAL play area so every card always fits on screen
     const pa = $("playArea").getBoundingClientRect();
