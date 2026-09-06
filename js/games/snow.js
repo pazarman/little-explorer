@@ -58,3 +58,8 @@ const snowLevel = {
     setTimeout(() => el.remove(), 480);
   }
 };
+
+registerGame({
+  id: "snow", world: "num", icon: "❄️", name: "Count", es: "Contar", yue: "數一數", lvl: 0,
+  level: snowLevel
+});

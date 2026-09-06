@@ -144,3 +144,7 @@ const paint = {
     this.checkChallenge("stamp", this.stamps[this.stampIdx]);
   }
 };
+
+registerGame({
+  id: "paint", world: "create", icon: "🎨", name: "Paint", es: "Pintar", yue: "畫畫", lvl: 0
+});

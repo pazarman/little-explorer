@@ -80,3 +80,8 @@ const memoryLevel = {
     }
   }
 };
+
+registerGame({
+  id: "memory", world: "brain", icon: "🃏", name: "Memory", es: "Memoria", yue: "記憶", lvl: 1,
+  level: memoryLevel
+});

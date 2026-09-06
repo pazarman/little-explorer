@@ -194,3 +194,8 @@ const meerkatLevel = {
     this.holes = [];
   }
 };
+
+registerGame({
+  id: "meerkat", world: "animal", icon: "🦁", name: "Zoo Pop", es: "Zoológico", yue: "動物園",
+  lvl: 0, level: meerkatLevel
+});

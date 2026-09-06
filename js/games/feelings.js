@@ -113,3 +113,8 @@ const feelingsLevel = {
     }, 8200);
   }
 };
+
+registerGame({
+  id: "feelings", world: "brain", icon: "💛", name: "Feelings", es: "Sentimientos", yue: "心情",
+  lvl: 0, level: feelingsLevel
+});

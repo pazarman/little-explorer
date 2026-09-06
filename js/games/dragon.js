@@ -68,3 +68,8 @@ const dragonLevel = {
     }
   }
 };
+
+registerGame({
+  id: "dragon", world: "num", icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón",
+  yue: "餵龍", lvl: 0, level: dragonLevel
+});

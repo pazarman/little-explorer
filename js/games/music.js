@@ -52,3 +52,8 @@ const musicLevel = {
     }
   }
 };
+
+registerGame({
+  id: "music", world: "animal", icon: "🥁", name: "Animal Band", es: "Banda Animal",
+  yue: "動物樂隊", lvl: 1, level: musicLevel
+});

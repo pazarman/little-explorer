@@ -76,3 +76,8 @@ const icecreamLevel = {
     roundComplete();
   }
 };
+
+registerGame({
+  id: "icecream", world: "shape", icon: "🍦", name: "Ice Cream", es: "Helado", yue: "雪糕",
+  lvl: 0, level: icecreamLevel
+});

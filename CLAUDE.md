@@ -4,8 +4,8 @@
 **Little Explorer's World** is a voice-guided educational game for toddlers (2–5). It is a **PWA** that
 runs entirely in the browser as static files — **no build step, no dependencies, no backend**. The whole
 app (HTML, CSS, JS, SVG art, audio synthesis) is hand-written static assets: `index.html` for markup,
-`css/style.css`, `js/core.js` (engine, i18n, audio, quest), `js/hub.js` (map, navigation, story, sticker
-book) and one file per game under `js/games/`. Scripts are plain `<script src>` tags — no modules, no
+`css/style.css`, `js/core.js` (engine, i18n, audio, quest, **game registry**), `js/hub.js` (map,
+navigation, sticker book) and one file per game under `js/games/`. Scripts are plain `<script src>` tags — no modules, no
 bundler — so every top-level `const`/`function` shares one global scope.
 
 ## Quality system (read before building or reviewing)
@@ -34,8 +34,15 @@ This repo has a hard quality bar. Use it; don't freelance.
 - **Hub progress**: `worldStars()` counts *distinct games tried*, never a fraction of the world's size —
   shipping a game into a world must never take away a star. New games are tagged `v: <APP_VERSION>` in
   `GAMES`; `isNewGame()` flies a "New!" flag until she plays it, and it ages out on the next version bump.
-- **38 games** (`LEVELS` + specials `paint`/`story`/`dressup`). Each level object has `theme`, `rounds`,
-  `startRound()`, and reads `state.tier` (0–2).
+- **Game registry** (`registerGame()` in core.js): a game declares itself **once, in its own file** —
+  id, world, icon, names, `lvl`, optional `v`, and its level object. `hub.js` derives `LEVELS`, `GAMES`
+  and each world's game list from `GAME_REGISTRY`; `WORLDS` there declares only a world's identity and
+  colour. **Registration order — i.e. `<script>` order in index.html — is the order she walks a world's
+  trail**, so an appended game lands at the far end of its path. That order is pinned by a test, so
+  reordering the tags fails CI instead of quietly moving a game she finds by place.
+- **38 games** (35 `LEVELS` + specials `paint`/`story`/`dressup`, which own a whole screen and are
+  dispatched by `startGameNow`). Each level object has `theme`, `rounds`, `startRound()`, and reads
+  `state.tier` (0–2).
 - **Difficulty**: `tierFor(level)` — manual easy/med/hard force 0/1/2; **auto mode uses a performance model**
   (`fionaPerf`: `autoTierFor`, EMA of round quality, down-shift on ≥3 mistakes). Mistakes are counted via the
   wrapped `sfx.bad`; `roundComplete` records perf and can lower the next round's tier.
@@ -66,9 +73,15 @@ This repo has a hard quality bar. Use it; don't freelance.
 ## Deploy
 - Push to `main` → `.github/workflows/pages-deploy.yml` validates (required files, JSON, JS syntax) then
   auto-deploys to GitHub Pages. Don't push code that fails `/release-check`.
-- **Shipping a new game**: add it to `LEVELS`/`GAMES`/a `CATEGORIES` world as usual, tag its `GAMES` entry
-  with `v: <the APP_VERSION it ships in>` so it flies the "New!" flag on the map, and add its file to the
-  `sw.js` `ASSETS` list. Nothing needs switching off later — the flag expires on its own.
+- **Shipping a new game** — three edits, no lists to keep in step:
+  1. `js/games/<id>.js` — write the level, then call `registerGame({ id, world, icon, name, es, yue, lvl,
+     v: <the APP_VERSION it ships in>, level })` at the bottom. `v` flies the "New!" flag on the map and
+     expires on its own — nothing to switch off later.
+  2. `index.html` — append its `<script src>`. Append, don't insert: position in the list is position on
+     the world's trail, and the newest belongs at the end.
+  3. `sw.js` — add the file to `ASSETS` and bump `CACHE`. A test fails if you forget the `ASSETS` entry,
+     because that break only shows up offline, on her device, with nobody watching.
+  Then update the world-order list in `tests/smoke.spec.mjs` to include it.
 
 ## Privacy
 - The child's name lives only in localStorage; it must not appear in any committed/public file

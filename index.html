@@ -131,6 +131,10 @@
     <button class="round-btn" id="paintClear" aria-label="Clear">🗑️</button>
     <button class="round-btn" id="paintDone" aria-label="Done">✅</button>
   </div>
+  <!-- Paint speaks its colour/stamp prompts through here. The CSS and the JS that
+       drive it both shipped; this element never did, so nextChallenge() threw on
+       every open and the guided half of Paint has never run. -->
+  <div id="paintInstruct" aria-live="polite"></div>
   <div id="paintCanvasWrap"><canvas id="paintC"></canvas></div>
 </div>
 
@@ -256,13 +260,13 @@
 <script src="js/games/music.js"></script>
 <script src="js/games/whosays.js"></script>
 <script src="js/games/rocket.js"></script>
+<script src="js/games/cups.js"></script>
 <script src="js/games/sort.js"></script>
 <script src="js/games/dragon.js"></script>
 <script src="js/games/dino.js"></script>
 <script src="js/games/icecream.js"></script>
 <script src="js/games/pets.js"></script>
 <script src="js/games/hideseek.js"></script>
-<script src="js/games/cups.js"></script>
 <script src="js/games/nightday.js"></script>
 <script src="js/games/measure.js"></script>
 <script src="js/games/fuelup.js"></script>
@@ -277,6 +281,7 @@
 <script src="js/games/letternames.js"></script>
 <script src="js/games/senses.js"></script>
 <script src="js/games/paint.js"></script>
+<script src="js/games/story.js"></script>
 <script src="js/games/dressup.js"></script>
 <script src="js/worldtrail.js"></script>
 <script src="js/hub.js"></script>

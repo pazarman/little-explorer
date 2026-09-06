@@ -250,3 +250,8 @@ const dolphinLevel = {
     this.rings = [];
   }
 };
+
+registerGame({
+  id: "dolphin", world: "animal", icon: "🐬", name: "Dolphin Dive", es: "Delfín", yue: "海豚",
+  lvl: 0, level: dolphinLevel
+});

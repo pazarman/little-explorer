@@ -266,3 +266,20 @@ const bodyLevel = {
     }
   }
 };
+
+registerGame({
+  id: "body", world: "animal", icon: "😊", name: "Body Match", es: "El Cuerpo", yue: "身體",
+  lvl: 0, level: bodyLevel
+});
+registerGame({
+  id: "petcare", world: "pets", icon: "🛁", name: "Pet Care", es: "Cuida", yue: "照顧寵物", lvl: 0,
+  level: petcareLevel
+});
+registerGame({
+  id: "petmatch", world: "pets", icon: "🐶", name: "Find Pet", es: "Busca", yue: "搵寵物", lvl: 0,
+  level: petmatchLevel
+});
+registerGame({
+  id: "petfeed", world: "pets", icon: "🦴", name: "Same Treats", es: "Mismos Premios",
+  yue: "一樣零食", lvl: 1, level: petfeedLevel
+});

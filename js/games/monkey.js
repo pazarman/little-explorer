@@ -167,3 +167,8 @@ const monkeyLevel = {
     this.bananas = [];
   }
 };
+
+registerGame({
+  id: "monkey", world: "animal", icon: "🐒", name: "Monkey Swing", es: "Mono", yue: "馬騮",
+  lvl: 1, level: monkeyLevel
+});

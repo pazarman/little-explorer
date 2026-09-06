@@ -101,3 +101,8 @@ const scavengerLevel = {
     roundComplete();
   }
 };
+
+registerGame({
+  id: "scavenger", world: "brain", icon: "🔦", name: "Go Find It", es: "A Buscar", yue: "去搵嘢",
+  lvl: 0, level: scavengerLevel
+});

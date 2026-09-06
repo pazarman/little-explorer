@@ -177,3 +177,16 @@ const patternLevel = {
     }
   }
 };
+
+registerGame({
+  id: "pattern", world: "brain", icon: "🔮", name: "Patterns", es: "Patrones", yue: "規律",
+  lvl: 2, level: patternLevel
+});
+registerGame({
+  id: "sort", world: "brain", icon: "🪐", name: "Big & Small", es: "Grande y Pequeño",
+  yue: "大同細", lvl: 0, level: sortLevel
+});
+registerGame({
+  id: "sortkind", world: "brain", icon: "🧺", name: "Sort It", es: "A Ordenar", yue: "分類",
+  lvl: 1, level: sortkindLevel
+});

@@ -91,3 +91,8 @@ const bikeLevel = {
   },
   cleanup() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.balloons = []; }
 };
+
+registerGame({
+  id: "bike", world: "num", icon: "🚲", name: "Numbers", es: "Números", yue: "數字", lvl: 1,
+  level: bikeLevel
+});

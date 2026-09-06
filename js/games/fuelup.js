@@ -186,3 +186,8 @@ const fuelupLevel = {
     roundComplete();
   }
 };
+
+registerGame({
+  id: "fuelup", world: "num", icon: "⛽", name: "Fuel Up", es: "A Cargar", yue: "加油", lvl: 1,
+  level: fuelupLevel
+});

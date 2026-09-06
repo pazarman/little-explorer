@@ -132,3 +132,8 @@ const hippoLevel = {
     }, 360);
   }
 };
+
+registerGame({
+  id: "hippo", world: "num", icon: "🦛", name: "Feed Hippo", es: "Alimenta", yue: "餵河馬",
+  lvl: 0, level: hippoLevel
+});
