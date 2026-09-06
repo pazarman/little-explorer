@@ -851,3 +851,495 @@ test("every script the page loads is cached by the service worker", () => {
   expect(assets.filter((a) => a.endsWith(".js") && !fs.existsSync(a)),
     "sw.js caches files that are gone").toEqual([]);
 });
+
+
+/* ================= Adaptive difficulty =================
+   The performance model decides what she sees next, and had no coverage at all —
+   a regression here is invisible until she is bored or defeated. */
+
+test("the performance model raises and lowers the tier on real play", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(() => {
+    const fresh = (lvl) => { delete perf[lvl]; completions[lvl] = 0; settings.diff = "auto"; };
+    const out = {};
+
+    // Clean play pushes the EMA up and the tier with it.
+    fresh("probe1");
+    for (let i = 0; i < 12; i++) recordRoundPerf("probe1", 0);
+    out.cleanPlay = { ema: +perf.probe1.emaScore.toFixed(2), tier: autoTierFor("probe1") };
+
+    // Struggling pulls it back down again — it must be able to go DOWN, not just up.
+    for (let i = 0; i < 12; i++) recordRoundPerf("probe1", 4);
+    out.afterStruggle = { ema: +perf.probe1.emaScore.toFixed(2), tier: autoTierFor("probe1") };
+
+    // A brand-new game stays gentle rather than starting hard.
+    fresh("probe2");
+    out.firstEverRound = autoTierFor("probe2");
+    recordRoundPerf("probe2", 0);
+    out.afterOneRound = autoTierFor("probe2");
+
+    // More mistakes must never score higher than fewer.
+    const scores = [0, 1, 2, 3, 5].map((m) => { fresh("probe3"); recordRoundPerf("probe3", m); return perf.probe3.emaScore; });
+    out.monotonic = scores.every((v, i) => i === 0 || v <= scores[i - 1]);
+
+    // A manual difficulty overrides the model completely.
+    settings.diff = "easy"; out.forcedEasy = tierFor("probe1");
+    settings.diff = "hard"; out.forcedHard = tierFor("probe1");
+    settings.diff = "auto";
+    ["probe1", "probe2", "probe3"].forEach((k) => { delete perf[k]; delete completions[k]; });
+    return out;
+  });
+
+  expect(r.cleanPlay.tier, "sustained clean play should reach the top tier").toBe(2);
+  expect(r.afterStruggle.tier, "sustained struggle must bring the tier back down").toBe(0);
+  expect(r.afterStruggle.ema).toBeLessThan(r.cleanPlay.ema);
+  expect(r.firstEverRound, "a game she has never played must start gentle").toBe(0);
+  expect(r.afterOneRound).toBeLessThanOrEqual(1);
+  expect(r.monotonic, "more mistakes scored higher than fewer").toBe(true);
+  expect(r.forcedEasy).toBe(0);
+  expect(r.forcedHard).toBe(2);
+  expect(errors).toEqual([]);
+});
+
+test("three mistakes in a round de-escalate the next one (no fail state)", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // The Core Bar promises help arrives by the third miss. roundComplete() is what
+  // actually lowers the next round's tier, so drive it rather than trusting the model.
+  const r = await page.evaluate(async () => {
+    settings.diff = "auto";
+    delete perf.snow; completions.snow = 0;
+    startLevel("snow");
+    state.tier = 2; state.round = 0;
+    for (let i = 0; i < 8; i++) recordRoundPerf("snow", 0);   // earn the top tier honestly
+    const before = tierFor("snow");
+    roundMistakes = 3;                                        // she just had a hard round
+    roundComplete();
+    // roundComplete applies the new tier behind waitSpeech, which holds for at least
+    // 900ms so the praise can finish talking. Poll rather than guess.
+    for (let i = 0; i < 40 && state.tier === before; i++) await new Promise((r) => setTimeout(r, 100));
+    const after = state.tier;
+    delete perf.snow;
+    return { before, after };
+  });
+  expect(r.before).toBe(2);
+  expect(r.after, "a round with 3 mistakes must not be followed by an equally hard one")
+    .toBeLessThan(r.before);
+  expect(errors).toEqual([]);
+});
+
+/* ================= The reward loop =================
+   Star Sparks → rocket is the spine of motivation and had no coverage either. */
+
+test("finishing games fills the rocket, and launching it starts a fresh journey", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(async () => {
+    sparks = 0; trips = 0; stickers.length = 0;
+    const out = { gained: [], stickersGained: [] };
+    for (let i = 0; i < QUEST_GOAL + 2; i++) {          // deliberately overshoot the goal
+      celebrateWith("snow");
+      out.gained.push(sparks);
+      out.stickersGained.push(stickers.length);
+    }
+    out.goal = QUEST_GOAL;
+    out.neverExceedsGoal = out.gained.every((v) => v <= QUEST_GOAL);
+    // celebrateWith updates the count; the hub redraws the slots on its next build
+    renderQuest();
+    out.everySlotDrawn = document.querySelectorAll("#questSlots .q-slot").length;
+    out.filledSlots = document.querySelectorAll("#questSlots .q-slot.filled").length;
+
+    // Launching resets the journey so it can be flown again — the counter is a loop,
+    // not a one-time score.
+    const tripsBefore = trips;
+    rocketLaunch();
+    await new Promise((r) => setTimeout(r, 5200));
+    out.sparksAfterLaunch = sparks;
+    out.tripRecorded = trips > tripsBefore;
+    return out;
+  });
+  expect(r.gained[0]).toBe(1);
+  expect(r.neverExceedsGoal, "sparks must cap at the goal, never overflow").toBe(true);
+  expect(r.gained[r.goal - 1]).toBe(r.goal);
+  expect(r.stickersGained[r.stickersGained.length - 1]).toBe(r.goal + 2);  // a sticker every win
+  expect(r.everySlotDrawn).toBe(r.goal);
+  expect(r.filledSlots).toBe(r.goal);
+  expect(r.sparksAfterLaunch, "a launch should start a fresh journey").toBe(0);
+  expect(r.tripRecorded, "the trip should be counted").toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test("a completion count never goes down", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // Progress that can decrease reads as punishment at this age; worldStars() was
+  // already fixed for this once, so pin the underlying counter too.
+  const r = await page.evaluate(() => {
+    const seen = [];
+    completions.snow = 0;
+    for (let i = 0; i < 5; i++) { celebrateWith("snow"); seen.push(completions.snow); }
+    return { seen, monotonic: seen.every((v, i) => i === 0 || v >= seen[i - 1]) };
+  });
+  expect(r.monotonic).toBe(true);
+  expect(r.seen).toEqual([1, 2, 3, 4, 5]);
+  expect(errors).toEqual([]);
+});
+
+/* ================= Parent gate =================
+   Core Bar: settings and destructive actions are never one child tap. */
+
+test("settings need a deliberate hold, not a tap", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+  await expect(page.locator("#hub")).toBeVisible();
+
+  const btn = page.locator("#settingsBtn");
+  // a child's tap
+  await btn.dispatchEvent("pointerdown");
+  await page.waitForTimeout(150);
+  await btn.dispatchEvent("pointerup");
+  await page.waitForTimeout(150);
+  await expect(page.locator("#settings"), "a quick tap must not open settings").toBeHidden();
+
+  // a grown-up's hold
+  await btn.dispatchEvent("pointerdown");
+  await page.waitForTimeout(1000);
+  await btn.dispatchEvent("pointerup");
+  await expect(page.locator("#settings"), "holding the button should open settings").toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("wiping her progress needs a grown-up answer first", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => { completions.snow = 3; saveCompletions(); core.flush(); openSettings(); });
+
+  // Dismiss the arithmetic check the way a child would: cancel, or a wrong answer.
+  for (const reply of [null, "1"]) {
+    page.once("dialog", (d) => (reply === null ? d.dismiss() : d.accept(reply)));
+    await page.locator("#setReset").click();
+    await page.waitForTimeout(150);
+    const kept = await page.evaluate(() => completions.snow);
+    expect(kept, "a failed parent check must not erase anything").toBe(3);
+  }
+
+  // A grown-up answers correctly, then still has to confirm. One handler for both
+  // dialogs: two `once` listeners would BOTH fire on the first one.
+  const answerThenConfirm = async (d) => {
+    const m = d.message().match(/(\d+)\s*\+\s*(\d+)/);
+    if (m) await d.accept(String(Number(m[1]) + Number(m[2])));   // the arithmetic check
+    else await d.accept();                                        // the "are you sure" confirm
+  };
+  page.on("dialog", answerThenConfirm);
+  await page.locator("#setReset").click();
+  await page.waitForTimeout(400);
+  page.off("dialog", answerThenConfirm);
+  expect(await page.evaluate(() => completions.snow || 0), "a passed check should reset").toBe(0);
+  expect(errors).toEqual([]);
+});
+
+/* ================= Persistence ================= */
+
+test("her progress survives a reload, and a storage failure never kills saving", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => {
+    completions.snow = 2; saveCompletions();
+    sparks = 3; saveQuest();
+    stickers.length = 0; stickers.push({ e: "🦄" }); saveStickers();
+    core.flush();
+  });
+  await page.reload();
+  await page.waitForSelector("#hub:not(.hidden)");
+  const restored = await page.evaluate(() => ({ snow: completions.snow, sparks, sticker: stickers[0] && stickers[0].e }));
+  expect(restored).toEqual({ snow: 2, sparks: 3, sticker: "🦄" });
+
+  // setItem throws on a full quota and in private browsing. It must not permanently
+  // disable persistence, which is what an un-caught throw inside the debounce did.
+  const survived = await page.evaluate(() => {
+    const real = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = () => { throw new DOMException("QuotaExceededError"); };
+    core.save("probeQuota", 1);
+    core.writeNow();                       // the failing write
+    localStorage.setItem = real;
+    core.save("probeAfter", 2);
+    core.flush();                          // must still work
+    const ok = localStorage.getItem("probeAfter") === "2";
+    ["probeQuota", "probeAfter"].forEach((k) => localStorage.removeItem(k));
+    return ok;
+  });
+  expect(survived, "one storage failure disabled all later saves").toBe(true);
+
+  // A toddler ends a session with the home button; iOS often never fires beforeunload.
+  const flushed = await page.evaluate(() => {
+    localStorage.removeItem("probeHide");
+    core.save("probeHide", 7);
+    Object.defineProperty(document, "hidden", { value: true, configurable: true });
+    document.dispatchEvent(new Event("visibilitychange"));
+    const ok = localStorage.getItem("probeHide") === "7";
+    localStorage.removeItem("probeHide");
+    return ok;
+  });
+  expect(flushed, "progress must be flushed when the app is backgrounded").toBe(true);
+  expect(errors).toEqual([]);
+});
+
+
+/* ================= Core-curriculum games =================
+   The original games carry the curriculum — counting, colour, numerals — and every
+   one of them shipped without a gameplay test while the newer ones got several.
+   These drive the real round: correct tap advances, wrong tap never dead-ends. */
+
+test("Counting Critters counts to the named number and fills the tray", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(async () => {
+    startLevel("snow");
+    state.tier = 0; state.round = 0; snowLevel.startRound();
+    const target = snowLevel.count;
+    const critters = [...document.querySelectorAll(".critter")];
+    const out = { target, spawned: critters.length, tierCounts: {} };
+    // one critter per number she has to count — symbol and quantity must agree
+    for (let i = 0; i < target; i++) critters[i].click();
+    out.counted = snowLevel.done;
+    out.numeralShown = document.getElementById("countNum").textContent;
+    out.slotsFilled = document.querySelectorAll(".count-slot.filled").length;
+    // the ladder gets harder, never easier
+    for (const tier of [0, 1, 2]) {
+      state.tier = tier; state.round = 0; snowLevel.startRound();
+      out.tierCounts[tier] = snowLevel.count;
+    }
+    return out;
+  });
+  expect(r.spawned).toBe(r.target);
+  expect(r.counted).toBe(r.target);
+  expect(String(r.numeralShown), "the numeral must match the quantity counted").toBe(String(r.target));
+  expect(r.slotsFilled).toBe(r.target);
+  expect(r.tierCounts[1]).toBeGreaterThanOrEqual(r.tierCounts[0]);
+  expect(r.tierCounts[2]).toBeGreaterThanOrEqual(r.tierCounts[1]);
+  expect(errors).toEqual([]);
+});
+
+test("Ocean Colors advances on the named colour and forgives a wrong one", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(async () => {
+    startLevel("ocean");
+    state.tier = 0; state.round = 0; oceanLevel.startRound();
+    const out = { target: oceanLevel.target };
+    const fish = () => [...document.querySelectorAll(".fish-btn")];
+    out.spawned = fish().length;
+    out.distinctColors = new Set(fish().map((f) => f.dataset.color)).size;
+
+    // A wrong tap must not end the round or remove the right answer.
+    const wrong = fish().find((f) => f.dataset.color !== out.target);
+    if (wrong) wrong.click();
+    await new Promise((r) => setTimeout(r, 200));
+    out.correctStillThere = fish().some((f) => f.dataset.color === out.target);
+    out.roundAfterWrong = state.round;
+
+    // Re-read the target: a wrong tap may re-render, and the test should follow the
+    // game rather than assume it stood still.
+    const target = oceanLevel.target;
+    const right = fish().find((f) => f.dataset.color === target);
+    out.foundCorrect = !!right;
+    const before = state.round;
+    if (right) right.click();
+    for (let i = 0; i < 40 && state.round === before; i++) await new Promise((r) => setTimeout(r, 100));
+    out.advanced = state.round > before;
+    return out;
+  });
+  expect(r.spawned).toBeGreaterThanOrEqual(3);
+  expect(r.distinctColors, "each fish must be a distinct colour to name").toBe(r.spawned);
+  expect(r.correctStillThere, "a wrong tap must never remove the right answer").toBe(true);
+  expect(r.roundAfterWrong, "a wrong tap must not advance the round").toBe(0);
+  expect(r.foundCorrect, "the correctly-coloured fish should still be on screen").toBe(true);
+  expect(r.advanced, "tapping the named colour should advance").toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test("Ocean Colors lights up the answer after repeated misses", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // BAR-CONFIG: guided assist by the third wrong attempt. This never fired, because the
+  // fish carried their colour only in a click closure and the lookup used [data-color].
+  const r = await page.evaluate(async () => {
+    startLevel("ocean");
+    state.tier = 0; state.round = 0; oceanLevel.startRound();
+    const target = oceanLevel.target;
+    const wrongOnes = [...document.querySelectorAll(".fish-btn")].filter((f) => f.dataset.color !== target);
+    const out = { hasDataColor: [...document.querySelectorAll(".fish-btn")].every((f) => !!f.dataset.color) };
+    wrongOnes[0].click();
+    await new Promise((r) => setTimeout(r, 80));
+    out.afterOne = !!document.querySelector(".fish-btn.hint-highlight");
+    (wrongOnes[1] || wrongOnes[0]).click();
+    await new Promise((r) => setTimeout(r, 80));
+    const hinted = document.querySelector(".fish-btn.hint-highlight");
+    out.afterTwo = !!hinted;
+    out.hintedTheRightOne = hinted ? hinted.dataset.color === target : false;
+    return out;
+  });
+  expect(r.hasDataColor, "every fish must carry its colour on the element").toBe(true);
+  expect(r.afterOne, "one miss is not yet a hint").toBe(false);
+  expect(r.afterTwo, "the second miss must light up the answer").toBe(true);
+  expect(r.hintedTheRightOne, "the hint highlighted the wrong fish").toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test("Numbers pops only the named numeral", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(async () => {
+    startLevel("bike");
+    state.tier = 0; state.round = 0; bikeLevel.startRound();
+    const out = { target: bikeLevel.target, ceiling: bikeLevel.maxN };
+    // The balloons live in the level's own array and drift in via its rAF loop.
+    for (let i = 0; i < 80 && !bikeLevel.balloons.length; i++) await new Promise((r) => setTimeout(r, 50));
+    out.spawned = bikeLevel.balloons.length;
+    out.allWithinCeiling = bikeLevel.balloons.every((b) => b.num >= 1 && b.num <= out.ceiling);
+    out.firstIsNotTarget = bikeLevel.balloons[0] ? bikeLevel.balloons[0].num !== out.target : true;
+    // the ceiling must climb with the tier
+    const ceilings = [0, 1, 2].map((tier) => { state.tier = tier; state.round = 0; bikeLevel.startRound(); return bikeLevel.maxN; });
+    bikeLevel.cleanup();
+    out.ceilings = ceilings;
+    return out;
+  });
+  expect(r.spawned, "balloons should spawn").toBeGreaterThan(0);
+  expect(r.allWithinCeiling, "a balloon showed a numeral above the tier's ceiling").toBe(true);
+  expect(r.firstIsNotTarget, "the first balloon must not be the answer — she has to scan and wait").toBe(true);
+  expect(r.ceilings[0]).toBeLessThan(r.ceilings[1]);
+  expect(r.ceilings[1]).toBeLessThan(r.ceilings[2]);
+  expect(errors).toEqual([]);
+});
+
+test("every game's round ladder never gets easier as the tier rises", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // A blunt sweep across all 35 levels: start every round at every tier and require
+  // that it paints something and throws nothing. Cheap, and it covers the 26 games
+  // that had no test of their own at all.
+  const bad = await page.evaluate(async () => {
+    const out = [];
+    for (const id of Object.keys(LEVELS)) {
+      for (const tier of [0, 1, 2]) {
+        try {
+          startLevel(id);
+          state.tier = tier; state.round = 0;
+          LEVELS[id].startRound();
+          await new Promise((r) => setTimeout(r, 10));
+          if (!document.getElementById("playArea").children.length) out.push({ id, tier, why: "drew nothing" });
+        } catch (e) {
+          out.push({ id, tier, why: e.message });
+        }
+        try { cleanupLevel(); } catch (_) {}
+      }
+    }
+    showHub();
+    return out;
+  });
+  expect(bad, "levels that fail to start at some tier").toEqual([]);
+  expect(errors, "console/page errors sweeping every level at every tier:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("every game's hint ladder can actually count mistakes", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // Ocean and Numbers both shipped with `this.mistakes` never initialised, so
+  // `undefined++` gave NaN and neither `=== 2` nor `>= 3` ever matched: guided assist
+  // could not fire at any number of misses. Catch the next one at the source.
+  const bad = await page.evaluate(async () => {
+    const out = [];
+    for (const id of Object.keys(LEVELS)) {
+      const lvl = LEVELS[id];
+      const src = Object.values(lvl).filter((v) => typeof v === "function").map(String).join("");
+      if (!/this\.mistakes\s*\+\+/.test(src)) continue;      // this game doesn't count misses
+      delete lvl.mistakes;                                     // a stale value from an earlier
+                                                               // round must not mask the bug
+      startLevel(id);
+      state.tier = 0; state.round = 0;
+      try { lvl.startRound(); } catch (e) { out.push({ id, got: "-", why: "startRound threw: " + e.message }); continue; }
+      await new Promise((r) => setTimeout(r, 10));
+      if (typeof lvl.mistakes !== "number")
+        out.push({ id, got: String(lvl.mistakes), why: "mistakes not initialised by startRound" });
+      try { cleanupLevel(); } catch (_) {}
+    }
+    showHub();
+    return out;
+  });
+  expect(bad, "a hint ladder that can never fire").toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+/* ================= Accessibility ================= */
+
+test("reduced motion is honoured end to end", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html");            // NOT ?test=1 — that disables animation anyway
+
+  expect(await page.evaluate(() => reducedMotion()), "the app should detect the preference").toBe(true);
+
+  // the world map's idle bob and entrance pop are off
+  const animated = await page.evaluate(() =>
+    [...document.querySelectorAll("#mapNodes .node")]
+      .filter((n) => getComputedStyle(n).animationName !== "none").length);
+  expect(animated, "world discs should hold still under reduced motion").toBe(0);
+
+  // the buddy still gets from A to B — it teleports rather than walking
+  await page.evaluate(() => document.querySelector("#mapNodes .node").click());
+  await expect(page.locator("#games")).toBeVisible();
+  await page.waitForTimeout(600);
+  const props = await page.evaluate(() =>
+    [...document.querySelectorAll(".tr-prop")].filter((n) => getComputedStyle(n).animationName !== "none").length);
+  expect(props, "trail scenery should hold still under reduced motion").toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test("the app renders in Spanish without losing its words", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(() => {
+    settings.lang = "es"; saveSettings(); applyI18n(); buildHub();
+    const out = {
+      worldLabels: [...document.querySelectorAll("#mapNodes .node-label")].map((e) => e.textContent),
+      // nouns spoken by games must be translated, not echoed back in English
+      spots: ["basket", "box", "table"].map((k) => theWord(k)),
+      untranslatedKeys: Object.keys(DICT.en).filter((k) => !(k in DICT.es)),
+    };
+    settings.lang = "en"; saveSettings(); applyI18n(); buildHub();
+    return out;
+  });
+  expect(r.worldLabels).toContain("Números");
+  expect(r.untranslatedKeys, "keys with no Spanish translation").toEqual([]);
+  expect(r.spots, "hide-and-seek nouns fell back to English").toEqual(["la canasta", "la caja", "la mesa"]);
+  expect(errors).toEqual([]);
+});

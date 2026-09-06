@@ -11,6 +11,9 @@ const bikeLevel = {
       this.order = pool.slice(0, 5);
     }
     this.target = this.order[state.round];
+    this.mistakes = 0;                 // same bug ocean.js had: never initialised, so
+                                       // `undefined++` is NaN and the hint ladder below
+                                       // never matched === 2 or >= 3.
     this.maxN = maxN;
     this.speedMul = [1, 1.25, 1.5][state.tier];
     this.maxBalloons = [3, 4, 5][state.tier];

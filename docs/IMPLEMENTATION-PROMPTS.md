@@ -6,7 +6,7 @@ Use these prompts directly in Copilot Chat later to implement the selected prior
 
 Prompt:
 
-You are editing fiona-game/index.html. Replace the current auto difficulty logic so it adapts based on real performance, not just completion counts.
+You are editing little-explorer/index.html. Replace the current auto difficulty logic so it adapts based on real performance, not just completion counts.
 
 Requirements:
 - Keep manual modes unchanged: easy, med, hard must still force tiers 0, 1, 2.
@@ -40,7 +40,7 @@ Validation:
 
 Prompt:
 
-You are editing fiona-game/index.html. Add a progressive hint ladder to improve learning feedback after mistakes.
+You are editing little-explorer/index.html. Add a progressive hint ladder to improve learning feedback after mistakes.
 
 Requirements:
 - Introduce a shared helper API for hints so each level can use it consistently.
@@ -67,7 +67,7 @@ Validation:
 
 Prompt:
 
-You are editing fiona-game/index.html. Expand settings to include separate volume controls for voice, music, and SFX.
+You are editing little-explorer/index.html. Expand settings to include separate volume controls for voice, music, and SFX.
 
 Requirements:
 - Add three sliders in grown-up settings:
@@ -92,7 +92,7 @@ Validation:
 
 Prompt:
 
-You are editing fiona-game/index.html. Implement three upgrades in one coherent pass:
+You are editing little-explorer/index.html. Implement three upgrades in one coherent pass:
 1) performance-based auto difficulty,
 2) progressive hint ladder,
 3) separate voice/music/sfx volume sliders.

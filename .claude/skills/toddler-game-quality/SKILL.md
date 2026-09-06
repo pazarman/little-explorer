@@ -1,6 +1,6 @@
 ---
 name: toddler-game-quality
-description: Apply when building, reviewing, scoring, or shipping any mini-game, screen, or UI in Little Explorer (the toddler PWA in index.html) — enforces the 7-axis product quality bar, learning design, STEM scope, accessibility/safety, and the pre-deploy release gate. Trigger on any change to game logic, new games, difficulty/audio, or before pushing to the live site.
+description: Apply when building, reviewing, scoring, or shipping any mini-game, screen, or UI in Little Explorer (the toddler PWA in index.html) — enforces the 12-axis product quality bar, learning design, STEM scope, accessibility/safety, and the pre-deploy release gate. Trigger on any change to game logic, new games, difficulty/audio, or before pushing to the live site.
 ---
 
 # Toddler Game Quality
@@ -14,7 +14,7 @@ This skill is the operating layer; `docs/skills/01–06` are the authoritative d
 - Parent trust: settings + destructive actions are gated, never one child tap.
 - Fast input (<100ms perceived) on a low-end phone; targets ≥44px.
 
-## Score before shipping (skill 01, 7 axes ×0/1/2, pass ≥ 11/14)
+## Score before shipping (skill 01 v2, 12 axes ×0/1/2, pass ≥ 18/24)
 Learning efficacy · Clarity · Pacing/adaptivity · Emotional safety · Motor accessibility · Sensory balance · Reliability.
 Auto-fail if Learning efficacy, Emotional safety, or Reliability is 0. Use `/review-game <id>` to score with file:line evidence.
 

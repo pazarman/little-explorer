@@ -1,7 +1,12 @@
 # Test Coverage Log
 
-Auto-updated by the Analyst agent after each merge. Do not edit manually.
-Last updated: 2026-06-25
+> **This file is not auto-updated, whatever it used to say.** It sat at "Last updated:
+> 2026-06-25" with a coverage table reading "(none yet)" while the suite grew to 30+
+> tests, so an agent reading it concluded there were no tests at all. The suite in
+> `tests/smoke.spec.mjs` is the record; run `npm test` to see it. What follows is the
+> standard a game's tests should meet, which is still worth having written down.
+
+Last reviewed: 2026-09-06
 
 ---
 

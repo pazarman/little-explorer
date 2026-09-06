@@ -10,7 +10,7 @@ bundler — so every top-level `const`/`function` shares one global scope.
 
 ## Quality system (read before building or reviewing)
 This repo has a hard quality bar. Use it; don't freelance.
-- `docs/skills/01-product-quality-bar.md` — 7-axis rubric (0/1/2, **pass ≥ 11/14**, auto-fail on Learning efficacy / Emotional safety / Reliability / any Core Bar item).
+- `docs/skills/01-product-quality-bar.md` — **v2 12-axis rubric** (0/1/2 per axis, **pass ≥ 18/24**, auto-fail on Learning efficacy / Emotional safety / Reliability / any Core Bar item). The 7-axis / 11-of-14 bar is retired — don't score against it.
 - `docs/skills/02-learning-design`, `03-content-quality`, `04-accessibility-safety`, `05-release-gate`.
 - `docs/skills/06-stem-scope-and-sequence.md` — STEM curriculum map + coverage gaps; every game needs a STEM objective tag.
 - `docs/skills/BAR-CONFIG.md` — current policy (primary goal: **learning outcomes**; sensory: balanced; difficulty: auto-assist quickly; parent controls: medium gate).
@@ -64,7 +64,7 @@ This repo has a hard quality bar. Use it; don't freelance.
 - Bump `sw.js` `CACHE` when shipping (network-first SW).
 
 ## Run / verify
-- Serve: `python -m http.server 8765` (or the `fiona-game` preview config).
+- Serve: `python -m http.server 8765` (or the `little-explorer` preview config).
 - The preview tab is backgrounded → CSS animations freeze at frame 0 and `preview_screenshot` times out.
   Verify via `preview_eval` / `preview_console_logs`; to measure true layout, inject
   `*{animation:none!important;transition:none!important}` or use `offsetWidth`.

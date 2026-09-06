@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "46";
+const APP_VERSION = "47";
 /* ================= Worlds, games and levels =================
    None of this is written out by hand any more. Every game declares itself in its
    own file with registerGame() (see core.js), and every js/games/* script loads
@@ -104,10 +104,6 @@ function narratorSay(line) {
     setTimeout(() => el.classList.add("hidden"), 380);
   }, 4200);
 }
-function gameCategory(gid) {
-  for (const cat of CATEGORIES) { if (cat.games.includes(gid)) return cat.id; }
-  return "create";
-}
 function hubGreeting() {
   const last = localStorage.getItem("fionaLastGame");
   localStorage.removeItem("fionaLastGame");
@@ -124,10 +120,6 @@ function startGameNow(id) {
   else if (id === "story") showStory();
   else if (id === "dressup") dressup.show();
   else startLevel(id);
-}
-function launchGame(id) {
-  narratorSay(t("narrator_cat_" + gameCategory(id)));
-  core.wait(() => startGameNow(id), 900);
 }
 // The "New!" pennant that plants itself above a disc. Empty string when nothing is new.
 const newFlag = show => (show ? `<span class="node-new">${t("new_badge")}</span>` : "");
@@ -359,10 +351,10 @@ function renderScene() {
     const x = (e.clientX - r.left) / r.width * 100, y = (e.clientY - r.top) / r.height * 100;
     (decor[curScene] = decor[curScene] || []).push({ e: palSel, x, y });
     saveDecor(); sfx.tap();
-    const d = (typeof STICKER_DATA !== "undefined") ? STICKER_DATA[palSel] : null;
+    const d = STICKER_DATA[palSel];
     if (d && d.h === curScene) {
       confetti();
-      speak(t("sticker_belongs", { x: d.n, scene: locName(SCENES.find(s => s.id === curScene)) }));
+      speak(t("sticker_belongs", { x: theWord(d.n), scene: locName(SCENES.find(s => s.id === curScene)) }));
     }
     addPlaced({ e: palSel, x, y }, decor[curScene].length - 1);
   };
@@ -518,10 +510,48 @@ $("bookBtn").onclick = () => { audio(); showStickerBook(); };
 $("bookHome").onclick = showHub;
 $("musicBtn").onclick = toggleMusic;
 $("speakBtn").onclick = () => speak($("instruction").dataset.spoken || $("instruction").textContent);
-$("settingsBtn").onclick = openSettings;
+/* ── Parent gate ──
+   Core Bar: "settings + destructive actions are gated (long-press + a simple parent
+   check), never one child tap." The ⚙️ sits on the hub next to the games, so a tap
+   used to open it and two more taps could wipe every star she owns.
+
+   Layer 1 — the ⚙️ must be HELD. A tap does nothing but say so, which is also how a
+   grown-up discovers the gesture. Layer 2 — the destructive pair asks an arithmetic
+   question a pre-reader cannot answer. */
+const SETTINGS_HOLD_MS = 800;
+let holdTimer = null;
+function beginSettingsHold(ev) {
+  ev.preventDefault();
+  const btn = $("settingsBtn");
+  btn.classList.add("holding");
+  holdTimer = setTimeout(() => { holdTimer = null; btn.classList.remove("holding"); sfx.tap(); openSettings(); },
+                         SETTINGS_HOLD_MS);
+}
+function cancelSettingsHold() {
+  const btn = $("settingsBtn");
+  btn.classList.remove("holding");
+  if (holdTimer === null) return;                 // already opened; nothing to cancel
+  clearTimeout(holdTimer); holdTimer = null;
+  narratorSay(t("settings_hold_hint"));           // a tap teaches the gesture instead of failing silently
+}
+$("settingsBtn").addEventListener("pointerdown", beginSettingsHold);
+$("settingsBtn").addEventListener("pointerup", cancelSettingsHold);
+$("settingsBtn").addEventListener("pointerleave", cancelSettingsHold);
+$("settingsBtn").addEventListener("pointercancel", cancelSettingsHold);
+
+// A simple arithmetic check. Deliberately not a puzzle — it only has to be beyond a
+// 2-5 year old, and instant for the adult holding the phone.
+function parentGate() {
+  const a = 3 + Math.floor(Math.random() * 7), b = 4 + Math.floor(Math.random() * 6);
+  const answer = prompt(t("parent_gate", { a, b }));
+  if (answer === null) return false;
+  return parseInt(String(answer).trim(), 10) === a + b;
+}
+
 $("setDone").onclick = () => { $("settings").classList.add("hidden"); buildHub(); };   // rebuild hub so a difficulty change re-filters games
 $("setReset").onclick = () => {
-  if (confirm("Reset all of " + NAME + "'s stars and stickers?")) {
+  if (!parentGate()) return;
+  if (confirm(t("settings_reset_confirm"))) {
     for (const k in completions) delete completions[k];
     stickers.length = 0; sparks = 0; trips = 0; questShown = 0;
     localStorage.removeItem("fionaTrail");        // send the buddy back to each trailhead too
@@ -529,6 +559,7 @@ $("setReset").onclick = () => {
   }
 };
 $("setRestart").onclick = () => {
+  if (!parentGate()) return;
   if (confirm(t("settings_restart_confirm"))) { localStorage.clear(); location.reload(); }
 };
 $("setName").onclick = () => { $("settings").classList.add("hidden"); showNameScreen(NAME); };

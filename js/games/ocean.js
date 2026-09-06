@@ -21,6 +21,10 @@ const oceanLevel = {
   theme: "theme-ocean", rounds: 5,
   startRound() {
     const howMany = [3, 4, 5][state.tier];
+    this.mistakes = 0;                 // per-round, and it was never initialised at all:
+                                       // `undefined++` is NaN, so neither `=== 2` nor
+                                       // `>= 3` below ever matched and the hint ladder
+                                       // could not fire on any number of misses.
     const palette = COLOR_TIERS[state.tier];
     const picks = shuffle(palette).slice(0, howMany);
     this.target = rand(picks);
@@ -42,6 +46,10 @@ const oceanLevel = {
     picks.forEach((color, i) => {
       const b = document.createElement("button");
       b.className = "fish-btn";
+      // The colour has to be ON the element, not just captured in the click closure:
+      // the hint ladder below looks the correct fish up with [data-color], and without
+      // this it never found one, so guided assist never fired after 2-3 mistakes.
+      b.dataset.color = color;
       b.style.left = spots[i].left; b.style.top = spots[i].top;
       b.style.animationDelay = Math.random() * 2.5 + "s";
       b.innerHTML = fishSVG(COLORS[color]);

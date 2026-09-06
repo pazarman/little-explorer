@@ -73,9 +73,9 @@ npx http-server -p 8765
 | `index.html` | Markup for every screen, and the script tags that load the rest |
 | `css/style.css` | All styling and animation |
 | `js/core.js` | Engine: translations, speech, sound synthesis, difficulty model, quest, persistence |
-| `js/hub.js` | The world map, navigation, story mode, sticker book, settings |
+| `js/hub.js` | The world map, navigation, sticker book, settings |
 | `js/worldtrail.js` | The scrollable road inside a world, and the buddy that walks it |
-| `js/games/*.js` | One file per mini-game |
+| `js/games/*.js` | One file per mini-game; each registers itself with `registerGame()` |
 | `manifest.json` | PWA app metadata (name, icon, fullscreen) |
 | `sw.js` | Service worker for offline support — bump `CACHE` when shipping |
 | `icon.svg` | App icon for PWA |

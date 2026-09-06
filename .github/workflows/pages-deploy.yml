@@ -36,8 +36,38 @@ jobs:
           node -e "const fs=require('fs');const h=fs.readFileSync('index.html','utf8');const b=[...h.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);if(!b.length){console.error('no inline <script> found');process.exit(1);}fs.mkdirSync('.ci',{recursive:true});b.forEach((s,i)=>fs.writeFileSync('.ci/b'+i+'.js',s));"
           for f in .ci/*.js; do node --check "$f"; done
 
+  # The real gate: the same suite ci.yml runs, but this one BLOCKS the deploy.
+  # Anything that reaches the live site has booted, played every game and come back clean.
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: Install Playwright (chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke tests
+        run: npx playwright test
+
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-deploy
+          path: playwright-report/
+          retention-days: 7
+
   deploy:
-    needs: validate
+    needs: [validate, smoke]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -49,10 +79,20 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # Publish the APP, not the repository. Everything else — docs/, sandbox/,
+      # .claude/, .gemini/, tests/, scripts/, CLAUDE.md — was being served publicly
+      # and downloaded on first visit for no reason.
+      - name: Stage the site
+        run: |
+          mkdir -p _site
+          cp index.html manifest.json sw.js icon.svg .nojekyll _site/
+          cp -r css js _site/
+          echo "--- staged:" && find _site -type f | sort
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
