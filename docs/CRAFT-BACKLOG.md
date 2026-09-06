@@ -200,8 +200,63 @@ Not craft, but open and ranked here so one list covers the work.
 
 ---
 
-## Suggested first pass
+## Running order
 
-**C1 → P1 → X1 → O1.** One shared system, one measurable pacing fix, and the two screens a
-parent judges the app by in the first minute. That is the whole Tier 0, and it moves the four
-weakest axes without touching the four strongest.
+Updated 2026-09-06 — the original first pass (C1 → P1 → X1 → O1) is half
+done: **C1 and C2 shipped in v49–v50**, and the vertical trail (v51) came out of a separate observation.
+What follows is the sequence from here, one coherent session per play.
+
+### Play 1 — Fix the rhythm  ·  P1 + X1  ·  effort S + M
+The two things she feels on **every single round and every single win**, and the reason to do them
+together: the celebration *is* the inter-round beat. Cutting the dead air and leaving the win screen
+chaotic would only make the chaos arrive sooner.
+
+- P1: 2,676ms from a correct answer to the next playable round, against ~2 taps of play. Cut the
+  `waitSpeech` floor, overlap praise with the next round painting in, let a tap skip the rest. Target
+  ~1.2s — not zero, or the praise stops feeling warm.
+- X1: one themed confetti palette, text on its own plate, the finished game fully covered.
+
+**Moves:** Pacing 5 → 7, Art 5 → 6. **Verify by:** re-measuring round-to-round, and a test that a tap
+during praise advances.
+
+### Play 2 — Give it a voice  ·  A1 + A2  ·  effort M
+Audio is a **4 and entirely untouched** — the last completely cold axis. It also pairs with what just
+shipped: ambience keys off the same 7 biome names the scene kit already uses, so `reef` gets a wash and
+`meadow` gets birds with no new taxonomy.
+
+- A1: an ambience bed per biome. Cheap in code — the synth engine exists — and it fills a screen as much
+  as art does.
+- A2: one signature cue per game on its key action, instead of the universal `good()`.
+
+**Moves:** Audio 4 → 7. **Watch:** BAR-CONFIG's calm path — ambience must sit under the voice, never
+compete with it.
+
+### Play 3 — The first minute  ·  O1  ·  effort M
+A pre-reader's first two screens are a text field and an age-band picker written for adults. Open on the
+map; ask for the name the first time it would be spoken; put difficulty behind the parent gate that now
+exists. **Moves:** Onboarding 4 → 7. This is what a parent judges the app on before anything else.
+
+### Play 4 — Finish the scene kit  ·  C2 remainder + C3 + R1  ·  effort M–L
+Twenty-one games still have no scenery. **Dolphin first** — it needs the scroll-aware variant of the kit,
+and it is the reference build every new game is told to imitate, so its emptiness propagates. Then the
+pets trio together, trace and feelings on their own terms, and the R1 emoji↔SVG rule written down and
+audited. **Moves:** Composition 4 → 7 across the whole app rather than 14 games.
+
+### Play 5 — Build again  ·  Blend-It!  ·  effort M
+Only now. The floor is raised, so a 39th game adds instead of diluting. Blend-It! is top of the READY
+queue and fills the **#1 real STEM gap** — phonological awareness beyond letter names, which is the
+strongest predictor of reading and which Letter Lights does not cover.
+
+### Riding along
+Small, and each prevents a specific known rot. Fold one into whichever play it fits:
+- **7 games carry no STEM objective tag** (`bike, icecream, music, ocean, pets, rocket, story`) — this is
+  what let the curriculum map drift in the first place.
+- **23 games still have no dedicated gameplay test.** The blunt sweep covers all 35 at all tiers; the
+  ones with real tests are the recent ones.
+- **The party credits its completion to whichever game came last**, so it can retire an unplayed game's
+  "New!" flag.
+- **`space` and `snow` scene recipes** are the weakest two; small tweaks, not structural.
+
+### Still deliberately not doing
+No streaks, no timers, no scores, no gating. The values score is the most valuable thing here and the
+cheapest to lose — treat it as a constraint on every play above, not a preference.
