@@ -1001,6 +1001,9 @@
   .sc-prop { position:absolute; bottom:0; display:block; }
   .sc-prop svg { width:100%; height:auto; display:block;
                  filter:drop-shadow(0 2px 2px rgba(0,0,0,.14)); }
+  /* A tileable band for scrolling games (scene.strip). Fixed aspect so repeats line up,
+     and inline-block so a marquee can carry a row of them. */
+  .sc-strip { display:inline-block; vertical-align:bottom; height:100%; width:auto; }
   .sc-ground { position:absolute; left:0; right:0; bottom:0; height:17%; }
   .sc-groundline { position:absolute; left:0; right:0; top:0; height:2px; opacity:.22; }
   /* the foreground frame — nearest the eye, cropped by the screen edges on purpose */

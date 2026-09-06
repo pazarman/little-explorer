@@ -282,7 +282,9 @@ const scene = {
     for (let i = 0; i < 9; i++) {
       const r1 = seeded(seed + i * 11 + 3), r2 = seeded(seed + i * 17 + 9), r3 = seeded(seed + i * 23 + 2);
       if (r3 < .18) continue;                                   // leave gaps
-      const kind = b.props[Math.floor(r2 * b.props.length)];
+      // walk the prop list rather than sampling it, so a short tile still shows
+      // every shape the biome owns instead of five copies of the same coral
+      const kind = b.props[(i + Math.floor(r2 * b.props.length)) % b.props.length];
       const x = 3 + i * 11.5 + r1 * 5, sz = 9 + r1 * 7;
       let art = "";
       if (kind === "pine")   art = S.pine(30, 58, 46 + r1 * 12, p.pine, p.pineDark);
@@ -436,6 +438,58 @@ const scene = {
       ${has("motes")  ? this.motes(b, seed) : ""}
       ${has("frame")  ? this.frame(b, seed) : ""}
     </div>`;
+  },
+
+  /* A seamlessly tileable band, for games that SCROLL their world past the camera.
+     The static layers above are laid out against a fixed canvas and would slide wrong
+     against a parallax; this returns one tile that can be repeated inside a marquee.
+
+     Two rules make the repeat invisible: every prop sits inside a margin so nothing is
+     clipped at a tile edge, and the caller repeats an EVEN number of times, so the
+     standard `translateX(-50%)` loop lands on an identical tile.
+
+     `band` picks the depth — "far" is small, pale and sparse; "near" is large and
+     opaque, the layer nearest the camera.
+
+     SIZE THE BAND IN vmin, NOT IN % OF THE STAGE. The tile keeps a 6:1 ratio, so its
+     height sets how big every prop is; a band given `height:22%` of a 851px-tall phone
+     draws coral 180px tall and two-thirds of a tile fills the screen. `clamp(..vmin..)`
+     keeps a prop the same apparent size on a phone and a laptop, which is what a
+     background layer wants. */
+  strip(biome, opts = {}) {
+    let b = BIOMES[biome] || BIOMES[THEME_BIOME[biome] || "meadow"] || BIOMES.meadow;
+    const near = opts.band === "near";
+    // Distance desaturates: the far band takes the biome's own horizon colour unless the
+    // caller asked for something else, so it recedes instead of sitting there in full paint.
+    const tint = opts.tint || (near ? null : b.far.fill);
+    if (tint) b = tintBiome(b, tint);
+    const S = SCENE_SHAPE, p = b.palette;
+    const seed = (opts.seed || 1) + (near ? 500 : 0);
+    const W = 600, H = 100, count = near ? 5 : 7;
+    let out = "";
+    for (let i = 0; i < count; i++) {
+      const r1 = seeded(seed + i * 13 + 3), r2 = seeded(seed + i * 19 + 7), r3 = seeded(seed + i * 23 + 11);
+      if (r3 < 0.14) continue;                                   // gaps, so it is not a fence
+      // walk the prop list rather than sampling it, so a short tile still shows
+      // every shape the biome owns instead of five copies of the same coral
+      const kind = b.props[(i + Math.floor(r2 * b.props.length)) % b.props.length];
+      // margin keeps a prop clear of both tile edges, which is what makes the seam vanish
+      const x = 60 + i * ((W - 120) / count) + r1 * 24;
+      const h = (near ? 62 : 40) + r1 * (near ? 26 : 16);
+      let art = "";
+      if (kind === "pine")    art = S.pine(x, H, h, p.pine, p.pineDark);
+      if (kind === "rock")    art = S.rock(x, H - h * .28, h * .42, p.rock, p.rockLight);
+      if (kind === "coral")   art = S.coral(x, H, h, p.coral, p.coralLight);
+      if (kind === "stalk")   art = S.stalk(x, H, h, p.stalk, 8 + r1 * 10);
+      if (kind === "flower")  art = S.flower(x, H - h * .5, h * .22, p.flower, p.flowerHeart);
+      if (kind === "star")    art = S.star(x, H - h * .6, h * .22, p.star);
+      if (kind === "crystal") art = S.crystal(x, H, h, p.crystal, p.crystalLight);
+      if (kind === "pot")     art = S.pot(x, H, h, p.pot, p.leaf);
+      if (kind === "block")   art = S.block(x, H, h, p.block, p.blockLight);
+      out += art;
+    }
+    return `<svg class="sc-strip" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax meet"
+                 style="opacity:${near ? .8 : .6}">${out}</svg>`;
   },
 
   // Biome for the level about to start, from its theme — so most games say nothing.

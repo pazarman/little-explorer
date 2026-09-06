@@ -38,8 +38,8 @@ const DL_TXT = {
   mid:  { en: "In the middle!", es: "¡En el medio!",  yue: "中間！" }
 };
 
-const DL_CORAL = "🪸 🌿 🐚 🪨 🌾 🐠 ";
-const DL_WEED  = "🌱 🌿 🪸 🌾 ";
+// The scrolling seabed comes from the scene kit as a tileable band (scene.strip), not a
+// row of emoji: an even repeat count keeps the marquee's translateX(-50%) loop seamless.
 
 const dolphinLevel = {
   theme: "theme-ocean", rounds: 5, raf: null,
@@ -65,9 +65,12 @@ const dolphinLevel = {
         .dl-stage:active{cursor:grabbing}
         .dl-surface{position:absolute;left:-2%;right:-2%;top:2%;height:9%;pointer-events:none;opacity:.85}
         .dl-surface svg{width:100%;height:100%}
-        .dl-layer{position:absolute;width:100%;overflow:hidden;white-space:nowrap;pointer-events:none;line-height:1}
-        .dl-far{bottom:20%;font-size:clamp(18px,5vmin,36px);opacity:.5}
-        .dl-near{bottom:2%;font-size:clamp(30px,8vmin,60px);opacity:.9}
+        /* z-index 2: above .dl-floor, or the sand gradient buries the reef it grows out of */
+        .dl-layer{position:absolute;width:100%;overflow:hidden;white-space:nowrap;pointer-events:none;line-height:1;z-index:2}
+        /* vmin, not %: the strip tile is 6:1, so its height is what sets coral size */
+        .dl-far{bottom:12%;height:clamp(34px,11vmin,92px);opacity:.8}
+        .dl-near{bottom:5%;height:clamp(52px,19vmin,150px);opacity:.95}
+        .dl-layer .marquee{height:100%;white-space:nowrap}
         .dl-floor{position:absolute;left:0;right:0;bottom:0;height:14%;background:linear-gradient(rgba(226,201,140,0),#e2c98c 55%);pointer-events:none;z-index:1}
         .dl-bubble{position:absolute;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(255,255,255,.12));animation:dlRise linear infinite;pointer-events:none;z-index:3}
         @keyframes dlRise{0%{transform:translateY(0);opacity:.7}100%{transform:translateY(-72vh);opacity:0}}
@@ -91,8 +94,8 @@ const dolphinLevel = {
             <path d="M0 22 Q25 6 50 22 T100 22 T150 22 T200 22 T250 22 T300 22 T350 22 T400 22" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="3"/>
           </svg>
         </div>
-        <div class="dl-layer dl-far"><span class="marquee" style="animation-duration:${(30 / this.speedMul).toFixed(1)}s">${DL_CORAL.repeat(6)}</span></div>
-        <div class="dl-layer dl-near"><span class="marquee" style="animation-duration:${(15 / this.speedMul).toFixed(1)}s">${DL_WEED.repeat(6)}</span></div>
+        <div class="dl-layer dl-far"><span class="marquee" style="animation-duration:${(30 / this.speedMul).toFixed(1)}s">${scene.strip("reef", { band: "far", seed: 4 }).repeat(6)}</span></div>
+        <div class="dl-layer dl-near"><span class="marquee" style="animation-duration:${(15 / this.speedMul).toFixed(1)}s">${scene.strip("reef", { band: "near", seed: 4 }).repeat(6)}</span></div>
         <div class="dl-floor"></div>
         <div class="dl-hud" id="dlHud">${pips}</div>
         <div class="dl-hoopfield" id="dlHoops"></div>

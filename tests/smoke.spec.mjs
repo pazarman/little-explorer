@@ -1639,6 +1639,47 @@ test("every biome draws without error", async ({ page }) => {
 });
 
 
+/* A scrolling game repeats one strip tile past the camera. Two things make that repeat
+   invisible, and both are easy to break by nudging a number in `strip()`: every prop has
+   to sit inside the tile's margin, and the same seed has to draw the same tile. If either
+   goes, a seam marches across the reef every few seconds — the kind of fault nobody spots
+   in a still screenshot. */
+test("a scrolling band tiles without a seam", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const bad = await page.evaluate(() => {
+    const out = [];
+    for (const name of Object.keys(BIOMES)) {
+      for (const band of ["far", "near"]) {
+        let html;
+        try { html = scene.strip(name, { band, seed: 5 }); }
+        catch (e) { out.push({ name, band, why: e.message }); continue; }
+
+        if (/undefined|NaN/.test(html)) out.push({ name, band, why: "undefined/NaN in the markup" });
+        if (html !== scene.strip(name, { band, seed: 5 })) out.push({ name, band, why: "not deterministic" });
+
+        const el = document.createElement("div");
+        el.innerHTML = html;
+        const svg = el.querySelector("svg");
+        if (!svg) { out.push({ name, band, why: "drew no svg" }); continue; }
+        if (svg.getAttribute("viewBox") !== "0 0 600 100") out.push({ name, band, why: "tile is not the 600x100 the CSS sizes against" });
+        if (svg.querySelectorAll("*").length < 3) out.push({ name, band, why: "drew almost nothing" });
+
+        // every x coordinate in the tile has to clear both edges, or the repeat shows a cut prop
+        const xs = [...html.matchAll(/(?:\bcx=|\bx=|\bx1=|\bx2=)"(-?[\d.]+)"/g)].map((m) => +m[1])
+          .concat([...html.matchAll(/[ML]\s*(-?[\d.]+)/g)].map((m) => +m[1]));
+        const off = xs.filter((v) => v < 4 || v > 596);
+        if (off.length) out.push({ name, band, why: `${off.length} points outside the tile (e.g. ${off[0]})` });
+      }
+    }
+    return out;
+  });
+  expect(bad, "bands that would show their seam").toEqual([]);
+  expect(errors).toEqual([]);
+});
+
 /* ================= Audio =================
    Audio was the coldest axis: five one-shot cues and three tunes across 38 games with
    nothing in between. These guard the two things that replaced that, and — more
