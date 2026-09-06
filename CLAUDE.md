@@ -34,7 +34,7 @@ This repo has a hard quality bar. Use it; don't freelance.
 - **Hub progress**: `worldStars()` counts *distinct games tried*, never a fraction of the world's size —
   shipping a game into a world must never take away a star. New games are tagged `v: <APP_VERSION>` in
   `GAMES`; `isNewGame()` flies a "New!" flag until she plays it, and it ages out on the next version bump.
-- **~22 games** (`LEVELS` + specials `paint`/`story`/`dressup`). Each level object has `theme`, `rounds`,
+- **38 games** (`LEVELS` + specials `paint`/`story`/`dressup`). Each level object has `theme`, `rounds`,
   `startRound()`, and reads `state.tier` (0–2).
 - **Difficulty**: `tierFor(level)` — manual easy/med/hard force 0/1/2; **auto mode uses a performance model**
   (`fionaPerf`: `autoTierFor`, EMA of round quality, down-shift on ≥3 mistakes). Mistakes are counted via the
