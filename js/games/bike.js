@@ -1,6 +1,36 @@
 "use strict";
 /* ================= LEVEL: Balloon bike ride ================= */
 const BALLOON_COLORS = ["#e63946", "#2f6fde", "#3fa84f", "#8e4fd0", "#f07f13", "#f06ba8"];
+/* Drawn, not emoji: the cyclist is the avatar she rides with for the whole game, and
+   🚴 renders as a different person on every platform. See docs/ART-STYLE-GUIDE.md. */
+const RIDER_ART = `<svg viewBox="0 0 160 132" width="100%" height="100%">
+  <g fill="none" stroke="#3a3f47" stroke-width="5">
+    <circle cx="36" cy="96" r="26"/><circle cx="124" cy="96" r="26"/>
+  </g>
+  <g fill="none" stroke="#aab3bd" stroke-width="1.7" opacity=".85">
+    <path d="M36 70 V122 M10 96 H62 M18 78 L54 114 M54 78 L18 114"/>
+    <path d="M124 70 V122 M98 96 H150 M106 78 L142 114 M142 78 L106 114"/>
+  </g>
+  <g fill="none" stroke="#ffc31f" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M78 96 L66 58 L108 60 Z"/>
+    <path d="M78 96 H36 M66 58 L36 96 M108 60 L124 96"/>
+  </g>
+  <path d="M56 56 Q66 52 76 56 Q66 61 56 56 Z" fill="#3a3f47"/>
+  <path d="M100 54 H116" stroke="#3a3f47" stroke-width="5" stroke-linecap="round"/>
+  <path d="M68 58 Q86 70 80 94" stroke="#e8722d" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <ellipse cx="78" cy="98" rx="9" ry="6" fill="#2f6fde"/>
+  <circle cx="78" cy="96" r="6.5" fill="#3a3f47"/>
+  <path d="M68 58 Q76 38 92 30" stroke="#f2653c" stroke-width="17" fill="none" stroke-linecap="round"/>
+  <path d="M92 32 Q104 40 110 52" stroke="#f2a03d" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <circle cx="112" cy="53" r="6" fill="#f6cfa4"/>
+  <circle cx="99" cy="22" r="13" fill="#f6cfa4"/>
+  <path d="M86 20 Q88 6 100 6 Q113 6 113 19 Q100 13 86 20 Z" fill="#2f6fde"/>
+  <path d="M110 15 L123 20 L109 24 Z" fill="#2f6fde"/>
+  <circle cx="106" cy="23" r="2.6" fill="#3a2e2e"/>
+  <circle cx="99" cy="28" r="4" fill="#ff9bb0" opacity=".6"/>
+  <path d="M104 31 Q109 36 113 30" stroke="#9c3b2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+</svg>`;
+
 const bikeLevel = {
   theme: "theme-bike", rounds: 5, raf: null,
   startRound() {
@@ -25,7 +55,7 @@ const bikeLevel = {
       <div class="treeline far"><div class="marquee" style="animation-duration:26s;">${far}</div></div>
       <div class="treeline"><div class="marquee" style="animation-duration:13s;">${near}</div></div>
       <div class="road"></div>
-      <div class="rider">🚴</div>
+      <div class="rider">${RIDER_ART}</div>
       <div id="balloonField"></div>`;
     this.balloons = [];
     this.spawnIn = randBetween(0.2, 0.6);

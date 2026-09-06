@@ -525,10 +525,12 @@
     background:repeating-linear-gradient(90deg, #fff 0 42px, transparent 42px 100px);
     animation:roadmove .55s linear infinite; }
   @keyframes roadmove { to { background-position-x:-100px; } }
-  .rider { position:absolute; left:5%; bottom:9%; z-index:6; pointer-events:none;
-           font-size:clamp(58px,13vmin,110px); filter:drop-shadow(0 3px 3px rgba(0,0,0,.3));
+  /* the rider is drawn SVG and already faces the way she travels, so no scaleX(-1) here */
+  .rider { position:absolute; left:5%; bottom:8%; z-index:6; pointer-events:none;
+           width:clamp(74px,19vmin,148px); filter:drop-shadow(0 3px 3px rgba(0,0,0,.3));
            animation:ride .7s ease-in-out infinite; }
-  @keyframes ride { 0%,100%{ transform:scaleX(-1) translateY(0);} 50%{ transform:scaleX(-1) translateY(-1vmin);} }
+  .rider svg { display:block; width:100%; height:auto; }
+  @keyframes ride { 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-1vmin);} }
   .balloon { position:absolute; border:none; background:none; z-index:8; }
   .b-body {
     position:relative; width:clamp(60px,13vmin,104px); height:clamp(72px,15.5vmin,124px);

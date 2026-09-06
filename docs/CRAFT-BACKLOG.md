@@ -250,9 +250,14 @@ went with it: Dress-Up's 🌈 button cycled six flat fills and now cycles six pl
 `SCENERY_FLOOR` is pinned to the full level count, so this cannot regress and a new game cannot ship
 on a bare gradient. **Moves:** Composition 4 → 7 across the whole app rather than 14 games.
 
-Still open from this play: **R1** — the emoji↔SVG boundary rule written down and audited. Several
-games still use emoji where a drawn hero object belongs (Monkey Swing's monkey and bananas, Meerkat
-Pop's animals, Hippo Feast's food); the kit gave them a place to stand, not a body.
+**R1 done too.** The boundary is written as three "draw it when" rules with examples in
+`docs/ART-STYLE-GUIDE.md`, and audited: sweep the running app for emoji text nodes at a computed
+font-size ≥ 44px. Ten screens have one; all but one are legitimately content items she names rather
+than judges by appearance. Two avatars failed the rule and are drawn now — **Monkey Swing's monkey**
+and **Balloon Ride's cyclist**, both of which she watches for a whole round.
+
+Left open, deliberately: **Pet Care's pet renders at 94px** and reacts to her, so rule 1 says draw
+it — but there are eight pets, not one. That is a small play of its own, not a footnote to this one.
 
 ### Play 5 — Build again  ·  Blend-It!  ·  effort M
 Only now. The floor is raised, so a 39th game adds instead of diluting. Blend-It! is top of the READY

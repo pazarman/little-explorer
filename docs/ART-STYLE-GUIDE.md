@@ -105,6 +105,45 @@ game that moves its world past the camera repeats a tile instead:
   pine into a dark arrow pointing at the child. That is what the first attempt looked like.
 
 
+## The emoji ↔ SVG boundary
+
+"Drawn SVG for hero objects; emoji only as whole objects" was the rule, and it was too vague
+to enforce — so it wasn't. This is the version with a test you can apply.
+
+**Draw it when the object is any of these:**
+
+1. **The avatar she controls**, or the character that reacts to her. Dolphin Dive's dolphin,
+   Monkey Swing's monkey, Balloon Ride's cyclist, Hippo Feast's hippo, the dress-up doll.
+   She looks at this thing for a whole round; it has to be posable and the same on every device.
+2. **Something whose *appearance* carries the answer** — colour, size, quantity, or a
+   part-to-whole relation. Emoji render differently per platform, so "the red fish" is not
+   reliably red and "the big one" is not reliably big.
+3. **Something that has to be composed, layered, or animated** — a mouth that opens, a doll
+   built from parts, a rocket with a flame.
+
+**Emoji is right when the object is:**
+
+- One of many interchangeable content items, identified by its **word** rather than judged by
+  its look: the animals popping out of Meerkat Pop's burrows, Sort It's tray, Night & Day's
+  sun and pillow and sunflower, the pictures in Letter Lights. Swapping in art here would cost
+  a great deal and teach nothing extra.
+- An affordance or label in the chrome: 🏠, 🎲, ⭐ pips, a bin's icon.
+- A single decorative token that carries no answer.
+
+**Never:**
+
+- Stack emoji to fake a composed object. One emoji, one object.
+- Scale an emoji past roughly 2× its natural size — it goes soft and platform-specific. If it
+  needs to be that big, it is a hero object and belongs in rule 1.
+
+**Auditing this.** Run the app and look for text nodes containing emoji at a computed
+`font-size` of 44px or more; anything that large is a candidate hero. At v53 that list is
+ten screens, and all but one are legitimately content items (a countable critter, a pet she
+names, a picture card, a bin label). The exception left open: **Pet Care's pet renders at
+94px** — it is the emotional centre of that screen and it reacts to her, so by rule 1 it
+should be drawn. It stays emoji for now because there are eight pets to draw, not one; it is
+logged in `docs/CRAFT-BACKLOG.md`.
+
 ## Sound belongs to the art direction too
 
 A game's look and its sound are one decision. Both are now required of every game:

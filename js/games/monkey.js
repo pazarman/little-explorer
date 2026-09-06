@@ -12,6 +12,39 @@ const MO_TXT = {
 };
 
 
+/* Drawn, not emoji: this is the avatar she steers for a whole round, and the one object
+   on screen whose motion IS the game. Per docs/ART-STYLE-GUIDE.md, an emoji at 63px is
+   a different picture on every device and cannot be posed. */
+const MONKEY_ART = `<svg viewBox="0 0 120 124" width="100%" height="100%">
+  <defs>
+    <linearGradient id="moFur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b07c4a"/><stop offset="1" stop-color="#8a5c31"/>
+    </linearGradient>
+  </defs>
+  <path d="M40 92 Q12 96 12 72 Q12 56 28 54 Q18 62 20 74 Q22 88 42 84 Z" fill="#7d5029"/>
+  <ellipse cx="62" cy="88" rx="25" ry="23" fill="url(#moFur)"/>
+  <ellipse cx="62" cy="94" rx="15" ry="14" fill="#e8bd8c"/>
+  <path d="M44 74 Q26 56 22 38 Q34 50 48 62 Z" fill="#8a5c31"/>
+  <path d="M80 74 Q98 56 102 38 Q90 50 76 62 Z" fill="#8a5c31"/>
+  <circle cx="24" cy="34" r="8" fill="#a06f42"/>
+  <circle cx="100" cy="34" r="8" fill="#a06f42"/>
+  <ellipse cx="48" cy="106" rx="11" ry="8" fill="#8a5c31"/>
+  <ellipse cx="76" cy="106" rx="11" ry="8" fill="#8a5c31"/>
+  <circle cx="36" cy="44" r="10" fill="#a06f42"/><circle cx="36" cy="44" r="5.6" fill="#eec49a"/>
+  <circle cx="88" cy="44" r="10" fill="#a06f42"/><circle cx="88" cy="44" r="5.6" fill="#eec49a"/>
+  <circle cx="62" cy="44" r="26" fill="url(#moFur)"/>
+  <ellipse cx="62" cy="50" rx="18" ry="16" fill="#f2cfa4"/>
+  <path d="M44 30 Q54 18 62 28 Q70 18 80 30 Q62 24 44 30 Z" fill="#7d5029"/>
+  <circle cx="54" cy="43" r="4.4" fill="#33231a"/><circle cx="55.4" cy="41.4" r="1.6" fill="#fff"/>
+  <circle cx="70" cy="43" r="4.4" fill="#33231a"/><circle cx="71.4" cy="41.4" r="1.6" fill="#fff"/>
+  <ellipse cx="62" cy="55" rx="10" ry="6.5" fill="#e3b485"/>
+  <ellipse cx="58.6" cy="53" rx="1.5" ry="1.9" fill="#8a5c31"/>
+  <ellipse cx="65.4" cy="53" rx="1.5" ry="1.9" fill="#8a5c31"/>
+  <path d="M54 59 Q62 66 70 59" stroke="#8a5c31" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <circle cx="44" cy="52" r="4.2" fill="#ff9bb0" opacity=".55"/>
+  <circle cx="80" cy="52" r="4.2" fill="#ff9bb0" opacity=".55"/>
+</svg>`;
+
 const monkeyLevel = {
   theme: "theme-zoo", rounds: 5, raf: null,
 
@@ -47,7 +80,8 @@ const monkeyLevel = {
         .mo-banana{position:absolute;font-size:clamp(30px,8.5vmin,60px);line-height:1;transform:translate(-50%,-50%);z-index:4;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
         .mo-banana.got{animation:moPop .3s ease forwards}
         @keyframes moPop{0%{transform:translate(-50%,-50%) scale(1)}100%{transform:translate(-50%,-50%) scale(1.6);opacity:0}}
-        .mo-monkey{position:absolute;font-size:clamp(56px,16vmin,120px);line-height:1;transform:translate(-50%,-50%);z-index:6;pointer-events:none;filter:drop-shadow(0 5px 6px rgba(0,0,0,.3));will-change:top,transform}
+        .mo-monkey{position:absolute;width:clamp(62px,18vmin,132px);height:auto;transform:translate(-50%,-50%);z-index:6;pointer-events:none;filter:drop-shadow(0 5px 6px rgba(0,0,0,.3));will-change:top,transform}
+        .mo-monkey svg{display:block;width:100%;height:auto}
       </style>
       <div class="mo-stage" id="moStage">
         <div class="mo-canopy"><span class="marquee" style="animation-duration:${(18 / this.speedMul).toFixed(1)}s">${scene.strip("forest", { band: "canopy", seed: 9 }).repeat(6)}</span></div>
@@ -56,7 +90,7 @@ const monkeyLevel = {
         <div class="mo-near"><span class="marquee" style="animation-duration:${(16 / this.speedMul).toFixed(1)}s">${scene.strip("forest", { band: "near", seed: 9 }).repeat(6)}</span></div>
         <div class="mo-hud" id="moHud">${pips}</div>
         <div class=.mo-bananas" id="moBananas"></div>
-        <div class="mo-monkey" id="moMonkey">🐒</div>
+        <div class="mo-monkey" id="moMonkey">${MONKEY_ART}</div>
       </div>`;
 
     const stage = $("moStage");
