@@ -6,7 +6,7 @@
 3. **Feedback**: Specific and supportive (e.g., "Red! You found it!").
 4. **Reinforcement**: Repeat the concept in a varied way.
 
-## Adaptive Difficulty (The "Fiona" Way)
+## Adaptive Difficulty (the house rules)
 - **Start Conservative**: Tier 0 should be accessible to a 2-year-old.
 - **Auto-Assist**: If the child makes 3 mistakes, simplify the interaction (de-escalate).
 - ** EMA of Performance**: We use an Exponential Moving Average to track quality.

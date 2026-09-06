@@ -1,10 +1,11 @@
 // Bump CACHE whenever you ship an update (forces old caches to clear).
-const CACHE = "little-explorer-v43";
+const CACHE = "little-explorer-v44";
 const ASSETS = [
   "./", "./index.html", "./manifest.json", "./icon.svg",
   "./css/style.css",
   "./js/core.js",
   "./js/hub.js",
+  "./js/worldtrail.js",
   "./js/games/snow.js", "./js/games/ocean.js", "./js/games/pizza.js",
   "./js/games/bike.js", "./js/games/pasta.js", "./js/games/trace.js",
   "./js/games/memory.js", "./js/games/music.js", "./js/games/whosays.js",

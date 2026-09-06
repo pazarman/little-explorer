@@ -43,7 +43,22 @@
 <div id="games" class="screen hidden">
   <button class="round-btn" id="gamesHome" aria-label="Home">🏠</button>
   <h1 id="gamesTitle"></h1>
-  <div id="gameNodes"></div>
+  <!-- A world is one long scrollable path; everything inside is drawn by worldtrail.js. -->
+  <div id="trailView">
+    <div id="trailCanvas">
+      <svg id="trailBg" xmlns="http://www.w3.org/2000/svg">
+        <!-- a soft dark edge under a cream road, so the path reads on any world colour -->
+        <polyline id="trailEdge" fill="none" stroke="#6b4f2a" stroke-opacity=".18"
+                  stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline id="trailPath" fill="none" stroke="#fff3d8" stroke-opacity=".95"
+                  stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+        <g id="trailDots"></g>
+      </svg>
+      <div id="trailDeco"></div>
+      <div id="gameNodes"></div>
+      <div id="trailBuddy" class="mascot"></div>
+    </div>
+  </div>
 </div>
 
 <div id="namescreen" class="screen hidden">
@@ -248,6 +263,7 @@
 <script src="js/games/senses.js"></script>
 <script src="js/games/paint.js"></script>
 <script src="js/games/dressup.js"></script>
+<script src="js/worldtrail.js"></script>
 <script src="js/hub.js"></script>
 </body>
 </html>

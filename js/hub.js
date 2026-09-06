@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "43";
+const APP_VERSION = "44";
 const LEVELS = {
   snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
   music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
@@ -136,14 +136,15 @@ function hubGreeting() {
   return rand([t("narrator_back"), t("narrator_ready")]);
 }
 
+function startGameNow(id) {
+  if (id === "paint") paint.show();
+  else if (id === "story") showStory();
+  else if (id === "dressup") dressup.show();
+  else startLevel(id);
+}
 function launchGame(id) {
   narratorSay(t("narrator_cat_" + gameCategory(id)));
-  core.wait(() => {
-    if (id === "paint") paint.show();
-    else if (id === "story") showStory();
-    else if (id === "dressup") dressup.show();
-    else startLevel(id);
-  }, 900);
+  core.wait(() => startGameNow(id), 900);
 }
 // The "New!" pennant that plants itself above a disc. Empty string when nothing is new.
 const newFlag = show => (show ? `<span class="node-new">${t("new_badge")}</span>` : "");
@@ -202,18 +203,7 @@ function openCategory(id) {
   animScreen("games", "fwd");
   document.body.className = "";
   $("gamesTitle").textContent = `${cat.icon} ${locName(cat)}`;
-  const wrap = $("gameNodes"); wrap.innerHTML = "";
-  visibleGames(cat).forEach(gid => {
-    const g = GAMES[gid];
-    const b = document.createElement("button");
-    b.className = "node";
-    b.innerHTML = `${newFlag(isNewGame(gid))}
-                   <div class="node-disc b-${gid}"><span>${g.icon}</span></div>
-                   <div class="node-label">${locName(g)}</div>
-                   <div class="node-stars">${"⭐".repeat(Math.min(3, completions[gid] || 0))}</div>`;
-    b.onclick = () => { sfx.tap(); launchGame(gid); };
-    wrap.appendChild(b);
-  });
+  worldTrail.open(cat);
 }
 
 /* ================= Story mode ================= */
@@ -425,7 +415,11 @@ function proceedAfterName() {
 
 /* ================= Navigation ================= */
 const ALL_SCREENS = ["hub", "games", "game", "stickerbook", "story", "paint", "dressup", "dashboard", "namescreen", "charscreen", "diffscreen", "settings", "celebrate"];
-function hideAllScreens() { ALL_SCREENS.forEach(id => { const e = $(id); if (e) e.classList.add("hidden"); }); playWipe(); }
+function hideAllScreens() {
+  if (typeof worldTrail !== "undefined") worldTrail.stop();
+  ALL_SCREENS.forEach(id => { const e = $(id); if (e) e.classList.add("hidden"); });
+  playWipe();
+}
 function playWipe() { const w = $("wipe"); if (!w) return; w.classList.remove("run"); void w.offsetWidth; w.classList.add("run"); }
 // contextual screen entrance: "fwd" (drill in) or "back" (go home); falls back to default screenIn
 function animScreen(id, cls) { const el = $(id); if (!el) return; el.classList.remove("fwd", "back"); void el.offsetWidth; el.classList.add(cls); }
