@@ -241,11 +241,23 @@ A pre-reader's first two screens are a text field and an age-band picker written
 map; ask for the name the first time it would be spoken; put difficulty behind the parent gate that now
 exists. **Moves:** Onboarding 4 → 7. This is what a parent judges the app on before anything else.
 
-### Play 4 — Finish the scene kit  ·  C2 remainder + C3 + R1  ·  effort M–L
-Twenty-one games still have no scenery. **Dolphin first** — it needs the scroll-aware variant of the kit,
-and it is the reference build every new game is told to imitate, so its emptiness propagates. Then the
-pets trio together, trace and feelings on their own terms, and the R1 emoji↔SVG rule written down and
-audited. **Moves:** Composition 4 → 7 across the whole app rather than 14 games.
+### Play 4 — Finish the scene kit  ·  C2 remainder + C3  ·  effort M–L  ·  **done (v53)**
+Twenty-one games had no scenery; all 35 levels carry it now, plus Story and Dress-Up. Dolphin came
+first, since it is the reference build every new game is told to imitate — it needed the scroll-aware
+variant, `scene.strip()`, which Bike Ride and Monkey Swing then reused for their emoji treelines. C3
+went with it: Dress-Up's 🌈 button cycled six flat fills and now cycles six places.
+
+`SCENERY_FLOOR` is pinned to the full level count, so this cannot regress and a new game cannot ship
+on a bare gradient. **Moves:** Composition 4 → 7 across the whole app rather than 14 games.
+
+**R1 done too.** The boundary is written as three "draw it when" rules with examples in
+`docs/ART-STYLE-GUIDE.md`, and audited: sweep the running app for emoji text nodes at a computed
+font-size ≥ 44px. Ten screens have one; all but one are legitimately content items she names rather
+than judges by appearance. Two avatars failed the rule and are drawn now — **Monkey Swing's monkey**
+and **Balloon Ride's cyclist**, both of which she watches for a whole round.
+
+Left open, deliberately: **Pet Care's pet renders at 94px** and reacts to her, so rule 1 says draw
+it — but there are eight pets, not one. That is a small play of its own, not a footnote to this one.
 
 ### Play 5 — Build again  ·  Blend-It!  ·  effort M
 Only now. The floor is raised, so a 39th game adds instead of diluting. Blend-It! is top of the READY

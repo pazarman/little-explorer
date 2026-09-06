@@ -33,7 +33,10 @@ const rocketLevel = {
                                        // and the hint ladder never fired for a child who
                                        // was struggling from the very start.
     setInstruction("🚀 " + t("countdown_show", { next: this.next }), t("countdown_say", { next: this.next }));
-    $("playArea").innerHTML = `<div class="space-bg" id="spaceBg"></div>
+    $("playArea").innerHTML =
+      // no canopy: .space-bg already twinkles overhead. No frame: the number pad is down there.
+      scene.html("space", { seed: 35 + state.round * 4, layers: ["far", "drift", "mid", "motes"] }) +
+      `<div class="space-bg" id="spaceBg"></div>
       <div class="rocket-pad"><div class="rocket" id="rocketEl">${ROCKET_ART}<div class="rk-flame" id="rkFlame"></div></div></div>
       <div class="num-pad" id="numPad"></div>`;
     addStars($("spaceBg"));

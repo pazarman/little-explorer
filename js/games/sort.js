@@ -9,7 +9,9 @@ const sortLevel = {
     const n = [2, 3, 4][state.tier];
     this.em = rand(SORT_EMOJIS);
     setInstruction("🪐 " + t("sortsize_show"), t("sortsize_say"));
-    $("playArea").innerHTML = `<div class="space-bg" id="spaceBg"></div>
+    $("playArea").innerHTML =
+      scene.html("space", { seed: 27 + state.round * 4, layers: ["far", "drift", "mid", "motes"] }) +
+      `<div class="space-bg" id="spaceBg"></div>
       <div class="sort-bins">
         <div class="bin big" id="binBig">🪐<div class="binlbl">${t("lbl_big")}</div></div>
         <div class="bin small" id="binSmall">🌑<div class="binlbl">${t("lbl_small")}</div></div>
@@ -87,7 +89,10 @@ const sortkindLevel = {
       const label = this.mode === "color" ? colorName(k) : t("kind_" + k);
       return `<div class="sk-bin" data-bin="${k}">${badge}<div class="sk-basket sk-drop"></div><div class="sk-binlbl">${label}</div></div>`;
     }).join("");
-    $("playArea").innerHTML = `<div class="sk-stage"><div class="sk-bins">${binsHtml}</div><div class="sk-tray" id="skTray"></div></div>`;
+    $("playArea").innerHTML =
+      // no mid/ground/frame: the bins fill the top and the tray the bottom of this one
+      scene.html("reef", { seed: 45 + state.round * 4, layers: ["canopy", "far", "drift", "motes"] }) +
+      `<div class="sk-stage"><div class="sk-bins">${binsHtml}</div><div class="sk-tray" id="skTray"></div></div>`;
     let items = [];
     keys.forEach(k => shuffle(sets[k].items).slice(0, perBin).forEach(e => items.push({ e, bin: k })));
     items = shuffle(items);
@@ -144,7 +149,9 @@ const patternLevel = {
     this.answer = full[full.length - 1];
     const shown = full.slice(0, full.length - 1);
     setInstruction("🔮 " + t("next_show"), t("next_say"));
-    $("playArea").innerHTML = `<div class="space-bg" id="spaceBg"></div>
+    $("playArea").innerHTML =
+      scene.html("space", { seed: 27 + state.round * 4, layers: ["far", "drift", "mid", "motes"] }) +
+      `<div class="space-bg" id="spaceBg"></div>
       <div class="pattern-row" id="patRow"></div>
       <div class="pattern-choices" id="patChoices"></div>`;
     addStars($("spaceBg"));

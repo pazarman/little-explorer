@@ -15,7 +15,9 @@ const petmatchLevel = {
     const picks = shuffle(PETS).slice(0, n);
     this.target = rand(picks);
     setInstruction("🐾 " + t("tap_pet", { x: theWord(this.target.name) }), t("tap_pet", { x: theWord(this.target.name) }));
-    $("playArea").innerHTML = `<div class="pet-choices" id="petChoices"></div>`;
+    $("playArea").innerHTML =
+      scene.html("cozy", { seed: 43 + state.round * 4 }) +
+      `<div class="pet-choices" id="petChoices"></div>`;
     picks.forEach(p => {
       const b = document.createElement("button");
       b.className = "pet-choice"; b.textContent = p.e;
@@ -65,7 +67,10 @@ const petcareLevel = {
     const toolBtns = [...this.needs].map(act =>
       `<button class="care-tool" data-act="${act}">${CARE_ICONS[act]}</button>`
     ).join("");
-    $("playArea").innerHTML = `<div class="petcare-wrap">
+    $("playArea").innerHTML =
+      // no mid/ground/frame: the tool row runs along the bottom of this one
+      scene.html("cozy", { seed: 47 + state.round * 4, layers: ["canopy", "far", "drift", "motes"] }) +
+      `<div class="petcare-wrap">
         <div class="care-mood" id="careMood">${CARE_MOODS[0]}</div>
         <div class="care-pet" id="carePet">${this.pet.e}</div>
         <div class="care-status" id="careStatus">${[...this.needs].map(n => CARE_NEED_ICONS[n]).join(" ")}</div>
@@ -138,7 +143,9 @@ const petfeedLevel = {
     const leftTreats = Array(this.need).fill(null)
       .map(() => `<span class="bowl-treat">${this.leftPet.treat}</span>`).join("");
 
-    $("playArea").innerHTML = `<div class="match-wrap">
+    $("playArea").innerHTML =
+      scene.html("cozy", { seed: 51 + state.round * 4, layers: ["canopy", "far", "drift", "motes"] }) +
+      `<div class="match-wrap">
       <div class="match-sides">
         <div class="match-side">
           <div class="match-pet-icon">${this.leftPet.e}</div>
@@ -239,7 +246,10 @@ const bodyLevel = {
     setInstruction("📍 " + t("tap_part", { part: theWord(this.target) }), t("tap_part", { part: theWord(this.target) }));
 
     const idx = { skin: 0, face: 1, hair: 1, hat: 0, glasses: 0, outfit: 3, friend: 0 };
-    $("playArea").innerHTML = `<div class="body-wrap">
+    $("playArea").innerHTML =
+      // the doll fills this screen top to bottom, so only the air around it is free
+      scene.html("space", { seed: 55 + state.round * 4, layers: ["canopy", "drift", "motes"] }) +
+      `<div class="body-wrap">
       <div class="body-doll${isFace ? " zoom-face" : ""}" id="bodyDoll">${dFullBodySVG(idx)}</div>
       <svg class="body-overlay${isFace ? " zoom-face" : ""}" viewBox="0 0 200 400" id="bodyOverlay"></svg>
     </div>`;

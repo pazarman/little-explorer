@@ -77,8 +77,72 @@ $("playArea").innerHTML = scene.html("reef", { seed: 3 + state.round * 5 }) + `�
 - **Tint when the biome fights the theme.** `{ tint: "#8d5bb0" }` keeps every form and its
   relative lightness but adopts one hue, so the scene reads as depth in the game's own palette.
   Forest greens over Dragon Feed's purple sky looked like scenery from a different app; tinted,
-  the same shapes read as violet hills and the green dragon becomes the hero again.
+  the same shapes read as violet hills and the green dragon becomes the hero again. Tinting
+  covers `rgb()`/`rgba()` as well as hex, so drifters and motes come along too.
+- **Every level carries scenery, and a test keeps it that way.** `SCENERY_FLOOR` in
+  `tests/smoke.spec.mjs` is set to the full level count: a game that ships on a bare gradient
+  fails CI.
+- **`sc-` is the kit's prefix.** There is one global stylesheet here, so a game that names its
+  own classes `.sc-*` is one rename away from restyling the scenery. A test reserves it.
 
+### Scrolling games use `scene.strip()`
+
+The static layers are laid out against a fixed canvas and slide wrong against a parallax. A
+game that moves its world past the camera repeats a tile instead:
+
+```js
+<div class="dl-near"><span class="marquee">${scene.strip("reef", { band: "near", seed: 4 }).repeat(6)}</span></div>
+```
+
+- **Bands:** `canopy` hangs from the top edge, `far` is small and takes the biome's horizon
+  colour so it recedes, `near` is the layer closest to the camera.
+- **Repeat an even number of tiles** — the marquee loops on `translateX(-50%)`, which only
+  lands on an identical tile if the count is even.
+- **Size the band in `vmin`, never in `%` of the stage.** The tile is 6:1, so its *height* sets
+  how big every prop draws. Dolphin Dive's first pass used `height:22%`, which on an 851px-tall
+  phone drew coral 180px high and filled the screen with salmon.
+- **A canopy is its own band, not a flipped ground one.** `scaleY(-1)` on a ground band turns a
+  pine into a dark arrow pointing at the child. That is what the first attempt looked like.
+
+
+## The emoji ↔ SVG boundary
+
+"Drawn SVG for hero objects; emoji only as whole objects" was the rule, and it was too vague
+to enforce — so it wasn't. This is the version with a test you can apply.
+
+**Draw it when the object is any of these:**
+
+1. **The avatar she controls**, or the character that reacts to her. Dolphin Dive's dolphin,
+   Monkey Swing's monkey, Balloon Ride's cyclist, Hippo Feast's hippo, the dress-up doll.
+   She looks at this thing for a whole round; it has to be posable and the same on every device.
+2. **Something whose *appearance* carries the answer** — colour, size, quantity, or a
+   part-to-whole relation. Emoji render differently per platform, so "the red fish" is not
+   reliably red and "the big one" is not reliably big.
+3. **Something that has to be composed, layered, or animated** — a mouth that opens, a doll
+   built from parts, a rocket with a flame.
+
+**Emoji is right when the object is:**
+
+- One of many interchangeable content items, identified by its **word** rather than judged by
+  its look: the animals popping out of Meerkat Pop's burrows, Sort It's tray, Night & Day's
+  sun and pillow and sunflower, the pictures in Letter Lights. Swapping in art here would cost
+  a great deal and teach nothing extra.
+- An affordance or label in the chrome: 🏠, 🎲, ⭐ pips, a bin's icon.
+- A single decorative token that carries no answer.
+
+**Never:**
+
+- Stack emoji to fake a composed object. One emoji, one object.
+- Scale an emoji past roughly 2× its natural size — it goes soft and platform-specific. If it
+  needs to be that big, it is a hero object and belongs in rule 1.
+
+**Auditing this.** Run the app and look for text nodes containing emoji at a computed
+`font-size` of 44px or more; anything that large is a candidate hero. At v53 that list is
+ten screens, and all but one are legitimately content items (a countable critter, a pet she
+names, a picture card, a bin label). The exception left open: **Pet Care's pet renders at
+94px** — it is the emotional centre of that screen and it reacts to her, so by rule 1 it
+should be drawn. It stays emoji for now because there are eight pets to draw, not one; it is
+logged in `docs/CRAFT-BACKLOG.md`.
 
 ## Sound belongs to the art direction too
 

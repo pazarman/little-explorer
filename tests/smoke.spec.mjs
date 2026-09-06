@@ -704,7 +704,7 @@ test("Scavenger Hunt shows a prompt and advances on 'found'", async ({ page }) =
   await page.evaluate(() => startLevel("scavenger"));
   await expect(page.locator("#game")).toBeVisible();
   await page.evaluate(() => { state.tier = 0; scavengerLevel.startRound(); });
-  await expect(page.locator(".sc-card")).toBeVisible();
+  await expect(page.locator(".sv-card")).toBeVisible();
   await expect(page.locator("#scFound")).toBeVisible();
   const instructions = await page.locator("#instruction").textContent();
   expect(instructions).toContain("🔦");
@@ -1639,6 +1639,47 @@ test("every biome draws without error", async ({ page }) => {
 });
 
 
+/* A scrolling game repeats one strip tile past the camera. Two things make that repeat
+   invisible, and both are easy to break by nudging a number in `strip()`: every prop has
+   to sit inside the tile's margin, and the same seed has to draw the same tile. If either
+   goes, a seam marches across the reef every few seconds — the kind of fault nobody spots
+   in a still screenshot. */
+test("a scrolling band tiles without a seam", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const bad = await page.evaluate(() => {
+    const out = [];
+    for (const name of Object.keys(BIOMES)) {
+      for (const band of ["far", "near"]) {
+        let html;
+        try { html = scene.strip(name, { band, seed: 5 }); }
+        catch (e) { out.push({ name, band, why: e.message }); continue; }
+
+        if (/undefined|NaN/.test(html)) out.push({ name, band, why: "undefined/NaN in the markup" });
+        if (html !== scene.strip(name, { band, seed: 5 })) out.push({ name, band, why: "not deterministic" });
+
+        const el = document.createElement("div");
+        el.innerHTML = html;
+        const svg = el.querySelector("svg");
+        if (!svg) { out.push({ name, band, why: "drew no svg" }); continue; }
+        if (svg.getAttribute("viewBox") !== "0 0 600 100") out.push({ name, band, why: "tile is not the 600x100 the CSS sizes against" });
+        if (svg.querySelectorAll("*").length < 3) out.push({ name, band, why: "drew almost nothing" });
+
+        // every x coordinate in the tile has to clear both edges, or the repeat shows a cut prop
+        const xs = [...html.matchAll(/(?:\bcx=|\bx=|\bx1=|\bx2=)"(-?[\d.]+)"/g)].map((m) => +m[1])
+          .concat([...html.matchAll(/[ML]\s*(-?[\d.]+)/g)].map((m) => +m[1]));
+        const off = xs.filter((v) => v < 4 || v > 596);
+        if (off.length) out.push({ name, band, why: `${off.length} points outside the tile (e.g. ${off[0]})` });
+      }
+    }
+    return out;
+  });
+  expect(bad, "bands that would show their seam").toEqual([]);
+  expect(errors).toEqual([]);
+});
+
 /* ================= Audio =================
    Audio was the coldest axis: five one-shot cues and three tunes across 38 games with
    nothing in between. These guard the two things that replaced that, and — more
@@ -1731,10 +1772,29 @@ test("each world has an ambience bed, and it starts, stops and never stacks", as
 });
 
 
-// Scenery coverage is a ratchet: it may go up, never down. 14 of 35 levels carry the
-// scene kit today (the rest are Play 4 in docs/CRAFT-BACKLOG.md). Raise this number
-// when you add more; it exists so a refactor can't quietly strip scenery back out.
-const SCENERY_FLOOR = 14;
+/* `sc-` belongs to the scene kit. Scavenger Hunt had grown a whole set of its own
+   `.sc-*` classes in an inline <style>, and the day one of them matched a kit layer the
+   scenery would have been restyled or hidden on that screen only — a fault nobody would
+   trace back to a class name. There is one global stylesheet namespace here, so this
+   keeps the prefix reserved. */
+test("no game squats on the scene kit's class prefix", async () => {
+  const kit = new Set([...fs.readFileSync("js/scene.js", "utf8").matchAll(/\bsc-[a-z-]+/g)].map((m) => m[0]));
+  const bad = [];
+  for (const f of fs.readdirSync("js/games")) {
+    if (!f.endsWith(".js")) continue;
+    const src = fs.readFileSync(`js/games/${f}`, "utf8");
+    for (const m of new Set([...src.matchAll(/\bsc-[a-z-]+/g)].map((x) => x[0])))
+      if (!kit.has(m)) bad.push(`${f}: ${m}`);
+  }
+  expect(bad, "these class names collide with the scene kit's namespace — rename them")
+    .toEqual([]);
+});
+
+// Scenery coverage is a ratchet: it may go up, never down. All 35 levels carry the scene
+// kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
+// this at the full count; it exists so a refactor can't quietly strip scenery back out,
+// and a new game that ships without a background fails here.
+const SCENERY_FLOOR = 35;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);
@@ -1746,7 +1806,10 @@ test("scenery coverage never goes backwards", async ({ page }) => {
     for (const id of Object.keys(LEVELS)) {
       startLevel(id); state.tier = 0; state.round = 0;
       await new Promise((r) => setTimeout(r, 90));
-      if (document.querySelectorAll("#playArea .sc-scene *").length > 15) withScene.push(id);
+      // .sc-strip too: a scrolling game builds its world from tiles, not the static layers
+      const n = document.querySelectorAll("#playArea .sc-scene *").length
+              + document.querySelectorAll("#playArea .sc-strip").length;
+      if (n > 5) withScene.push(id);
       try { cleanupLevel(); } catch (_) {}
     }
     showHub();

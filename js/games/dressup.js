@@ -127,7 +127,17 @@ function dFullBodySVG(idx) {
 const dressup = {
   idx: { skin: 0, face: 0, hair: 1, hat: 0, glasses: 0, outfit: 3, friend: 0 },
   cur: "skin",
-  bgs: ["#bfe9ff", "#ffd6f0", "#d8f7c8", "#fff0b8", "#e0d0ff", "#ffd9c0"],
+  /* The 🌈 button used to cycle six flat fills. They are places now: the doll stands
+     somewhere, and swapping the background is a thing worth pressing rather than a
+     colour change. Each entry is a sky to sit behind one of the kit's biomes. */
+  bgs: [
+    { biome: "meadow",  sky: "linear-gradient(#bfe9ff,#d8f7c8)" },
+    { biome: "reef",    sky: "linear-gradient(#8fd8ef,#3f9fbd)" },
+    { biome: "snow",    sky: "linear-gradient(#dff1ff,#bcd9ef)" },
+    { biome: "space",   sky: "linear-gradient(#2a2350,#4b3f8f)" },
+    { biome: "forest",  sky: "linear-gradient(#cdeeff,#a9d99a)" },
+    { biome: "cozy",    sky: "linear-gradient(#ffe9d2,#f6d3b0)" },
+  ],
   bg: 0,
   show() {
     cleanupLevel();
@@ -141,8 +151,18 @@ const dressup = {
     speak(t("dressup_intro"));
   },
   renderDoll(popCat) {
-    $("dressStage").style.background = this.bgs[this.bg];
+    this.paintBg();
     $("dollWrap").innerHTML = dDollSVG(this.idx, popCat);
+  },
+  paintBg() {
+    const place = this.bgs[this.bg], stage = $("dressStage");
+    stage.style.background = place.sky;
+    const old = stage.querySelector(".sc-scene");
+    if (old) old.remove();
+    // no frame: the closet tray is right below, and a foreground prop would crowd the doll
+    stage.insertAdjacentHTML("afterbegin", scene.html(place.biome, {
+      seed: 7 + this.bg * 5, layers: ["canopy", "far", "drift", "mid", "ground", "motes"],
+    }));
   },
   buildTabs() {
     const tabs = $("closetTabs"); tabs.innerHTML = "";
@@ -178,7 +198,7 @@ const dressup = {
     const c = centerOf(w); floaters(["✨", "💫"], c.x, c.y, 4);
     speak(curLang() === "es" ? DRESS[cat].es : DRESS[cat].word);
   },
-  cycleBg() { this.bg = (this.bg + 1) % this.bgs.length; sfx.tick(); $("dressStage").style.background = this.bgs[this.bg]; },
+  cycleBg() { this.bg = (this.bg + 1) % this.bgs.length; sfx.tick(); this.paintBg(); },
   shuffle() {
     dressOrder.forEach(cat => this.idx[cat] = Math.floor(Math.random() * DRESS[cat].opts.length));
     this.bg = Math.floor(Math.random() * this.bgs.length);

@@ -44,7 +44,10 @@ const runwayLevel = {
          <div class="rw-strip"></div><div class="rw-letter">${L}</div>
        </div>`).join("");
 
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      // no canopy: this screen makes its own clouds. No mid/ground/frame: the landing
+      // strips fill the bottom quarter and she flies the plane down onto them.
+      scene.html("meadow", { seed: 30 + state.round * 4, layers: ["far", "drift", "motes"] }) + `
       <style>
         .rw-stage{position:absolute;inset:0;overflow:hidden;z-index:5;touch-action:none;cursor:grab}
         .rw-stage:active{cursor:grabbing}

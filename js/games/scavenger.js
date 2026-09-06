@@ -52,32 +52,35 @@ const scavengerLevel = {
     );
 
     const visual = item.icon === "swatch"
-      ? `<div class="sc-swatch" style="background:${item.c}"></div>`
-      : `<div class="sc-emoji">${item.icon}</div>`;
+      ? `<div class="sv-swatch" style="background:${item.c}"></div>`
+      : `<div class="sv-emoji">${item.icon}</div>`;
 
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      // no mid/ground/frame: the prompt card is centred and this screen sends her off to
+      // look at the real room, so the background stays quiet
+      scene.html("meadow", { seed: 39 + state.round * 4, layers: ["canopy", "far", "drift", "motes"] }) + `
       <style>
-        .sc-stage{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vmin,26px);padding:3vmin;text-align:center}
-        .sc-card{background:rgba(255,255,255,.82);border-radius:clamp(18px,4vmin,30px);padding:clamp(16px,4vmin,34px);box-shadow:0 8px 26px rgba(0,0,0,.16);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vmin,16px);max-width:min(88vw,460px)}
-        .sc-swatch{width:clamp(90px,26vmin,180px);height:clamp(90px,26vmin,180px);border-radius:clamp(14px,4vmin,26px);box-shadow:inset 0 -6px 12px rgba(0,0,0,.15),0 4px 10px rgba(0,0,0,.2)}
-        .sc-emoji{font-size:clamp(80px,24vmin,168px);line-height:1}
-        .sc-word{font-size:clamp(22px,5.4vmin,36px);font-weight:800;color:#2a2a3a;text-transform:capitalize;text-wrap:balance}
-        .sc-buddy{font-size:clamp(34px,9vmin,68px);line-height:1;animation:scBob 2.4s ease-in-out infinite}
+        .sv-stage{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vmin,26px);padding:3vmin;text-align:center}
+        .sv-card{background:rgba(255,255,255,.82);border-radius:clamp(18px,4vmin,30px);padding:clamp(16px,4vmin,34px);box-shadow:0 8px 26px rgba(0,0,0,.16);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vmin,16px);max-width:min(88vw,460px)}
+        .sv-swatch{width:clamp(90px,26vmin,180px);height:clamp(90px,26vmin,180px);border-radius:clamp(14px,4vmin,26px);box-shadow:inset 0 -6px 12px rgba(0,0,0,.15),0 4px 10px rgba(0,0,0,.2)}
+        .sv-emoji{font-size:clamp(80px,24vmin,168px);line-height:1}
+        .sv-word{font-size:clamp(22px,5.4vmin,36px);font-weight:800;color:#2a2a3a;text-transform:capitalize;text-wrap:balance}
+        .sv-buddy{font-size:clamp(34px,9vmin,68px);line-height:1;animation:scBob 2.4s ease-in-out infinite}
         @keyframes scBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10%) rotate(3deg)}}
-        .sc-found{border:none;cursor:pointer;font-size:clamp(20px,5vmin,30px);font-weight:800;color:#fff;background:linear-gradient(#ffb43e,#f0871a);
+        .sv-found{border:none;cursor:pointer;font-size:clamp(20px,5vmin,30px);font-weight:800;color:#fff;background:linear-gradient(#ffb43e,#f0871a);
                   padding:clamp(13px,3vmin,20px) clamp(26px,7vmin,52px);border-radius:999px;box-shadow:0 5px 0 #c96b10,0 8px 16px rgba(0,0,0,.25);touch-action:manipulation;display:flex;align-items:center;gap:10px}
-        .sc-found:active{transform:translateY(3px);box-shadow:0 2px 0 #c96b10,0 5px 10px rgba(0,0,0,.25)}
-        .sc-again{border:none;background:none;cursor:pointer;font-size:clamp(14px,3.4vmin,18px);font-weight:650;color:#3a3a55;text-decoration:underline;padding:8px;opacity:.85}
-        @media(prefers-reduced-motion:reduce){.sc-buddy{animation:none}}
+        .sv-found:active{transform:translateY(3px);box-shadow:0 2px 0 #c96b10,0 5px 10px rgba(0,0,0,.25)}
+        .sv-again{border:none;background:none;cursor:pointer;font-size:clamp(14px,3.4vmin,18px);font-weight:650;color:#3a3a55;text-decoration:underline;padding:8px;opacity:.85}
+        @media(prefers-reduced-motion:reduce){.sv-buddy{animation:none}}
       </style>
-      <div class="sc-stage" id="scStage">
-        <div class="sc-buddy">${scBuddy()}</div>
-        <div class="sc-card">
+      <div class="sv-stage" id="scStage">
+        <div class="sv-buddy">${scBuddy()}</div>
+        <div class="sv-card">
           ${visual}
-          <div class="sc-word">${phrase}</div>
+          <div class="sv-word">${phrase}</div>
         </div>
-        <button class="sc-found" id="scFound">⭐ ${scL({en:"I found it!", es:"¡Lo encontré!", yue:"搵到喇！"})}</button>
-        <button class="sc-again" id="scAgain">${scL({en:"Show me another", es:"Muéstrame otro", yue:"換一個"})}</button>
+        <button class="sv-found" id="scFound">⭐ ${scL({en:"I found it!", es:"¡Lo encontré!", yue:"搵到喇！"})}</button>
+        <button class="sv-again" id="scAgain">${scL({en:"Show me another", es:"Muéstrame otro", yue:"換一個"})}</button>
       </div>`;
 
     $("scFound").onclick = ev => this.found(ev);

@@ -64,7 +64,13 @@ This repo has a hard quality bar. Use it; don't freelance.
   Built because measured foreground occupancy averaged 15% of the play area across all levels.
   Call it *after* a game's own full-bleed backdrop or that backdrop paints over it; pass a
   `layers` subset when a game already draws its own floor or sky. Seeded (identical on repaint),
-  inert (`pointer-events:none`), and complete at frame 0. See `docs/ART-STYLE-GUIDE.md`.
+  inert (`pointer-events:none`), and complete at frame 0. **All 35 levels carry it now**, and
+  `SCENERY_FLOOR` in the smoke tests is pinned to that full count, so a game cannot ship on a
+  bare gradient. `sc-` is the kit's class prefix and a test reserves it — one global stylesheet,
+  no squatting. A game that **scrolls** its world uses `scene.strip(biome, { band })` instead:
+  one seamlessly tileable 6:1 band per depth (`canopy`/`far`/`near`), repeated an even number of
+  times inside a marquee, and **sized in `vmin`, never `%`** — the tile's height is what sets
+  prop size. See `docs/ART-STYLE-GUIDE.md`.
 - **Audio**: `speak()` (Web Speech), `voice()`/`sfx` (Web Audio synth), `MUSIC` styles. No audio files.
   - **Ambience** (`ambience` + `AMBIENCE` in core.js): a quiet continuous bed per world — filtered
     noise that sways, plus sparse details (a bubble, a bird). It keys off the same 7 biomes as the

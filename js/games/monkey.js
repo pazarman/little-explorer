@@ -11,7 +11,39 @@ const MO_TXT = {
           yue: "㩒下畫面，等馬騮盪高啲，接住香蕉！" }
 };
 
-const MO_TREES = "🌴 🌳 🌿 🌴 🍃 🌳 ";
+
+/* Drawn, not emoji: this is the avatar she steers for a whole round, and the one object
+   on screen whose motion IS the game. Per docs/ART-STYLE-GUIDE.md, an emoji at 63px is
+   a different picture on every device and cannot be posed. */
+const MONKEY_ART = `<svg viewBox="0 0 120 124" width="100%" height="100%">
+  <defs>
+    <linearGradient id="moFur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b07c4a"/><stop offset="1" stop-color="#8a5c31"/>
+    </linearGradient>
+  </defs>
+  <path d="M40 92 Q12 96 12 72 Q12 56 28 54 Q18 62 20 74 Q22 88 42 84 Z" fill="#7d5029"/>
+  <ellipse cx="62" cy="88" rx="25" ry="23" fill="url(#moFur)"/>
+  <ellipse cx="62" cy="94" rx="15" ry="14" fill="#e8bd8c"/>
+  <path d="M44 74 Q26 56 22 38 Q34 50 48 62 Z" fill="#8a5c31"/>
+  <path d="M80 74 Q98 56 102 38 Q90 50 76 62 Z" fill="#8a5c31"/>
+  <circle cx="24" cy="34" r="8" fill="#a06f42"/>
+  <circle cx="100" cy="34" r="8" fill="#a06f42"/>
+  <ellipse cx="48" cy="106" rx="11" ry="8" fill="#8a5c31"/>
+  <ellipse cx="76" cy="106" rx="11" ry="8" fill="#8a5c31"/>
+  <circle cx="36" cy="44" r="10" fill="#a06f42"/><circle cx="36" cy="44" r="5.6" fill="#eec49a"/>
+  <circle cx="88" cy="44" r="10" fill="#a06f42"/><circle cx="88" cy="44" r="5.6" fill="#eec49a"/>
+  <circle cx="62" cy="44" r="26" fill="url(#moFur)"/>
+  <ellipse cx="62" cy="50" rx="18" ry="16" fill="#f2cfa4"/>
+  <path d="M44 30 Q54 18 62 28 Q70 18 80 30 Q62 24 44 30 Z" fill="#7d5029"/>
+  <circle cx="54" cy="43" r="4.4" fill="#33231a"/><circle cx="55.4" cy="41.4" r="1.6" fill="#fff"/>
+  <circle cx="70" cy="43" r="4.4" fill="#33231a"/><circle cx="71.4" cy="41.4" r="1.6" fill="#fff"/>
+  <ellipse cx="62" cy="55" rx="10" ry="6.5" fill="#e3b485"/>
+  <ellipse cx="58.6" cy="53" rx="1.5" ry="1.9" fill="#8a5c31"/>
+  <ellipse cx="65.4" cy="53" rx="1.5" ry="1.9" fill="#8a5c31"/>
+  <path d="M54 59 Q62 66 70 59" stroke="#8a5c31" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <circle cx="44" cy="52" r="4.2" fill="#ff9bb0" opacity=".55"/>
+  <circle cx="80" cy="52" r="4.2" fill="#ff9bb0" opacity=".55"/>
+</svg>`;
 
 const monkeyLevel = {
   theme: "theme-zoo", rounds: 5, raf: null,
@@ -30,11 +62,17 @@ const monkeyLevel = {
     setInstruction(moL(MO_TXT.show), moL(MO_TXT.say));
 
     const pips = Array.from({ length: this.goal }, (_, i) => `<span class="mo-pip" data-i="${i}">◯</span>`).join("");
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      // drift + motes only: the jungle floor and canopy are scrolling strips, and the
+      // sky in between is where she jumps, so it stays walkable
+      scene.html("forest", { seed: 14 + state.round * 4, layers: ["drift", "motes"] }) + `
       <style>
         .mo-stage{position:absolute;inset:0;overflow:hidden;z-index:5;touch-action:none;cursor:pointer}
-        .mo-canopy{position:absolute;top:0;left:0;right:0;height:16%;overflow:hidden;white-space:nowrap;font-size:clamp(30px,9vmin,64px);z-index:1;opacity:.9}
-        .mo-far{position:absolute;bottom:20%;left:0;right:0;overflow:hidden;white-space:nowrap;font-size:clamp(20px,6vmin,44px);opacity:.5;z-index:1}
+        /* vmin, not %: a strip tile is 6:1, so the band's height is what sets tree size */
+        .mo-canopy{position:absolute;top:0;left:0;right:0;height:clamp(40px,13vmin,104px);overflow:hidden;white-space:nowrap;z-index:1;opacity:.9}
+        .mo-far{position:absolute;bottom:19%;left:0;right:0;height:clamp(56px,18vmin,140px);overflow:hidden;white-space:nowrap;opacity:.85;z-index:1}
+        .mo-near{position:absolute;bottom:11%;left:0;right:0;height:clamp(64px,21vmin,165px);overflow:hidden;white-space:nowrap;opacity:.95;z-index:2}
+        .mo-canopy .marquee, .mo-far .marquee, .mo-near .marquee{height:100%;white-space:nowrap;display:inline-block}
         .mo-ground{position:absolute;left:0;right:0;bottom:0;height:20%;background:linear-gradient(#c8e89a,#8fc85a 55%,#6fb23f);pointer-events:none;z-index:1}
         .mo-hud{position:absolute;top:17%;left:50%;transform:translateX(-50%);display:flex;gap:clamp(3px,1vmin,7px);z-index:9;background:rgba(30,80,20,.32);padding:clamp(3px,1vmin,7px) clamp(8px,2.4vmin,16px);border-radius:999px}
         .mo-pip{font-size:clamp(15px,4vmin,26px);line-height:1;color:#eafbe0}
@@ -42,15 +80,17 @@ const monkeyLevel = {
         .mo-banana{position:absolute;font-size:clamp(30px,8.5vmin,60px);line-height:1;transform:translate(-50%,-50%);z-index:4;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
         .mo-banana.got{animation:moPop .3s ease forwards}
         @keyframes moPop{0%{transform:translate(-50%,-50%) scale(1)}100%{transform:translate(-50%,-50%) scale(1.6);opacity:0}}
-        .mo-monkey{position:absolute;font-size:clamp(56px,16vmin,120px);line-height:1;transform:translate(-50%,-50%);z-index:6;pointer-events:none;filter:drop-shadow(0 5px 6px rgba(0,0,0,.3));will-change:top,transform}
+        .mo-monkey{position:absolute;width:clamp(62px,18vmin,132px);height:auto;transform:translate(-50%,-50%);z-index:6;pointer-events:none;filter:drop-shadow(0 5px 6px rgba(0,0,0,.3));will-change:top,transform}
+        .mo-monkey svg{display:block;width:100%;height:auto}
       </style>
       <div class="mo-stage" id="moStage">
-        <div class="mo-canopy"><span class="marquee" style="animation-duration:${(18 / this.speedMul).toFixed(1)}s">${MO_TREES.repeat(6)}</span></div>
-        <div class="mo-far"><span class="marquee" style="animation-duration:${(26 / this.speedMul).toFixed(1)}s">${MO_TREES.repeat(6)}</span></div>
+        <div class="mo-canopy"><span class="marquee" style="animation-duration:${(18 / this.speedMul).toFixed(1)}s">${scene.strip("forest", { band: "canopy", seed: 9 }).repeat(6)}</span></div>
+        <div class="mo-far"><span class="marquee" style="animation-duration:${(26 / this.speedMul).toFixed(1)}s">${scene.strip("forest", { band: "far", seed: 9 }).repeat(6)}</span></div>
         <div class="mo-ground"></div>
+        <div class="mo-near"><span class="marquee" style="animation-duration:${(16 / this.speedMul).toFixed(1)}s">${scene.strip("forest", { band: "near", seed: 9 }).repeat(6)}</span></div>
         <div class="mo-hud" id="moHud">${pips}</div>
-        <div class="mo-bananas" id="moBananas"></div>
-        <div class="mo-monkey" id="moMonkey">🐒</div>
+        <div class=.mo-bananas" id="moBananas"></div>
+        <div class="mo-monkey" id="moMonkey">${MONKEY_ART}</div>
       </div>`;
 
     const stage = $("moStage");

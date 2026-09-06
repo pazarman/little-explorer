@@ -96,7 +96,8 @@ const letternamesLevel = {
          <span class="ll-pic">${LL_LETTERS[k].pic}</span></button>`
     ).join("");
 
-    $("playArea").innerHTML = `
+    $("playArea").innerHTML =
+      scene.html("space", { seed: 18 + state.round * 4, layers: ["canopy", "far", "drift", "motes"] }) + `
       <style>
         .ll-stage{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;
           justify-content:center;gap:clamp(14px,4vmin,34px);padding:2vmin}
