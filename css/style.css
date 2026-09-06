@@ -230,6 +230,20 @@
                 pointer-events:none; filter:drop-shadow(0 4px 5px rgba(0,0,0,.3));
                 animation:none !important; }
 
+  /* The world party: the node that closes a path. Bigger and warmer than a game disc so
+     it reads as a destination, with a slow shine rather than another bouncing thing. */
+  .tr-party .node-disc { width:clamp(88px,22vmin,150px); height:clamp(88px,22vmin,150px);
+                         font-size:clamp(42px,12vmin,78px); }
+  .party-disc { border-radius:50%; background:linear-gradient(#ffd76a,#f2913d);
+                box-shadow:0 6px 0 rgba(0,0,0,.18), 0 0 0 5px rgba(255,255,255,.9); }
+  .tr-party .node-label { color:#5b3c00; background:rgba(255,255,255,.92);
+                          border-radius:99px; padding:.1em .7em; }
+  .tr-party .party-disc::before { content:""; position:absolute; inset:-14px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,214,62,.45), rgba(255,214,62,0) 70%);
+    animation:partyGlow 3.2s ease-in-out infinite; pointer-events:none; z-index:-1; }
+  @keyframes partyGlow { 0%,100%{transform:scale(1); opacity:.55;}
+                         50%   {transform:scale(1.14); opacity:.9;} }
+
   /* scenery — decoration only, never a target that matters */
   .tr-mark  { position:absolute; transform:translate(-50%,-50%); z-index:3;
               font-size:clamp(26px,6vmin,50px); filter:drop-shadow(0 2px 2px rgba(0,0,0,.22)); }
@@ -1048,4 +1062,5 @@
     /* world trail: scenery holds still and nodes don't pop in; the buddy still
        moves between games, it just teleports rather than walking (see worldtrail.js) */
     .tr-prop, .tr-node, .map-prop { animation: none !important; }
+    .tr-party .party-disc::before { animation: none !important; }
   }

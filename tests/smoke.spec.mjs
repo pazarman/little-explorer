@@ -161,7 +161,9 @@ test("a world is one scrollable path with every game on it and nothing locked", 
 
   const world = await page.evaluate(() => ({
     games: worldTrail.gids.length,
-    nodes: document.querySelectorAll("#gameNodes .node").length,
+    nodes: document.querySelectorAll("#gameNodes .node:not(.tr-party)").length,
+    // the world party closes the path — one node, past the last game
+    partyNodes: document.querySelectorAll("#gameNodes .tr-party").length,
     // the path is longer than the screen — that is the point, she scrolls it
     canvas: Math.round(worldTrail.geom.w),
     view: worldTrail.geom.vw,
@@ -172,6 +174,7 @@ test("a world is one scrollable path with every game on it and nothing locked", 
     disabled: [...document.querySelectorAll("#gameNodes .node")].filter((n) => n.disabled).length,
   }));
   expect(world.nodes).toBe(world.games);
+  expect(world.partyNodes, "every world should end in exactly one party node").toBe(1);
   expect(world.canvas).toBeGreaterThan(world.view);
   expect(world.scrollable).toBe(true);
   expect(world.overscroll).toBe(0);
@@ -1341,5 +1344,113 @@ test("the app renders in Spanish without losing its words", async ({ page }) => 
   expect(r.worldLabels).toContain("Números");
   expect(r.untranslatedKeys, "keys with no Spanish translation").toEqual([]);
   expect(r.spots, "hide-and-seek nouns fell back to English").toEqual(["la canasta", "la caja", "la mesa"]);
+  expect(errors).toEqual([]);
+});
+
+
+/* ================= World party =================
+   The node that closes a world's trail: one round each from three games she has played
+   there. Interleaved retrieval practice, and the only place the app asks her to switch
+   between concepts instead of drilling one. */
+
+test("the party plays three games from its world, then celebrates", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(async () => {
+    const cat = CATEGORIES.find((c) => c.id === "num");
+    // she has played three of the counting games
+    ["snow", "pasta", "dragon"].forEach((g) => (completions[g] = 2));
+    const queue = worldParty.build(cat);
+    const out = {
+      queue,
+      allFromThisWorld: queue.every((g) => cat.games.includes(g)),
+      allPlayable: queue.every((g) => !!LEVELS[g]),           // never a special
+      noRepeats: new Set(queue).size === queue.length,
+      prefersPlayed: queue.every((g) => (completions[g] || 0) > 0),
+    };
+
+    worldParty.start(cat);
+    out.startedWith = state.level;
+    out.roundsInGame = totalRounds();                        // one round per game
+    out.dots = document.querySelectorAll("#progress .dot").length;
+
+    // finish round one; the party must hand on to a DIFFERENT game, not celebrate
+    const first = state.level;
+    levelComplete();
+    for (let i = 0; i < 40 && state.level === first; i++) await new Promise((r) => setTimeout(r, 100));
+    out.secondGame = state.level;
+    out.celebHiddenMidParty = document.getElementById("celebrate").classList.contains("hidden");
+    out.atAfterOne = worldParty.at;
+    return out;
+  });
+
+  expect(r.queue.length).toBe(3);
+  expect(r.allFromThisWorld, "a party round came from another world").toBe(true);
+  expect(r.allPlayable, "a special (paint/story/dressup) cannot be a party round").toBe(true);
+  expect(r.noRepeats, "the same game twice in one party").toBe(true);
+  expect(r.prefersPlayed, "the party should draw on games she has played").toBe(true);
+  expect(r.roundsInGame, "each party game should be a single round").toBe(1);
+  expect(r.dots, "progress should track the party, not the game inside it").toBe(3);
+  expect(r.secondGame).not.toBe(r.startedWith);
+  expect(r.celebHiddenMidParty, "the party must not celebrate between rounds").toBe(true);
+  expect(r.atAfterOne).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+test("the party is never a gate, and never traps her", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(async () => {
+    const cat = CATEGORIES.find((c) => c.id === "num");
+    // a child who has played NOTHING must still be able to open it — no locks anywhere
+    cat.games.forEach((g) => delete completions[g]);
+    const out = { queueWhenNothingPlayed: worldParty.build(cat).length };
+
+    worldParty.start(cat);
+    out.startedCold = worldParty.active;
+
+    // Home mid-party ends it cleanly and restores normal round counting.
+    showHub();
+    out.stoppedOnHome = !worldParty.active;
+    startLevel("snow");
+    out.normalRoundsRestored = totalRounds();
+    showHub();
+    return out;
+  });
+
+  expect(r.queueWhenNothingPlayed, "an unplayed world must still fill a party").toBe(3);
+  expect(r.startedCold, "the party must open on a first visit — it is not a reward to unlock").toBe(true);
+  expect(r.stoppedOnHome).toBe(true);
+  expect(r.normalRoundsRestored, "leaving a party must restore normal round counts").toBeGreaterThan(1);
+  expect(errors).toEqual([]);
+});
+
+test("walking to the party takes the buddy to the end of the road", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+  await page.evaluate(() => openCategory("num"));
+  await expect(page.locator("#games")).toBeVisible();
+
+  const r = await page.evaluate(async () => {
+    const n = worldTrail.gids.length;
+    const partyX = worldTrail.ptAt(n).x;
+    const lastGameX = worldTrail.ptAt(n - 1).x;
+    document.querySelector("#gameNodes .tr-party").click();
+    await new Promise((r) => setTimeout(r, 1400));
+    return {
+      partyIsFurthest: partyX > lastGameX,
+      partyStarted: worldParty.active,
+      // the party is not "where she left off" — it must not become her saved spot
+      saved: JSON.parse(localStorage.getItem("fionaTrail") || "{}").num,
+    };
+  });
+  expect(r.partyIsFurthest, "the party should sit past the last game").toBe(true);
+  expect(r.partyStarted).toBe(true);
+  expect(r.saved, "the party must not be saved as the buddy's spot").not.toBe(undefined + "");
   expect(errors).toEqual([]);
 });

@@ -75,6 +75,9 @@ const worldTrail = {
     const disc = Math.max(72, Math.min(124, vh * 0.18, vw * 0.18));
     // The buddy walks ON the road, holding back a fraction of a step from the node
     // it is standing at, so it never covers the picture of the game.
+    // The party sits at the end of the road, one index past the last game, so the buddy
+    // walks to it exactly as it walks to anything else.
+    this.partyPt = { x: endX, y: n ? this.pts[n - 1].y : midY };
     this.geom = { vw, vh, gap, amp, midY, endX, disc,
                   lag: Math.min(0.42, (disc * 0.5 + 34) / gap),
                   w: Math.ceil(Math.max(vw, endX + vw * 0.34)), h: vh };
@@ -86,7 +89,9 @@ const worldTrail = {
   // Position at a fractional node index; -1 is the trailhead. Segments are
   // straight, so lerping the index walks exactly along the drawn path.
   ptAt(f) {
-    const p = i => (i < 0 ? this.head : this.pts[Math.min(i, this.pts.length - 1)] || this.head);
+    const p = i => (i < 0 ? this.head
+                  : i >= this.pts.length ? (this.partyPt || this.pts[this.pts.length - 1] || this.head)
+                  : this.pts[i]);
     const lo = Math.floor(f), hi = Math.ceil(f), k = f - lo;
     const a = p(lo), b = p(hi);
     return { x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k };
@@ -127,8 +132,9 @@ const worldTrail = {
     const { w, h, midY, amp } = this.geom;
     const deco = $("trailDeco");
     const tailY = this.pts.length ? this.pts[this.pts.length - 1].y : this.head.y;
-    let html = `<span class="tr-mark" style="left:${this.head.x - 6}px; top:${this.head.y - this.geom.disc * 0.66}px">🪧</span>
-                <span class="tr-mark" style="left:${this.geom.endX}px; top:${tailY - this.geom.disc * 0.2}px">⛺</span>`;
+    // The trailhead keeps its signpost; the far end is now the party node itself
+    // (paintNodes), so the decorative tent that used to sit there is gone.
+    let html = `<span class="tr-mark" style="left:${this.head.x - 6}px; top:${this.head.y - this.geom.disc * 0.66}px">🪧</span>`;
     // Fixed scenery, scattered with a seeded jitter so a world looks like somewhere
     // rather than a grid — and kept out of the path band so nothing sits under a node.
     const band = amp + this.geom.disc * 0.62 + 30;
@@ -179,6 +185,18 @@ const worldTrail = {
       b.onclick = () => this.travelTo(i);
       wrap.appendChild(b);
     });
+
+    // The world party: a bigger, different node closing the path. Never locked — early
+    // on it is a sampler of this world, and it becomes real review as she plays more.
+    const p = this.partyPt;
+    const party = document.createElement("button");
+    party.className = "node tr-node tr-party";
+    party.style.left = p.x + "px"; party.style.top = p.y + "px";
+    party.dataset.party = this.cat.id;
+    party.innerHTML = `<div class="node-disc party-disc"><span>🎉</span></div>
+                       <div class="node-label">${t("party_node")}</div>`;
+    party.onclick = () => this.travelTo(this.gids.length);
+    wrap.appendChild(party);
   },
 
   paintBuddy() {
@@ -205,15 +223,17 @@ const worldTrail = {
   /* ── the walk: buddy travels the path, camera follows, then the game starts ── */
   travelTo(i) {
     if (this.walking) return;
+    const isParty = i >= this.gids.length;
     const gid = this.gids[i];
     sfx.tap();
-    narratorSay(t("narrator_cat_" + this.cat.id));
+    narratorSay(isParty ? t("narrator_party") : t("narrator_cat_" + this.cat.id));
     const from = this.at, steps = Math.abs(i - from);
     const arrive = () => {
-      this.at = i; this.walking = false; this.saveAt(i); this.placeBuddy(i);
-      core.wait(() => startGameNow(gid), 140);
+      this.at = i; this.walking = false; this.placeBuddy(i);
+      if (!isParty) this.saveAt(i);      // the party is not a game, so it isn't "where she left off"
+      core.wait(() => (isParty ? worldParty.start(this.cat) : startGameNow(gid)), 140);
     };
-    if (steps === 0 || reducedMotion()) { this.center(this.pts[i].x, true); core.wait(arrive, 260); return; }
+    if (steps === 0 || reducedMotion()) { this.center(this.ptAt(i).x, true); core.wait(arrive, 260); return; }
 
     // The walk fits inside the beat the narrator line already took, so travelling
     // the path costs her no extra waiting before the game starts.

@@ -43,6 +43,14 @@ This repo has a hard quality bar. Use it; don't freelance.
 - **38 games** (35 `LEVELS` + specials `paint`/`story`/`dressup`, which own a whole screen and are
   dispatched by `startGameNow`). Each level object has `theme`, `rounds`, `startRound()`, and reads
   `state.tier` (0–2).
+- **World party** (`worldParty` in core.js): the node closing each world's trail. It plays **one round
+  each from three games she has already played in that world** — interleaved retrieval practice, the
+  one well-evidenced lever the app lacked, since every game otherwise drills its concept alone. It
+  reuses the normal round engine through three hooks: `totalRounds()` returns 1 while a party is
+  active, `levelComplete()` hands on to `worldParty.next()` instead of celebrating, and
+  `drawProgress()` tracks the party rather than the game inside it. **Never a gate** — tappable from
+  the first visit, and an unplayed world tops the queue up from its other games, so it is a sampler
+  early and real review later. `showHub()` stops it; the party is not saved as the buddy's spot.
 - **Difficulty**: `tierFor(level)` — manual easy/med/hard force 0/1/2; **auto mode uses a performance model**
   (`fionaPerf`: `autoTierFor`, EMA of round quality, down-shift on ≥3 mistakes). Mistakes are counted via the
   wrapped `sfx.bad`; `roundComplete` records perf and can lower the next round's tier.

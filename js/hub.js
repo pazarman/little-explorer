@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "47";
+const APP_VERSION = "48";
 /* ================= Worlds, games and levels =================
    None of this is written out by hand any more. Every game declares itself in its
    own file with registerGame() (see core.js), and every js/games/* script loads
@@ -445,6 +445,7 @@ function playWipe() { const w = $("wipe"); if (!w) return; w.classList.remove("r
 function animScreen(id, cls) { const el = $(id); if (!el) return; el.classList.remove("fwd", "back"); void el.offsetWidth; el.classList.add(cls); }
 function showHub() {
   cleanupLevel();
+  worldParty.stop();                      // leaving mid-party ends it; nothing is held against her
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   setMascots("talking", false);
   document.body.className = "";

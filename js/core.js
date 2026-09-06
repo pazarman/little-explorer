@@ -167,6 +167,10 @@ const DICT = {
     settings_restart_confirm: "This will erase all of {n}'s stars, stickers, and progress. Are you sure?",
     settings_reset_confirm: "Reset all of {n}'s stars and stickers?",
     settings_hold_hint: "Grown-ups: hold the button to open settings.",
+    party_node: "Party!",
+    party_intro: "It's a {world} party! Let's play three games!",
+    party_done: "What a {world} party! You played them all!",
+    narrator_party: "There's a party at the end of the path!",
     parent_gate: "Grown-up check: what is {a} + {b}?",
     settings_done: "Done",
     back: "Back",
@@ -371,6 +375,10 @@ const DICT = {
     settings_restart_confirm: "Esto borrará todas las estrellas, pegatinas y progreso de {n}. ¿Estás seguro?",
     settings_reset_confirm: "¿Borrar todas las estrellas y pegatinas de {n}?",
     settings_hold_hint: "Adultos: mantén pulsado el botón para abrir los ajustes.",
+    party_node: "¡Fiesta!",
+    party_intro: "¡Es una fiesta de {world}! ¡Vamos a jugar tres juegos!",
+    party_done: "¡Qué fiesta de {world}! ¡Los jugaste todos!",
+    narrator_party: "¡Hay una fiesta al final del camino!",
     parent_gate: "Comprobación para adultos: ¿cuánto es {a} + {b}?",
     settings_done: "Listo",
     back: "Atrás",
@@ -574,6 +582,10 @@ const DICT = {
     settings_restart_confirm: "呢個會清除{n}所有嘅星星、貼紙同進度。你肯定嗎？",
     settings_reset_confirm: "清除{n}所有嘅星星同貼紙？",
     settings_hold_hint: "大人：撳住個掣先可以開設定。",
+    party_node: "派對！",
+    party_intro: "係{world}派對呀！我哋玩三個遊戲啦！",
+    party_done: "好正嘅{world}派對！你全部都玩晒喇！",
+    narrator_party: "條路盡頭有個派對呀！",
     parent_gate: "大人核對：{a} + {b} 等於幾多？",
     settings_done: "完成",
     back: "返去", next: "下一個", home: "首頁", clear: "清除", done: "完成",
@@ -1307,10 +1319,15 @@ function setInstruction(text, spoken) {
   $("instruction").dataset.spoken = spoken || text;
   speak(spoken || text);
 }
-function totalRounds() { return LEVELS[state.level].rounds || 5; }
+// One round per game during a world party, so roundComplete() hands straight on to the
+// next game instead of playing a whole level.
+function totalRounds() { return worldParty.active ? 1 : (LEVELS[state.level].rounds || 5); }
 function drawProgress() {
-  $("progress").innerHTML = Array.from({ length: totalRounds() },
-    (_, i) => `<div class="dot ${i < state.round ? "done" : ""}"></div>`).join("");
+  // During a party the dots track the party, not the one-round game inside it.
+  const n  = worldParty.active ? worldParty.queue.length : totalRounds();
+  const at = worldParty.active ? worldParty.at : state.round;
+  $("progress").innerHTML = Array.from({ length: n },
+    (_, i) => `<div class="dot ${i < at ? "done" : ""}"></div>`).join("");
 }
 function miniStar(x, y) {
   const s = document.createElement("div");
@@ -1394,7 +1411,49 @@ function roundComplete() {
     else { state.busy = false; LEVELS[state.level].startRound(); }
   });
 }
-function levelComplete() { core.cleanup(); celebrateWith(state.level); }
+function levelComplete() {
+  core.cleanup();
+  if (worldParty.active) return worldParty.next();     // a party round hands on, it doesn't celebrate
+  celebrateWith(state.level);
+}
+
+/* ================= World party =================
+   The node at the end of a world's trail. It plays one round each from three games she
+   has ALREADY played in that world — interleaved retrieval practice, which is the one
+   well-evidenced lever the app was missing: every game drills its concept in isolation,
+   and nothing ever asked her to switch between them.
+
+   It is never a gate. It is tappable from the first visit; if she has played fewer than
+   three games here the queue is topped up from the rest of the world, so it is a sampler
+   early on and becomes real review later. There is no score and no way to fail it. */
+const PARTY_ROUNDS = 3;
+const worldParty = {
+  active: false, cat: null, queue: [], at: 0,
+  build(cat) {
+    const inWorld = visibleGames(cat).filter(gid => LEVELS[gid]);   // specials own a whole screen
+    const played = shuffle(inWorld.filter(gid => (completions[gid] || 0) > 0));
+    const rest   = shuffle(inWorld.filter(gid => !(completions[gid] > 0)));
+    return [...played, ...rest].slice(0, PARTY_ROUNDS);
+  },
+  start(cat) {
+    const queue = this.build(cat);
+    if (!queue.length) return false;
+    this.active = true; this.cat = cat; this.queue = queue; this.at = 0;
+    speak(t("party_intro", { world: locName(cat) }));
+    this.play();
+    return true;
+  },
+  play() { startLevel(this.queue[this.at]); },
+  next() {
+    this.at++;
+    if (this.at < this.queue.length) { core.wait(() => this.play(), 650); return; }
+    const last = this.queue[this.queue.length - 1];
+    this.stop();
+    speak(t("party_done", { world: locName(this.cat || {}) }));
+    celebrateWith(last);
+  },
+  stop() { this.active = false; this.queue = []; this.at = 0; }
+};
 function celebrateWith(levelId, opts = {}) {
   completions[levelId] = (completions[levelId] || 0) + 1;
   saveCompletions();

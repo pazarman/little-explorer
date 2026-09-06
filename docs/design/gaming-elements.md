@@ -73,7 +73,7 @@ past the games she knows. A hut sitting two nodes further along is that affordan
 Code: `worldTrail.pts` is already a generic node list; this is a second node type in `paintNodes()`.
 **Effort: low.**
 
-### 3.2 The end-of-world party — *SMB3's castle*
+### 3.2 The end-of-world party — *SMB3's castle* ✅ **BUILT (v48)**
 A bigger node at the far end of each trail. It plays three short rounds drawn from games she has
 already played **in that world** — a counting round, then a colour round, then a shape round. Then
 confetti and the buddy throws a party.
@@ -85,7 +85,14 @@ the treat at the end of the road is the whole trick.
 
 Guardrails: **no gating** — tappable from the first visit, per the Core Bar. It simply draws from
 whatever she's played, so it starts short and grows richer. No score, no pass/fail.
-**Effort: medium-high** (needs a round-runner that can host rounds from arbitrary levels).
+
+> **Shipped in v48** as `worldParty` (core.js) plus the `.tr-party` node in `worldtrail.js`. The
+> round-runner turned out not to need building: three small hooks make the existing engine host
+> rounds from arbitrary levels — `totalRounds()` returns 1 during a party, `levelComplete()` hands
+> on instead of celebrating, and `drawProgress()` tracks the party. One known wrinkle: the closing
+> `celebrateWith()` attributes its completion to whichever game came last, so a party can retire an
+> unplayed game's "New!" flag. Defensible (she did play a round of it) but worth revisiting if the
+> flag matters more than the tidiness.
 
 ### 3.3 A world that knows what time it is — *Animal Crossing*
 Tint the hub from the real clock: morning gold, afternoon blue, dusk pink, night indigo with the
@@ -184,8 +191,8 @@ deal with an adult who opted in. It isn't one here.
 
 1. **Time-of-day hub** (§3.3) — hours of work, immediate magic, teaches vocabulary in the wrapper.
 2. **Surprise huts** (§3.1) — low effort, and it fixes Layer 2's known scroll-affordance nit.
-3. **`STICKER_DATA` + naming** (§3.5) — repairs dead code and converts decoration into curriculum.
-4. **End-of-world party** (§3.2) — the real prize: mixed retrieval practice, disguised as a party.
+3. ~~**`STICKER_DATA` + naming** (§3.5)~~ — **built in v47.** Repaired the dead code and turned decoration into curriculum.
+4. ~~**End-of-world party** (§3.2)~~ — **built in v48.** The real prize: mixed retrieval practice, disguised as a party.
 
 1–3 are one release. 4 is its own.
 
