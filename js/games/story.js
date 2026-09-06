@@ -27,13 +27,16 @@ function renderStory() {
   const p = STORY[storyPage];
   storySolved = !p.task;
   document.body.className = p.theme;
-  const scene = $("storyScene");
-  scene.className = "story-scene";
-  
+  // NOT `scene` — that name belongs to the scene kit, and there is one global scope here
+  const el = $("storyScene");
+  el.className = "story-scene";
+
   // split art into interactive emojis
   const artHtml = [...p.art].map(e => `<span class="s-em" onclick="storyTap('${e}', event)">${e}</span>`).join("");
-  
-  scene.innerHTML = `<div class="story-art">${artHtml}</div>
+
+  // each page is a place: the kit reads the page's own body theme
+  el.innerHTML = scene.html(p.theme, { seed: 9 + storyPage * 6 }) +
+      `<div class="story-art">${artHtml}</div>
       <div class="story-textbox" id="storyText">${storyText(p)}</div>
       <div class="story-tap-hint">${t("story_tap")}</div>`;
   

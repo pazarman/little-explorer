@@ -241,11 +241,18 @@ A pre-reader's first two screens are a text field and an age-band picker written
 map; ask for the name the first time it would be spoken; put difficulty behind the parent gate that now
 exists. **Moves:** Onboarding 4 → 7. This is what a parent judges the app on before anything else.
 
-### Play 4 — Finish the scene kit  ·  C2 remainder + C3 + R1  ·  effort M–L
-Twenty-one games still have no scenery. **Dolphin first** — it needs the scroll-aware variant of the kit,
-and it is the reference build every new game is told to imitate, so its emptiness propagates. Then the
-pets trio together, trace and feelings on their own terms, and the R1 emoji↔SVG rule written down and
-audited. **Moves:** Composition 4 → 7 across the whole app rather than 14 games.
+### Play 4 — Finish the scene kit  ·  C2 remainder + C3  ·  effort M–L  ·  **done (v53)**
+Twenty-one games had no scenery; all 35 levels carry it now, plus Story and Dress-Up. Dolphin came
+first, since it is the reference build every new game is told to imitate — it needed the scroll-aware
+variant, `scene.strip()`, which Bike Ride and Monkey Swing then reused for their emoji treelines. C3
+went with it: Dress-Up's 🌈 button cycled six flat fills and now cycles six places.
+
+`SCENERY_FLOOR` is pinned to the full level count, so this cannot regress and a new game cannot ship
+on a bare gradient. **Moves:** Composition 4 → 7 across the whole app rather than 14 games.
+
+Still open from this play: **R1** — the emoji↔SVG boundary rule written down and audited. Several
+games still use emoji where a drawn hero object belongs (Monkey Swing's monkey and bananas, Meerkat
+Pop's animals, Hippo Feast's food); the kit gave them a place to stand, not a body.
 
 ### Play 5 — Build again  ·  Blend-It!  ·  effort M
 Only now. The floor is raised, so a 39th game adds instead of diluting. Blend-It! is top of the READY

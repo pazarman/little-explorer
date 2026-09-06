@@ -82,7 +82,10 @@ const traceLevel = {
     const lab = traceLabel(item);
     setInstruction(lab.show, lab.say + " " + t("follow_dots"));
     const area = $("playArea");
-    area.innerHTML = `<canvas id="guideC"></canvas><canvas id="inkC"></canvas><div class="trace-start" id="traceStart"></div><button class="round-btn trace-shuffle" id="traceShuffle" aria-label="New shapes to trace">🎲</button>`;
+    area.innerHTML =
+      // no mid/ground/frame: the glyph is drawn anywhere in this box and her finger follows it
+      scene.html("space", { seed: 21 + state.round * 4, layers: ["canopy", "far", "drift", "motes"] }) +
+      `<canvas id="guideC"></canvas><canvas id="inkC"></canvas><div class="trace-start" id="traceStart"></div><button class="round-btn trace-shuffle" id="traceShuffle" aria-label="New shapes to trace">🎲</button>`;
     const rect = area.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
     for (const id of ["guideC", "inkC"]) { const c = $(id); c.width = rect.width * dpr; c.height = rect.height * dpr; c.getContext("2d").scale(dpr, dpr); }

@@ -296,8 +296,11 @@
   /* dress-up (drawn, composable SVG character + closet) */
   #dressup { padding:0; }
   #dressBar { display:flex; align-items:center; justify-content:center; gap:1.4vmin; width:100%; padding:1.2vmin; z-index:20; }
-  #dressStage { flex:1; width:100%; display:flex; align-items:center; justify-content:center;
-                transition:background .3s; min-height:0; padding:1vmin; }
+  /* flex-end + a bottom pad the height of the kit's ground band: the doll stands on the
+     grass rather than hovering above it */
+  #dressStage { flex:1; width:100%; display:flex; align-items:flex-end; justify-content:center;
+                transition:background .3s; min-height:0; padding:1vmin 1vmin 13%;
+                position:relative; overflow:hidden; }
   #dollWrap { width:clamp(150px,40vmin,300px); max-height:100%; display:flex; }
   .dollsvg { width:100%; height:auto; max-height:100%; overflow:visible; filter:drop-shadow(0 6px 8px rgba(0,0,0,.18)); }
   .dollsvg g { transform-box:fill-box; transform-origin:center; }

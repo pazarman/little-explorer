@@ -704,7 +704,7 @@ test("Scavenger Hunt shows a prompt and advances on 'found'", async ({ page }) =
   await page.evaluate(() => startLevel("scavenger"));
   await expect(page.locator("#game")).toBeVisible();
   await page.evaluate(() => { state.tier = 0; scavengerLevel.startRound(); });
-  await expect(page.locator(".sc-card")).toBeVisible();
+  await expect(page.locator(".sv-card")).toBeVisible();
   await expect(page.locator("#scFound")).toBeVisible();
   const instructions = await page.locator("#instruction").textContent();
   expect(instructions).toContain("🔦");
@@ -1772,10 +1772,29 @@ test("each world has an ambience bed, and it starts, stops and never stacks", as
 });
 
 
-// Scenery coverage is a ratchet: it may go up, never down. 14 of 35 levels carry the
-// scene kit today (the rest are Play 4 in docs/CRAFT-BACKLOG.md). Raise this number
-// when you add more; it exists so a refactor can't quietly strip scenery back out.
-const SCENERY_FLOOR = 14;
+/* `sc-` belongs to the scene kit. Scavenger Hunt had grown a whole set of its own
+   `.sc-*` classes in an inline <style>, and the day one of them matched a kit layer the
+   scenery would have been restyled or hidden on that screen only — a fault nobody would
+   trace back to a class name. There is one global stylesheet namespace here, so this
+   keeps the prefix reserved. */
+test("no game squats on the scene kit's class prefix", async () => {
+  const kit = new Set([...fs.readFileSync("js/scene.js", "utf8").matchAll(/\bsc-[a-z-]+/g)].map((m) => m[0]));
+  const bad = [];
+  for (const f of fs.readdirSync("js/games")) {
+    if (!f.endsWith(".js")) continue;
+    const src = fs.readFileSync(`js/games/${f}`, "utf8");
+    for (const m of new Set([...src.matchAll(/\bsc-[a-z-]+/g)].map((x) => x[0])))
+      if (!kit.has(m)) bad.push(`${f}: ${m}`);
+  }
+  expect(bad, "these class names collide with the scene kit's namespace — rename them")
+    .toEqual([]);
+});
+
+// Scenery coverage is a ratchet: it may go up, never down. All 35 levels carry the scene
+// kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
+// this at the full count; it exists so a refactor can't quietly strip scenery back out,
+// and a new game that ships without a background fails here.
+const SCENERY_FLOOR = 35;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);
@@ -1787,7 +1806,10 @@ test("scenery coverage never goes backwards", async ({ page }) => {
     for (const id of Object.keys(LEVELS)) {
       startLevel(id); state.tier = 0; state.round = 0;
       await new Promise((r) => setTimeout(r, 90));
-      if (document.querySelectorAll("#playArea .sc-scene *").length > 15) withScene.push(id);
+      // .sc-strip too: a scrolling game builds its world from tiles, not the static layers
+      const n = document.querySelectorAll("#playArea .sc-scene *").length
+              + document.querySelectorAll("#playArea .sc-strip").length;
+      if (n > 5) withScene.push(id);
       try { cleanupLevel(); } catch (_) {}
     }
     showHub();

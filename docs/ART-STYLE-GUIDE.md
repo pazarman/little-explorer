@@ -77,7 +77,32 @@ $("playArea").innerHTML = scene.html("reef", { seed: 3 + state.round * 5 }) + `â
 - **Tint when the biome fights the theme.** `{ tint: "#8d5bb0" }` keeps every form and its
   relative lightness but adopts one hue, so the scene reads as depth in the game's own palette.
   Forest greens over Dragon Feed's purple sky looked like scenery from a different app; tinted,
-  the same shapes read as violet hills and the green dragon becomes the hero again.
+  the same shapes read as violet hills and the green dragon becomes the hero again. Tinting
+  covers `rgb()`/`rgba()` as well as hex, so drifters and motes come along too.
+- **Every level carries scenery, and a test keeps it that way.** `SCENERY_FLOOR` in
+  `tests/smoke.spec.mjs` is set to the full level count: a game that ships on a bare gradient
+  fails CI.
+- **`sc-` is the kit's prefix.** There is one global stylesheet here, so a game that names its
+  own classes `.sc-*` is one rename away from restyling the scenery. A test reserves it.
+
+### Scrolling games use `scene.strip()`
+
+The static layers are laid out against a fixed canvas and slide wrong against a parallax. A
+game that moves its world past the camera repeats a tile instead:
+
+```js
+<div class="dl-near"><span class="marquee">${scene.strip("reef", { band: "near", seed: 4 }).repeat(6)}</span></div>
+```
+
+- **Bands:** `canopy` hangs from the top edge, `far` is small and takes the biome's horizon
+  colour so it recedes, `near` is the layer closest to the camera.
+- **Repeat an even number of tiles** â€” the marquee loops on `translateX(-50%)`, which only
+  lands on an identical tile if the count is even.
+- **Size the band in `vmin`, never in `%` of the stage.** The tile is 6:1, so its *height* sets
+  how big every prop draws. Dolphin Dive's first pass used `height:22%`, which on an 851px-tall
+  phone drew coral 180px high and filled the screen with salmon.
+- **A canopy is its own band, not a flipped ground one.** `scaleY(-1)` on a ground band turns a
+  pine into a dark arrow pointing at the child. That is what the first attempt looked like.
 
 
 ## Sound belongs to the art direction too
