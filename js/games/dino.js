@@ -127,3 +127,8 @@ const dinoLevel = {
     }, 1500);
   }
 };
+
+registerGame({
+  id: "dino", world: "animal", icon: "🦕", name: "Flash Count", es: "Cuenta Rápida", yue: "快數",
+  lvl: 0, level: dinoLevel
+});

@@ -171,3 +171,8 @@ const runwayLevel = {
     this._steer = false;
   }
 };
+
+registerGame({
+  id: "runway", world: "brain", icon: "✈️", name: "Plane Land", es: "Aterriza", yue: "降落",
+  lvl: 1, level: runwayLevel
+});

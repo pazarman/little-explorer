@@ -9,6 +9,37 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 // Deterministic 0..1 from an integer seed. Scenery scatter uses it so a world looks
 // hand-placed but lands in the same spot on every repaint (and on every device).
 const seeded = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
+
+/* ================= Game registry =================
+   A game declares itself once, in its own file, right under the code it describes:
+
+     registerGame({ id: "snow", world: "num", icon: "❄️",
+                    name: "Count", es: "Contar", yue: "數一數",
+                    lvl: 0, level: snowLevel });
+
+   hub.js derives LEVELS, GAMES and each world's game list from whatever has
+   registered by the time it runs (every js/games/* file loads before it).
+
+   Registration order IS the order she walks a world's trail, so a new game whose
+   <script> is appended to index.html lands at the END of its world's path — which
+   is exactly where a weekly drop belongs, per the "newest is furthest along" rule
+   in worldtrail.js. That makes script order load-bearing, so a test pins the exact
+   per-world order: reshuffling the tags fails loudly instead of quietly moving a
+   game she navigates to by place.
+
+   `level` is omitted by the three specials (paint, story, dress-up) — they own a
+   whole screen instead of running rounds, and startGameNow() dispatches them. */
+const GAME_REGISTRY = [];
+function registerGame(def) {
+  for (const f of ["id", "world", "icon", "name"])
+    if (!def[f]) throw new Error(`registerGame(${def.id || "?"}): "${f}" is required`);
+  if (GAME_REGISTRY.some(g => g.id === def.id))
+    throw new Error(`registerGame: duplicate id "${def.id}"`);
+  if (def.level && typeof def.level.startRound !== "function")
+    throw new Error(`registerGame(${def.id}): level has no startRound()`);
+  GAME_REGISTRY.push(def);
+  return def;
+}
 // honor the OS "reduce motion" setting — real-time games slow their scroll and skip ambient particles
 const reducedMotion = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const IRREGULAR = { snowman: "snowmen", reindeer: "reindeer" };

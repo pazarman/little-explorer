@@ -87,3 +87,8 @@ const pastaLevel = {
     else { speak(t("fed_count", { num: numWord(this.on), count: this.need, x: words(this.food.noun, this.need) }) + " " + praise()); roundComplete(); }
   }
 };
+
+registerGame({
+  id: "pasta", world: "num", icon: "🍝", name: "Yum Count", es: "A Contar", yue: "數食物", lvl: 0,
+  level: pastaLevel
+});

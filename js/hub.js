@@ -1,62 +1,45 @@
 "use strict";
-const APP_VERSION = "45";
-const LEVELS = {
-  snow: snowLevel, ocean: oceanLevel, memory: memoryLevel, bike: bikeLevel,
-  music: musicLevel, whosays: whosaysLevel, pizza: pizzaLevel, pasta: pastaLevel, trace: traceLevel,
-  rocket: rocketLevel, sort: sortLevel, pattern: patternLevel, sortkind: sortkindLevel,
-  dragon: dragonLevel, dino: dinoLevel, icecream: icecreamLevel,
-  petmatch: petmatchLevel, petcare: petcareLevel, petfeed: petfeedLevel, body: bodyLevel,
-  hideseek: hideseekLevel, cups: cupsLevel, nightday: nightdayLevel, measure: measureLevel,
-  fuelup: fuelupLevel, dolphin: dolphinLevel, meerkat: meerkatLevel, eggcatch: eggcatchLevel,
-  hippo: hippoLevel, monkey: monkeyLevel, runway: runwayLevel,
-  feelings: feelingsLevel, scavenger: scavengerLevel, letternames: letternamesLevel,
-  senses: sensesLevel
-};
+const APP_VERSION = "46";
+/* ================= Worlds, games and levels =================
+   None of this is written out by hand any more. Every game declares itself in its
+   own file with registerGame() (see core.js), and every js/games/* script loads
+   before this one, so by the time hub.js runs the registry holds all of them.
 
-/* ================= Categories & games ================= */
-// lvl: difficulty rating (0 = easy/ages 2-3, 1 = medium/3-4, 2 = hard/4-5). Used to hide games above the chosen level.
-const GAMES = {
-  snow:    { icon: "❄️", name: "Count", es: "Contar", yue: "數一數", lvl: 0 },     ocean:   { icon: "🐠", name: "Colors", es: "Colores", yue: "顏色", lvl: 0 },
-  memory:  { icon: "🃏", name: "Memory", es: "Memoria", yue: "記憶", lvl: 1 },    bike:    { icon: "🚲", name: "Numbers", es: "Números", yue: "數字", lvl: 1 },
-  music:   { icon: "🥁", name: "Animal Band", es: "Banda Animal", yue: "動物樂隊", lvl: 1 }, whosays: { icon: "🔊", name: "Who Says?", es: "¿Quién Dice?", yue: "邊個叫？", lvl: 0 },
-  pizza:   { icon: "🍕", name: "Pizza", es: "Pizza", yue: "薄餅", lvl: 1 },     pasta:   { icon: "🍝", name: "Yum Count", es: "A Contar", yue: "數食物", lvl: 0 },
-  trace:   { icon: "✨", name: "Tracing", es: "Trazar", yue: "描畫", lvl: 2 },   rocket:  { icon: "🚀", name: "Countdown", es: "Cuenta Atrás", yue: "倒數", lvl: 2 },
-  sort:    { icon: "🪐", name: "Big & Small", es: "Grande y Pequeño", yue: "大同細", lvl: 0 }, pattern: { icon: "🔮", name: "Patterns", es: "Patrones", yue: "規律", lvl: 2 },
-  sortkind:{ icon: "🧺", name: "Sort It", es: "A Ordenar", yue: "分類", lvl: 1 },
-  paint:   { icon: "🎨", name: "Paint", es: "Pintar", yue: "畫畫", lvl: 0 },     story:   { icon: "📖", name: "Story", es: "Cuento", yue: "故事", lvl: 0 },
-  dragon:  { icon: "🐉", name: "Dragon Feed", es: "Alimenta al Dragón", yue: "餵龍", lvl: 0 }, dino:  { icon: "🦕", name: "Flash Count", es: "Cuenta Rápida", yue: "快數", lvl: 0 },
-  icecream:{ icon: "🍦", name: "Ice Cream", es: "Helado", yue: "雪糕", lvl: 0 },  petfeed: { icon: "🦴", name: "Same Treats", es: "Mismos Premios", yue: "一樣零食", lvl: 1 },
-  petmatch:{ icon: "🐶", name: "Find Pet", es: "Busca", yue: "搵寵物", lvl: 0 },   petcare: { icon: "🛁", name: "Pet Care", es: "Cuida", yue: "照顧寵物", lvl: 0 },
-  body:    { icon: "😊", name: "Body Match", es: "El Cuerpo", yue: "身體", lvl: 0 },
-  dressup: { icon: "👗", name: "Dress Up", es: "Vestir", yue: "換衫", lvl: 0 },
-  hideseek: { icon: "🐾", name: "Hide & Seek", es: "Escondite", yue: "捉迷藏", lvl: 0 },
-  cups:     { icon: "🥤", name: "Three Cups",  es: "Tres Vasos", yue: "三個杯", lvl: 1 },
-  nightday: { icon: "🌙", name: "Day & Night", es: "Día y Noche", yue: "日同夜", lvl: 0 },
-  measure:  { icon: "📏", name: "Tall or Short", es: "Alto o Bajo", yue: "高定矮", lvl: 1 },
-  fuelup:   { icon: "⛽", name: "Fuel Up", es: "A Cargar", yue: "加油", lvl: 1 },
-  dolphin:  { icon: "🐬", name: "Dolphin Dive", es: "Delfín", yue: "海豚", lvl: 0 },
-  meerkat:  { icon: "🦁", name: "Zoo Pop", es: "Zoológico", yue: "動物園", lvl: 0 },
-  eggcatch: { icon: "🥚", name: "Egg Catch", es: "Atrapa Huevos", yue: "接雞蛋", lvl: 0 },
-  hippo:    { icon: "🦛", name: "Feed Hippo", es: "Alimenta", yue: "餵河馬", lvl: 0 },
-  monkey:   { icon: "🐒", name: "Monkey Swing", es: "Mono", yue: "馬騮", lvl: 1 },
-  runway:   { icon: "✈️", name: "Plane Land", es: "Aterriza", yue: "降落", lvl: 1 },
-  feelings: { icon: "💛", name: "Feelings", es: "Sentimientos", yue: "心情", lvl: 0 },
-  scavenger:{ icon: "🔦", name: "Go Find It", es: "A Buscar", yue: "去搵嘢", lvl: 0 },
-  letternames:{ icon: "🔤", name: "Letter Lights", es: "Letras que Brillan", yue: "字母燈", lvl: 1, v: 41 },
-  senses:   { icon: "👐", name: "Five Senses", es: "Los Sentidos", yue: "五感", lvl: 0, v: 42 }
-};
+   A world declares only its identity and colour here. Which games it holds — and
+   the order she walks them — comes from registration order, so shipping a game
+   means appending one <script> tag and one registerGame() call, and it arrives at
+   the far end of its world's trail with no list here to keep in step. */
+const WORLDS = [
+  { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",           yue: "數字",       cls: "c-num" },
+  { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", yue: "顏色同形狀", cls: "c-shape" },
+  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   yue: "動腦遊戲",   cls: "c-brain" },
+  { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          yue: "動物",       cls: "c-animal" },
+  { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          yue: "寵物",       cls: "c-pets" },
+  { id: "create", icon: "✏️", name: "Create",          es: "Crear",             yue: "創作",       cls: "c-create" }
+];
+
+// id → the level object that runs its rounds. The three specials have no entry.
+const LEVELS = {};
+// id → what the map and trail draw: { icon, name, es, yue, lvl, v? }.
+// lvl: difficulty rating (0 = easy/ages 2-3, 1 = medium/3-4, 2 = hard/4-5) — used to
+// hide games above the chosen level. v: the APP_VERSION it shipped in (New! flag).
+const GAMES = {};
+const CATEGORIES = WORLDS.map(w => ({ ...w, games: [] }));
+(() => {
+  const world = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
+  for (const { id, world: w, level, ...meta } of GAME_REGISTRY) {
+    if (!world[w]) throw new Error(`registerGame(${id}): unknown world "${w}"`);
+    GAMES[id] = meta;
+    if (level) LEVELS[id] = level;
+    world[w].games.push(id);
+  }
+})();
+
 // chosen difficulty → max game level shown (auto/hard show everything)
 const diffLevel = () => settings.diff === "easy" ? 0 : settings.diff === "med" ? 1 : 2;
 const gameVisible = gid => (GAMES[gid].lvl || 0) <= diffLevel();
 const visibleGames = cat => cat.games.filter(gameVisible);
-const CATEGORIES = [
-  { id: "num",    icon: "🔢", name: "Numbers",         es: "Números",          yue: "數字",       cls: "c-num",    games: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"] },
-  { id: "shape",  icon: "🎨", name: "Colors & Shapes", es: "Colores y Figuras", yue: "顏色同形狀", cls: "c-shape",  games: ["ocean", "pizza", "trace", "icecream", "eggcatch"] },
-  { id: "brain",  icon: "🧩", name: "Brain Games",     es: "Juegos de Mente",   yue: "動腦遊戲",   cls: "c-brain",  games: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure", "runway", "feelings", "scavenger", "letternames", "senses"] },
-  { id: "animal", icon: "🐾", name: "Animals",         es: "Animales",          yue: "動物",       cls: "c-animal", games: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"] },
-  { id: "pets",   icon: "🐶", name: "Pets",            es: "Mascotas",          yue: "寵物",       cls: "c-pets",   games: ["petcare", "petmatch", "petfeed", "hideseek"] },
-  { id: "create", icon: "✏️", name: "Create",          es: "Crear",             yue: "創作",       cls: "c-create", games: ["paint", "story", "dressup"] }
-];
+
 /* ================= World map layout =================
    Every world has a FIXED home on the map so she can find it by place, not by reading.
    Coordinates are percentages of the map, tuned per orientation:
@@ -316,73 +299,6 @@ function openCategory(id) {
   document.body.className = "";
   $("gamesTitle").textContent = `${cat.icon} ${locName(cat)}`;
   worldTrail.open(cat);
-}
-
-/* ================= Story mode ================= */
-const STORY = [
-  { theme: "theme-bike",  art: "🚲☀️🌳", text: "One bright morning, {n} hopped on her bike. “I'm going on an adventure!” she said, and rode into the magical park.", es: "Una mañana soleada, {n} se subió a su bici. «¡Voy de aventura!», dijo, y entró al parque mágico.", yue: "一個晴朗嘅早晨，{n}跳上佢嘅單車。佢話：「我要去探險喇！」然後就騎入咗魔法公園。", tapEmoji: ["💨", "🔔", "🌸"], tapSound: () => tone(660, 0, .25, "triangle"), task: "🚲" },
-  { theme: "theme-snow",  art: "🏔️⛄❄️", text: "First she climbed a sparkly snow mountain. A friendly snowman waved hello. Together they counted the snowflakes: one, two, three!", es: "Primero subió una montaña de nieve brillante. Un muñeco de nieve la saludó. ¡Juntos contaron los copos de nieve: uno, dos, tres!", yue: "佢首先爬上一座閃閃發光嘅雪山。一個友善嘅雪人揮手打招呼。佢哋一齊數雪花：一、二、三！", tapEmoji: ["❄️", "✨", "⛄"], tapSound: () => tone(880, 0, .2, "sine"), task: "⛄" },
-  { theme: "theme-ocean", art: "🌊🐠🐬", text: "Next, {n} sailed across the bright blue ocean. Red, yellow, and green fish swam all around, and a dolphin did a happy flip!", es: "Después, {n} navegó por el océano azul. Peces rojos, amarillos y verdes nadaban alrededor, ¡y un delfín dio un saltito feliz!", yue: "跟住，{n}航行過蔚藍嘅海洋。紅色、黃色同綠色嘅魚游嚟游去，仲有一隻海豚開心咁翻咗個筋斗！", tapEmoji: ["🐠", "💦", "🐬"], tapSound: () => tone(523, 0, .25, "sine"), task: "🐬" },
-  { theme: "theme-pizza", art: "🍕🍝🧆", text: "All that adventuring made {n} hungry! She stopped in Yummy Town for a slice of pizza and spaghetti with three little meatballs.", es: "¡Tanta aventura le dio hambre a {n}! Paró en Pueblo Rico por una rebanada de pizza y espagueti con tres albóndigas.", yue: "探險咗咁耐，{n}肚餓喇！佢喺美食鎮停低，食咗一件薄餅同埋有三粒丸嘅意粉。", tapEmoji: ["🍕", "😋", "🍝"], tapSound: () => tone(440, 0, .2, "triangle"), task: "🍕" },
-  { theme: "theme-music", art: "🐸🐱🐮", text: "In the meadow, the animal band was playing! The frog went ribbit, the cat went meow, and the cow went moo. {n} danced and danced.", es: "En el prado, ¡la banda de animales tocaba! La rana hacía croac, el gato miau y la vaca muu. {n} bailó y bailó.", yue: "喺草地上面，動物樂隊正在演奏！青蛙呱呱叫，貓喵喵叫，牛哞哞叫。{n}不停咁跳舞。", tapEmoji: ["🎵", "🎶", "💃"], tapSound: () => speakAnimal(rand(["frog", "cat", "cow", "duck"]), { queue: true }), task: "🐱" },
-  { theme: "theme-space", art: "🚀🌙⭐", text: "Then {n} put on a shiny space helmet and zoomed to the moon in a rocket! Five, four, three, two, one... blast off! She counted the twinkly stars up high.", es: "Luego {n} se puso un casco espacial brillante y voló a la luna en un cohete. ¡Cinco, cuatro, tres, dos, uno... despegue! Contó las estrellas brillantes en lo alto.", yue: "之後，{n}戴上閃亮嘅太空頭盔，坐火箭飛上月球！五、四、三、二、一……發射！佢數住高空中閃爍嘅星星。", tapEmoji: ["⭐", "🚀", "🪐"], tapSound: () => tone(130, 0, .5, "sawtooth", .15), task: "🚀" },
-  { theme: "theme-story", art: "🌈⭐💖", text: "As the sun set, {n} flew home, happy and sleepy. “What a wonderful day!” she yawned. Goodnight, {n}. The End. 💖", es: "Cuando el sol se ocultó, {n} voló a casa, feliz y con sueño. «¡Qué día tan maravilloso!», bostezó. Buenas noches, {n}. Fin. 💖", yue: "太陽落山嗰陣，{n}開開心心、攰攰哋飛返屋企。佢打住呵欠話：「今日真係好開心！」晚安，{n}。故事完。💖", tapEmoji: ["⭐", "🌙", "💖"], tapSound: () => sfx.good(), last: true }
-];
-const storyText = p => fillName(curLang() === "yue" && p.yue ? p.yue : curLang() === "es" ? p.es : p.text);
-let storyPage = 0, storySolved = false;
-function showStory() {
-  cleanupLevel();
-  if ("speechSynthesis" in window) speechSynthesis.cancel();
-  hideAllScreens();
-  $("story").classList.remove("hidden");
-  storyPage = 0;
-  renderStory();
-}
-function renderStory() {
-  const p = STORY[storyPage];
-  storySolved = !p.task;
-  document.body.className = p.theme;
-  const scene = $("storyScene");
-  scene.className = "story-scene";
-  
-  // split art into interactive emojis
-  const artHtml = [...p.art].map(e => `<span class="s-em" onclick="storyTap('${e}', event)">${e}</span>`).join("");
-  
-  scene.innerHTML = `<div class="story-art">${artHtml}</div>
-      <div class="story-textbox" id="storyText">${storyText(p)}</div>
-      <div class="story-tap-hint">${t("story_tap")}</div>`;
-  
-  $("storyDots").innerHTML = STORY.map((_, i) => `<div class="sdot ${i === storyPage ? "on" : ""}"></div>`).join("");
-  $("storyPrev").style.visibility = storyPage === 0 ? "hidden" : "visible";
-  updateStoryNav();
-  speak(storyText(p));
-  if (p.task) core.wait(() => speak(t("story_find", { x: p.task })), 6000);
-}
-function updateStoryNav() {
-  const p = STORY[storyPage];
-  const btn = $("storyNext");
-  btn.textContent = p.last ? "🎉" : "▶️";
-  btn.style.opacity = storySolved ? "1" : "0.3";
-  btn.style.pointerEvents = storySolved ? "auto" : "none";
-}
-function storyTap(e, ev) {
-  const p = STORY[storyPage];
-  floaters(p.tapEmoji, ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2, 5);
-  if (p.tapSound) p.tapSound();
-  
-  if (p.task && e === p.task && !storySolved) {
-    storySolved = true;
-    sfx.good();
-    confetti();
-    speak(t("found_it", { item: e }) + " " + praise());
-    updateStoryNav();
-  }
-}
-function storyNav(dir) {
-  const p = STORY[storyPage];
-  if (dir > 0 && p.last) { confetti(); sfx.win(); speak(t("story_end")); setTimeout(showHub, 1800); return; }
-  storyPage = clamp(storyPage + dir, 0, STORY.length - 1);
-  renderStory();
 }
 
 /* ================= Sticker book ================= */

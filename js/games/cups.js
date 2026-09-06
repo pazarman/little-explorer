@@ -207,3 +207,8 @@ const cupsLevel = {
     core.wait(() => { if (!this.solved) this.dropCup(cupId); }, 1100);
   }
 };
+
+registerGame({
+  id: "cups", world: "brain", icon: "🥤", name: "Three Cups", es: "Tres Vasos", yue: "三個杯",
+  lvl: 1, level: cupsLevel
+});

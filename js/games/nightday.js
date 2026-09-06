@@ -229,3 +229,8 @@ const nightdayLevel = {
     }
   }
 };
+
+registerGame({
+  id: "nightday", world: "brain", icon: "🌙", name: "Day & Night", es: "Día y Noche",
+  yue: "日同夜", lvl: 0, level: nightdayLevel
+});

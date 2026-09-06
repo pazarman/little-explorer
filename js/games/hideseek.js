@@ -166,3 +166,8 @@ const hideseekLevel = {
     speak(t("hideseek_retry", { rel: t("rel_" + this.relation), spot: theWord(this.spot) }));
   }
 };
+
+registerGame({
+  id: "hideseek", world: "pets", icon: "🐾", name: "Hide & Seek", es: "Escondite", yue: "捉迷藏",
+  lvl: 0, level: hideseekLevel
+});

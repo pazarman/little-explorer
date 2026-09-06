@@ -188,3 +188,8 @@ const dressup = {
   },
   done() { speak(t("cool_look") + " " + praise()); celebrateWith("dressup", { noLevelUp: true }); }
 };
+
+registerGame({
+  id: "dressup", world: "create", icon: "👗", name: "Dress Up", es: "Vestir", yue: "換衫",
+  lvl: 0
+});

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import fs from "node:fs";
 
 // Skip the first-run name/buddy flow so we land on the hub deterministically.
 const SKIP_INTRO = () => {
@@ -723,4 +724,130 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
   expect(assisted).toBe(true);
 
   expect(errors, "console/page errors in Five Senses:\n" + errors.join("\n")).toEqual([]);
+});
+
+
+/* ================= Game registry =================
+   Games declare themselves with registerGame() in their own file, and hub.js derives
+   LEVELS / GAMES / each world's trail from registration order. Three things that used
+   to be guaranteed by hand-written lists now need guarding. */
+
+// The order she walks a world is registration order, which is <script> order in
+// index.html. That makes the tag order load-bearing: reordering it silently moves a
+// game she navigates to by PLACE, and takes the newest off the end of the path.
+// Pin the exact order so a reshuffle fails here instead of on her screen.
+const WORLD_ORDER = {
+  num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
+  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
+  brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
+          "runway", "feelings", "scavenger", "letternames", "senses"],
+  animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
+  pets: ["petcare", "petmatch", "petfeed", "hideseek"],
+  create: ["paint", "story", "dressup"],
+};
+
+test("every world's trail keeps its exact order", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const actual = await page.evaluate(() =>
+    Object.fromEntries(CATEGORIES.map((c) => [c.id, c.games])));
+  expect(actual, "a game moved on its world's trail — check <script> order in index.html")
+    .toEqual(WORLD_ORDER);
+  expect(errors).toEqual([]);
+});
+
+test("the registry is complete and self-consistent", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(() => {
+    const ids = GAME_REGISTRY.map((g) => g.id);
+    const placed = CATEGORIES.flatMap((c) => c.games);
+    const worlds = CATEGORIES.map((c) => c.id);
+    return {
+      dupes: ids.filter((id, i) => ids.indexOf(id) !== i),
+      unplaced: ids.filter((id) => !placed.includes(id)),
+      // every registration must land in a real world and carry what the map draws
+      badWorld: GAME_REGISTRY.filter((g) => !worlds.includes(g.world)).map((g) => g.id),
+      missingMeta: ids.filter((id) => !GAMES[id] || !GAMES[id].icon || !GAMES[id].name),
+      // a level, when present, has to be runnable
+      badLevel: Object.keys(LEVELS).filter((id) => typeof LEVELS[id].startRound !== "function"),
+      // startGameNow() dispatches these three by hand; anything else needs a level
+      levelless: ids.filter((id) => !LEVELS[id]),
+      count: ids.length,
+    };
+  });
+  expect(r.dupes).toEqual([]);
+  expect(r.unplaced).toEqual([]);
+  expect(r.badWorld).toEqual([]);
+  expect(r.missingMeta).toEqual([]);
+  expect(r.badLevel).toEqual([]);
+  expect(r.levelless.sort()).toEqual(["dressup", "paint", "story"]);
+  expect(r.count).toBe(38);
+  expect(errors).toEqual([]);
+});
+
+test("registerGame refuses a malformed game", async ({ page }) => {
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const caught = await page.evaluate(() => {
+    const before = GAME_REGISTRY.length;
+    const tries = [
+      () => registerGame({ id: "x", world: "num", icon: "x" }),                  // no name
+      () => registerGame({ id: "snow", world: "num", icon: "x", name: "Dup" }),  // taken id
+      () => registerGame({ id: "y", world: "num", icon: "x", name: "N", level: {} }), // no startRound
+    ];
+    const threw = tries.map((f) => { try { f(); return false; } catch (_) { return true; } });
+    return { threw, leaked: GAME_REGISTRY.length - before };
+  });
+  expect(caught.threw, "registerGame accepted a malformed definition").toEqual([true, true, true]);
+  expect(caught.leaked, "a rejected game still reached the registry").toBe(0);
+});
+
+test("every registered game opens without throwing", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // The registry's whole promise is that a registered game is a game that works.
+  // This is what caught Paint opening with its prompt element missing from the markup.
+  const bad = await page.evaluate(() => {
+    const out = [];
+    for (const { id } of GAME_REGISTRY) {
+      try {
+        startGameNow(id);
+        const painted = LEVELS[id]
+          ? document.getElementById("playArea").children.length > 0
+          : [...document.querySelectorAll(".screen")].some((s) => !s.classList.contains("hidden"));
+        if (!painted) out.push({ id, why: "opened but drew nothing" });
+      } catch (e) {
+        out.push({ id, why: e.message });
+      }
+      try { cleanupLevel(); } catch (_) {}
+      showHub();
+    }
+    return out;
+  });
+  expect(bad, "games that fail to open").toEqual([]);
+  expect(errors, "console/page errors while opening games:\n" + errors.join("\n")).toEqual([]);
+});
+
+// A game missing from the service worker's ASSETS works in dev and breaks only
+// offline, on her device, with no error anyone sees. Cheapest possible guard.
+test("every script the page loads is cached by the service worker", () => {
+  const html = fs.readFileSync("index.html", "utf8");
+  const sw = fs.readFileSync("sw.js", "utf8");
+  const srcs = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
+  const assets = [...sw.matchAll(/"\.\/([^"]+)"/g)].map((m) => m[1]);
+  expect(srcs.length).toBeGreaterThan(30);
+  expect(srcs.filter((s) => !assets.includes(s)),
+    "these scripts would 404 offline — add them to ASSETS in sw.js").toEqual([]);
+
+  // and nothing is cached that no longer exists
+  expect(assets.filter((a) => a.endsWith(".js") && !fs.existsSync(a)),
+    "sw.js caches files that are gone").toEqual([]);
 });

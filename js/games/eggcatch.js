@@ -241,3 +241,8 @@ const eggcatchLevel = {
     this.eggs = [];
   }
 };
+
+registerGame({
+  id: "eggcatch", world: "shape", icon: "🥚", name: "Egg Catch", es: "Atrapa Huevos",
+  yue: "接雞蛋", lvl: 0, level: eggcatchLevel
+});

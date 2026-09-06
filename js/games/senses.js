@@ -126,3 +126,8 @@ const sensesLevel = {
     }
   }
 };
+
+registerGame({
+  id: "senses", world: "brain", icon: "👐", name: "Five Senses", es: "Los Sentidos", yue: "五感",
+  lvl: 0, v: 42, level: sensesLevel
+});
