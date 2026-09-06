@@ -253,5 +253,5 @@ const dolphinLevel = {
 
 registerGame({
   id: "dolphin", world: "animal", icon: "🐬", name: "Dolphin Dive", es: "Delfín", yue: "海豚",
-  lvl: 0, level: dolphinLevel
+  lvl: 0, cue: "splash", level: dolphinLevel
 });

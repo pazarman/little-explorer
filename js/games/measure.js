@@ -114,5 +114,5 @@ const measureLevel = {
 
 registerGame({
   id: "measure", world: "brain", icon: "📏", name: "Tall or Short", es: "Alto o Bajo",
-  yue: "高定矮", lvl: 1, level: measureLevel
+  yue: "高定矮", lvl: 1, cue: "chime", level: measureLevel
 });

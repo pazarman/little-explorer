@@ -171,5 +171,5 @@ const hideseekLevel = {
 
 registerGame({
   id: "hideseek", world: "pets", icon: "🐾", name: "Hide & Seek", es: "Escondite", yue: "捉迷藏",
-  lvl: 0, level: hideseekLevel
+  lvl: 0, cue: "pop", level: hideseekLevel
 });

@@ -190,6 +190,6 @@ const fuelupLevel = {
 };
 
 registerGame({
-  id: "fuelup", world: "num", icon: "⛽", name: "Fuel Up", es: "A Cargar", yue: "加油", lvl: 1,
+  id: "fuelup", world: "num", icon: "⛽", name: "Fuel Up", es: "A Cargar", yue: "加油", lvl: 1, cue: "engine",
   level: fuelupLevel
 });

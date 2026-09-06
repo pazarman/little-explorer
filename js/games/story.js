@@ -71,5 +71,5 @@ function storyNav(dir) {
 }
 
 registerGame({
-  id: "story", world: "create", icon: "📖", name: "Story", es: "Cuento", yue: "故事", lvl: 0
+  id: "story", world: "create", icon: "📖", name: "Story", es: "Cuento", yue: "故事", lvl: 0, cue: "bell"
 });

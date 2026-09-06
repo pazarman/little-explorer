@@ -113,7 +113,7 @@ now have a gate for those).
 
 ## Tier 1 — next
 
-### A1 · Ambience beds per world  ·  effort M  ·  lifts Audio + Composition
+### A1 · Ambience beds per world  ·  effort M  ·  ✅ **BUILT (v52)**
 There are **five sound cues and three tunes for thirty-eight games, and no ambience at all**.
 A quiet ocean wash under the sea worlds, wind and birds over the meadow, a room tone for the
 cosy scenes. Cheap in code — the synth engine already exists — and it fills a screen as much
@@ -163,7 +163,7 @@ app's main creative surface and its emptiest screen.
 Currently a head on a bell shape, so nothing below the torso can be dressed. The face is the
 best art in the app and the skin-tone range is genuinely good — the body is what limits it.
 
-### A2 · Per-game signature cues  ·  effort M  ·  lifts Audio
+### A2 · Per-game signature cues  ·  effort M  ·  ✅ **BUILT (v52) — all 38 games, enforced**
 One recognisable sound per game on its key action, instead of the same universal `good()`.
 
 ### P2 · One progress indicator per screen  ·  effort S  ·  lifts Pacing
@@ -219,7 +219,12 @@ chaotic would only make the chaos arrive sooner.
 **Moves:** Pacing 5 → 7, Art 5 → 6. **Verify by:** re-measuring round-to-round, and a test that a tap
 during praise advances.
 
-### Play 2 — Give it a voice  ·  A1 + A2  ·  effort M
+### Play 2 — Give it a voice  ·  A1 + A2  ·  ✅ **DONE (v52)**
+
+> Ambience beds for all 7 biomes, keyed off `scene.forLevel` so every game got its sound from its theme
+> with no per-game work; 14 signature cues across all 38 games; and `cue` made a **required** field so a
+> new game cannot ship silent. Both enforcement paths mutation-tested. Measured bed output at RMS 0.0098,
+> stopping clean and not stacking across 24 level changes. A3 (character vocalisations) is still open.
 Audio is a **4 and entirely untouched** — the last completely cold axis. It also pairs with what just
 shipped: ambience keys off the same 7 biome names the scene kit already uses, so `reef` gets a wash and
 `meadow` gets birds with no new taxonomy.

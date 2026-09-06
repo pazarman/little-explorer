@@ -191,5 +191,5 @@ const dressup = {
 
 registerGame({
   id: "dressup", world: "create", icon: "👗", name: "Dress Up", es: "Vestir", yue: "換衫",
-  lvl: 0
+  lvl: 0, cue: "chime"
 });

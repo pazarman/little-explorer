@@ -104,5 +104,5 @@ const scavengerLevel = {
 
 registerGame({
   id: "scavenger", world: "brain", icon: "🔦", name: "Go Find It", es: "A Buscar", yue: "去搵嘢",
-  lvl: 0, level: scavengerLevel
+  lvl: 0, cue: "chirp", level: scavengerLevel
 });

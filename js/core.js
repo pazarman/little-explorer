@@ -31,8 +31,12 @@ const seeded = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - M
    whole screen instead of running rounds, and startGameNow() dispatches them. */
 const GAME_REGISTRY = [];
 function registerGame(def) {
-  for (const f of ["id", "world", "icon", "name"])
+  for (const f of ["id", "world", "icon", "name", "cue"])
     if (!def[f]) throw new Error(`registerGame(${def.id || "?"}): "${f}" is required`);
+  // A cue has to come from the shared palette, so no game can invent a harsh sound of
+  // its own and every world still belongs to the same family.
+  if (!CUES[def.cue])
+    throw new Error(`registerGame(${def.id}): unknown cue "${def.cue}" — pick one of ${Object.keys(CUES).join(", ")}`);
   if (GAME_REGISTRY.some(g => g.id === def.id))
     throw new Error(`registerGame: duplicate id "${def.id}"`);
   if (def.level && typeof def.level.startRound !== "function")
@@ -1143,6 +1147,155 @@ const MUSIC = {
     ]
   }
 };
+/* ================= Signature cues =================
+   The sound a game makes when she gets it right. Every game used the same universal
+   `good()` chime, so thirty-eight different activities were acoustically identical —
+   nothing told her ear which world she was in.
+
+   A shared palette rather than per-game invention: a game picks one by name in
+   `registerGame({ cue: "splash" })`, and roundComplete() plays it. Keeping it to a
+   vocabulary means they stay in the same family and none of them can be harsh, which
+   an ad-hoc sound per game would not guarantee. */
+const CUES = {
+  // water & air
+  splash: () => { voice({ type: "sine", f0: 900, f1: 300, dur: .20, cut: 2400, cut1: 700, vol: .16, atk: .004 });
+                  voice({ type: "triangle", f0: 420, f1: 160, dur: .26, cut: 1200, vol: .09 }); },
+  bubble: () => { [520, 700, 940].forEach((f, i) => voice({ type: "sine", f0: f, f1: f * 1.5, dur: .11, start: i * .07, cut: 2600, vol: .12 })); },
+  whoosh: () => { voice({ type: "triangle", f0: 260, f1: 1500, dur: .30, cut: 900, cut1: 4200, vol: .12, atk: .05 }); },
+  // bright & sparkling
+  chime:  () => { [784, 1046.5, 1318.5].forEach((f, i) => voice({ type: "sine", f0: f, dur: .34, start: i * .07, cut: 5200, vol: .14, atk: .01 })); },
+  sparkle:() => { [1318.5, 1760, 2093].forEach((f, i) => voice({ type: "sine", f0: f, f1: f * 1.18, dur: .22, start: i * .05, cut: 6500, vol: .10 })); },
+  bell:   () => { voice({ type: "sine", f0: 1046.5, dur: .55, cut: 5000, vol: .15, atk: .008 });
+                  voice({ type: "sine", f0: 1568, dur: .40, start: .04, cut: 6000, vol: .07 }); },
+  // warm & wooden
+  pop:    () => { voice({ type: "sine", f0: 380, f1: 880, dur: .12, cut: 2200, cut1: 3600, vol: .18, atk: .004 });
+                  voice({ type: "triangle", f0: 190, f1: 440, dur: .14, cut: 1400, vol: .08 }); },
+  wood:   () => { voice({ type: "triangle", f0: 640, f1: 520, dur: .16, cut: 1800, vol: .16, atk: .003 });
+                  voice({ type: "sine", f0: 320, f1: 260, dur: .18, cut: 900, vol: .08 }); },
+  drum:   () => { voice({ type: "sine", f0: 200, f1: 90, dur: .22, cut: 700, vol: .18, atk: .003 });
+                  voice({ type: "triangle", f0: 400, f1: 180, dur: .12, cut: 1600, vol: .07 }); },
+  // creatures
+  chirp:  () => { voice({ type: "sine", f0: 1500, f1: 2200, dur: .10, cut: 4600, vol: .14 });
+                  voice({ type: "sine", f0: 1900, f1: 2500, dur: .09, start: .12, cut: 4600, vol: .11 }); },
+  purr:   () => { voice({ type: "triangle", f0: 210, f1: 260, dur: .34, cut: 900, vol: .14, atk: .04 });
+                  voice({ type: "sine", f0: 420, f1: 520, dur: .28, start: .06, cut: 1600, vol: .07 }); },
+  roar:   () => { voice({ type: "sawtooth", f0: 150, f1: 240, dur: .34, cut: 620, cut1: 1100, vol: .13, atk: .03 }); },
+  // machines & journeys
+  engine: () => { voice({ type: "sawtooth", f0: 120, f1: 300, dur: .40, cut: 700, cut1: 1600, vol: .12, atk: .04 }); },
+  rocket: () => { voice({ type: "sawtooth", f0: 90, f1: 420, dur: .55, cut: 600, cut1: 2400, vol: .13, atk: .06 });
+                  voice({ type: "sine", f0: 1200, f1: 2400, dur: .35, start: .2, cut: 6000, vol: .07 }); },
+};
+
+// The cue a game declared, or the universal chime if it somehow has none.
+function playCue(levelId) {
+  const def = GAME_REGISTRY.find(g => g.id === levelId);
+  const cue = def && CUES[def.cue];
+  (cue || sfx.good)();
+}
+
+/* ================= Ambience =================
+   A quiet, continuous bed under each world. Audio was the app's coldest axis: five
+   one-shot cues and three tunes across thirty-eight games, and nothing at all in
+   between them — which is a large part of why the screens felt as empty as they
+   looked.
+
+   It keys off the same seven biomes the scene kit uses (`scene.forLevel`), so a game
+   gets its sound for free the moment it has a theme, with no per-game work.
+
+   Two layers: a filtered noise bed that sways slowly (water, wind, room tone), and
+   sparse one-shot details on a random interval (a bubble, a distant bird). Both sit
+   far under the speaking voice — per BAR-CONFIG the calm path matters more than the
+   atmosphere, so this must never compete with an instruction. */
+const AMBIENCE = {
+  reef:    { noise: "brown", cut: 480,  vol: .050, sway: [.05, 170],
+             detail: { gap: [2.5, 6], play: () => voice({ type: "sine", f0: 380, f1: 900, dur: .22, cut: 1400, vol: .05, atk: .01 }) } },
+  snow:    { noise: "pink",  cut: 900,  vol: .034, sway: [.03, 420],
+             detail: { gap: [5, 11],  play: () => voice({ type: "sine", f0: 1500, f1: 1900, dur: .5, cut: 3400, vol: .022, atk: .12 }) } },
+  meadow:  { noise: "pink",  cut: 1100, vol: .030, sway: [.04, 380],
+             // two quick rising notes: a bird, not a melody
+             detail: { gap: [3, 8], play: () => { voice({ type: "sine", f0: 1750, f1: 2300, dur: .10, cut: 4200, vol: .05 });
+                                                  voice({ type: "sine", f0: 2100, f1: 2600, dur: .09, start: .13, cut: 4200, vol: .042 }); } } },
+  forest:  { noise: "pink",  cut: 820,  vol: .036, sway: [.05, 300],
+             detail: { gap: [3.5, 9], play: () => { voice({ type: "triangle", f0: 1250, f1: 1500, dur: .12, cut: 3000, vol: .045 });
+                                                    voice({ type: "triangle", f0: 1500, f1: 1180, dur: .14, start: .15, cut: 3000, vol: .038 }); } } },
+  savanna: { noise: "brown", cut: 620,  vol: .040, sway: [.035, 500],
+             detail: { gap: [5, 12], play: () => voice({ type: "sine", f0: 240, f1: 180, dur: .55, cut: 900, vol: .035, atk: .1 }) } },
+  space:   { noise: "brown", cut: 260,  vol: .034, sway: [.02, 700],
+             detail: { gap: [4, 10], play: () => voice({ type: "sine", f0: 900, f1: 1700, dur: .7, cut: 5000, vol: .026, atk: .25 }) } },
+  cozy:    { noise: "brown", cut: 380,  vol: .028, sway: [.025, 600],
+             detail: { gap: [6, 13], play: () => voice({ type: "sine", f0: 520, f1: 470, dur: .45, cut: 1200, vol: .022, atk: .15 }) } },
+};
+
+const ambience = {
+  src: null, gain: null, lfo: null, timer: null, biome: null, buf: null,
+
+  // One noise buffer, generated once and looped. Brown is heavier and reads as water
+  // or a room; pink is airier and reads as wind.
+  buffer(ctx, kind) {
+    if (this.buf && this.buf.kind === kind) return this.buf.b;
+    const len = ctx.sampleRate * 2, b = ctx.createBuffer(1, len, ctx.sampleRate), d = b.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++) {
+      const w = Math.random() * 2 - 1;
+      last = kind === "brown" ? (last + 0.02 * w) / 1.02 : (last * 0.86 + w * 0.14);
+      d[i] = last * (kind === "brown" ? 3.2 : 1.6);
+    }
+    this.buf = { kind, b };
+    return b;
+  },
+
+  start(biome) {
+    if (settings.music === "off") return;      // the music control governs all background sound
+    const a = AMBIENCE[biome] || AMBIENCE.meadow;
+    if (this.biome === biome && this.src) return;             // already running this world
+    this.stop();
+    this.biome = biome;
+    let ctx;
+    try { ctx = audio(); } catch (_) { return; }              // no audio yet: stay silent, try again later
+    const src = ctx.createBufferSource(), filt = ctx.createBiquadFilter(), g = ctx.createGain();
+    src.buffer = this.buffer(ctx, a.noise);
+    src.loop = true;
+    filt.type = "lowpass";
+    filt.frequency.setValueAtTime(a.cut, ctx.currentTime);
+    g.gain.setValueAtTime(0.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(a.vol, ctx.currentTime + 1.6);   // fade in, never a click
+    // a slow sway on the cutoff: waves, or breath in the wind
+    const lfo = ctx.createOscillator(), lg = ctx.createGain();
+    lfo.frequency.setValueAtTime(a.sway[0], ctx.currentTime);
+    lg.gain.setValueAtTime(a.sway[1], ctx.currentTime);
+    lfo.connect(lg).connect(filt.frequency);
+    src.connect(filt).connect(g).connect(ctx.destination);
+    src.start(); lfo.start();
+    this.src = src; this.gain = g; this.lfo = lfo;
+    this.schedule(a);
+  },
+
+  // sparse one-shots on top of the bed
+  schedule(a) {
+    if (!a.detail) return;
+    const [lo, hi] = a.detail.gap;
+    this.timer = core.wait(() => {
+      if (this.src && settings.music !== "off") { try { a.detail.play(); } catch (_) {} }
+      if (this.src) this.schedule(a);
+    }, (lo + Math.random() * (hi - lo)) * 1000);
+  },
+
+  stop() {
+    if (this.timer) { clearTimeout(this.timer); core.timers.delete(this.timer); this.timer = null; }
+    const src = this.src, g = this.gain, lfo = this.lfo;
+    this.src = this.gain = this.lfo = null; this.biome = null;
+    if (!src) return;
+    try {
+      const ctx = audio(), t = ctx.currentTime;
+      g.gain.cancelScheduledValues(t);
+      g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);   // fade out, then let go
+      src.stop(t + 0.4); lfo.stop(t + 0.4);
+      setTimeout(() => { try { src.disconnect(); g.disconnect(); lfo.disconnect(); } catch (_) {} }, 600);
+    } catch (_) { try { src.stop(); lfo.stop(); } catch (_) {} }
+  },
+};
+
 let musicOn = false, musicTimer = null;
 function curStyle() { return MUSIC[settings.music] || MUSIC.bouncy; }
 function playStep(tune, i, st) {
@@ -1159,6 +1312,9 @@ function playStep(tune, i, st) {
 }
 function startMusic() { audio(); musicOn = true; $("musicBtn").classList.add("on"); const st = curStyle(); playStep(rand(st.tunes), 0, st); }
 function stopMusic() { musicOn = false; if (musicTimer) { clearTimeout(musicTimer); core.timers.delete(musicTimer); } $("musicBtn").classList.remove("on"); }
+// "Music: off" in settings means a quiet app, so it silences the ambience bed as well —
+// a parent choosing silence should get silence, not silence-plus-wind.
+function applyMusicSetting() { if (settings.music === "off") ambience.stop(); }
 function toggleMusic() { if (musicOn) stopMusic(); else startMusic(); }
 
 /* ================= Fireworks + floaters ================= */
@@ -1402,7 +1558,7 @@ function roundComplete() {
   let nextTier = tierFor(state.level);
   if (settings.diff === "auto" && manyMistakes) nextTier = Math.max(0, nextTier - 1);
   roundMistakes = 0;
-  sfx.good();
+  playCue(state.level);
   waitSpeech(() => {                       // let the praise finish talking first
     state.round++;
     state.tier = nextTier;

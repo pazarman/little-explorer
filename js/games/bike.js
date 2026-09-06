@@ -96,6 +96,6 @@ const bikeLevel = {
 };
 
 registerGame({
-  id: "bike", world: "num", icon: "🚲", name: "Numbers", es: "Números", yue: "數字", lvl: 1,
+  id: "bike", world: "num", icon: "🚲", name: "Numbers", es: "Números", yue: "數字", lvl: 1, cue: "pop",
   level: bikeLevel
 });

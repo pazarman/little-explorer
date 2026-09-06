@@ -210,5 +210,5 @@ const cupsLevel = {
 
 registerGame({
   id: "cups", world: "brain", icon: "🥤", name: "Three Cups", es: "Tres Vasos", yue: "三個杯",
-  lvl: 1, level: cupsLevel
+  lvl: 1, cue: "wood", level: cupsLevel
 });

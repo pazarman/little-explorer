@@ -146,5 +146,5 @@ const paint = {
 };
 
 registerGame({
-  id: "paint", world: "create", icon: "🎨", name: "Paint", es: "Pintar", yue: "畫畫", lvl: 0
+  id: "paint", world: "create", icon: "🎨", name: "Paint", es: "Pintar", yue: "畫畫", lvl: 0, cue: "sparkle"
 });

@@ -170,5 +170,5 @@ const monkeyLevel = {
 
 registerGame({
   id: "monkey", world: "animal", icon: "🐒", name: "Monkey Swing", es: "Mono", yue: "馬騮",
-  lvl: 1, level: monkeyLevel
+  lvl: 1, cue: "whoosh", level: monkeyLevel
 });
