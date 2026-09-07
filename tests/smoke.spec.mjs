@@ -128,6 +128,7 @@ test("a newly shipped game flies a New! flag until she plays it", async ({ page 
   // this drops a game into the current release rather than naming a real one (which
   // would start failing the moment that game got old enough).
   const tagged = await page.evaluate(() => {
+    GAME_REGISTRY.forEach((g) => { if (GAMES[g.id]) GAMES[g.id].v = 0; });  // start from no real new games
     GAMES.senses.v = +APP_VERSION;
     GAMES.pattern.v = +APP_VERSION - 5;          // several releases back
     return { fresh: isNewGame("senses"), aged: isNewGame("pattern"), untagged: isNewGame("snow") };
@@ -247,7 +248,12 @@ test("a newly shipped game sits at the end of the path and the camera travels th
   await page.goto("/index.html?test=1");
 
   const reveal = await page.evaluate(async () => {
-    GAMES.senses.v = +APP_VERSION;               // as if Five Senses shipped this release
+    // tag whichever game is last on the brain trail as this release's new one — the real
+    // newest game lives there, so this stays true as later games append (and don't leave
+    // an extra real new game flagged alongside it).
+    GAME_REGISTRY.forEach((g) => { if (GAMES[g.id]) GAMES[g.id].v = 0; });
+    const brain = CATEGORIES.find((c) => c.id === "brain").games;
+    GAMES[brain[brain.length - 1]].v = +APP_VERSION;
     openCategory("brain");
     const view = document.getElementById("trailView");
     await new Promise((r) => setTimeout(r, 150));
@@ -482,6 +488,68 @@ test("Dolphin Dive scrolls, steers, and collects hoops", async ({ page }) => {
   expect(scored.pipsOn).toBeGreaterThan(0);
 
   expect(errors, "console/page errors in Dolphin Dive:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("Fill It Up! pours water and teaches capacity", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("pour"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  // Tier 0: two cups + a drawn jug; the instruction poses the capacity question
+  await page.evaluate(() => { state.tier = 0; state.round = 0; pourLevel.startRound(); });
+  await expect(page.locator(".pf-cup")).toHaveCount(2);
+  await expect(page.locator("#pfJug")).toBeVisible();
+  await expect(page.locator("#playArea .sc-scene")).toBeVisible();      // scene kit, not a bare gradient
+  const instr = await page.locator("#instruction").textContent();
+  expect(instr).toContain("🫗");
+
+  // Pouring the whole jug into the cup that holds MORE finishes the round (drive the
+  // rAF loop by hand so the check is deterministic, the way the Dolphin test does).
+  const win = await page.evaluate(() => {
+    cancelAnimationFrame(pourLevel.raf); pourLevel.raf = null;
+    const side = pourLevel.correct[0];
+    pourLevel.grab(side, null);
+    let t = performance.now();
+    for (let i = 0; i < 120 && !pourLevel.done; i++) { t += 40; pourLevel.frame(t); }
+    return { done: pourLevel.done, jug: pourLevel.jug, filled: document.querySelector(`.pf-water[data-w="${side}"]`).style.height };
+  });
+  expect(win.done).toBe(true);           // the round completed
+  expect(win.jug).toBeLessThan(0.02);    // the jug emptied — all the water fit
+  expect(win.filled).not.toBe("0%");     // the winning cup shows water
+
+  // Pouring into the too-small cup overflows: it counts a miss but never fails the child
+  const spill = await page.evaluate(() => {
+    state.busy = false; state.tier = 0; state.round = 0; pourLevel.startRound();
+    cancelAnimationFrame(pourLevel.raf); pourLevel.raf = null;
+    const side = pourLevel.cups.find(c => !c.correct).side;
+    pourLevel.grab(side, null);
+    let t = performance.now();
+    for (let i = 0; i < 60 && pourLevel.misses === 0; i++) { t += 40; pourLevel.frame(t); }
+    return { misses: pourLevel.misses, done: pourLevel.done };
+  });
+  expect(spill.misses).toBeGreaterThan(0);   // the small cup spilled
+  expect(spill.done).toBe(false);            // no fail state — she just tries again
+
+  // Tier 1 offers three cups with exactly one that holds it all; tier 2 is the
+  // conservation pair — two differently shaped cups that hold the SAME amount
+  const tiers = await page.evaluate(() => {
+    state.busy = false; state.tier = 1; state.round = 0; pourLevel.startRound();
+    const t1 = { cups: pourLevel.cups.length, correct: pourLevel.correct.length };
+    state.tier = 2; pourLevel.startRound();
+    const caps = pourLevel.cups.map(c => c.cap);
+    const t2 = { cups: pourLevel.cups.length, correct: pourLevel.correct.length, equalCaps: caps.every(c => c === caps[0]) };
+    return { t1, t2 };
+  });
+  expect(tiers.t1.cups).toBe(3);
+  expect(tiers.t1.correct).toBe(1);
+  expect(tiers.t2.cups).toBe(2);
+  expect(tiers.t2.correct).toBe(2);
+  expect(tiers.t2.equalCaps).toBe(true);
+
+  expect(errors, "console/page errors in Fill It Up!:\n" + errors.join("\n")).toEqual([]);
 });
 
 test("Zoo Pop surfaces animals and scores only the named target", async ({ page }) => {
@@ -817,7 +885,7 @@ const WORLD_ORDER = {
   num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
   shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
   brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
-          "runway", "feelings", "scavenger", "letternames", "senses"],
+          "runway", "feelings", "scavenger", "letternames", "senses", "pour"],
   animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
   pets: ["petcare", "petmatch", "petfeed", "hideseek"],
   create: ["paint", "story", "dressup"],
@@ -863,7 +931,7 @@ test("the registry is complete and self-consistent", async ({ page }) => {
   expect(r.missingMeta).toEqual([]);
   expect(r.badLevel).toEqual([]);
   expect(r.levelless.sort()).toEqual(["dressup", "paint", "story"]);
-  expect(r.count).toBe(38);
+  expect(r.count).toBe(39);
   expect(errors).toEqual([]);
 });
 
@@ -1794,7 +1862,7 @@ test("no game squats on the scene kit's class prefix", async () => {
 // kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
 // this at the full count; it exists so a refactor can't quietly strip scenery back out,
 // and a new game that ships without a background fails here.
-const SCENERY_FLOOR = 35;
+const SCENERY_FLOOR = 36;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);
