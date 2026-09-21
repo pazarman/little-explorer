@@ -128,9 +128,9 @@ test("a newly shipped game flies a New! flag until she plays it", async ({ page 
   // this drops a game into the current release rather than naming a real one (which
   // would start failing the moment that game got old enough).
   const tagged = await page.evaluate(() => {
-    GAMES.senses.v = +APP_VERSION;
+    GAMES.pour.v = +APP_VERSION;                  // Fill It Up shipped this release
     GAMES.pattern.v = +APP_VERSION - 5;          // several releases back
-    return { fresh: isNewGame("senses"), aged: isNewGame("pattern"), untagged: isNewGame("snow") };
+    return { fresh: isNewGame("pour"), aged: isNewGame("pattern"), untagged: isNewGame("snow") };
   });
   expect(tagged.fresh).toBe(true);
   expect(tagged.aged).toBe(false);
@@ -144,9 +144,9 @@ test("a newly shipped game flies a New! flag until she plays it", async ({ page 
 
   // Playing it retires the flag — nothing to switch off by hand.
   const afterPlaying = await page.evaluate(() => {
-    completions.senses = 1;
+    completions.pour = 1;
     buildHub();
-    return { flags: document.querySelectorAll("#mapNodes .node-new").length, isNew: isNewGame("senses") };
+    return { flags: document.querySelectorAll("#mapNodes .node-new").length, isNew: isNewGame("pour") };
   });
   expect(afterPlaying.isNew).toBe(false);
   expect(afterPlaying.flags).toBe(0);
@@ -247,7 +247,7 @@ test("a newly shipped game sits at the end of the path and the camera travels th
   await page.goto("/index.html?test=1");
 
   const reveal = await page.evaluate(async () => {
-    GAMES.senses.v = +APP_VERSION;               // as if Five Senses shipped this release
+    GAMES.pour.v = +APP_VERSION;                 // Fill It Up is the game that shipped this release
     openCategory("brain");
     const view = document.getElementById("trailView");
     await new Promise((r) => setTimeout(r, 150));
@@ -482,6 +482,65 @@ test("Dolphin Dive scrolls, steers, and collects hoops", async ({ page }) => {
   expect(scored.pipsOn).toBeGreaterThan(0);
 
   expect(errors, "console/page errors in Dolphin Dive:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("Fill It Up pours water and completes only when the biggest cup is full", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("pour"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  // Easiest tier: two cups of clearly different capacity, the water prompt visible
+  await page.evaluate(() => { state.tier = 0; state.round = 0; pourLevel.startRound(); });
+  await expect(page.locator(".pu-jar")).toHaveCount(2);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("💧");
+
+  const r = await page.evaluate(() => {
+    cancelAnimationFrame(pourLevel.raf); pourLevel.raf = null;   // freeze the loop for a deterministic check
+    const tgt = pourLevel.targets[0];
+    const wrong = pourLevel.jars.findIndex((_, i) => !pourLevel.targets.includes(i));
+    // filling the SMALL cup is a gentle miss (no fail state) and never completes the round
+    const beforeMiss = pourLevel.mistakes;
+    for (let k = 0; k < 400 && pourLevel.jars[wrong].level < 0.999; k++) pourLevel.pourInto(wrong, 0.05);
+    const missInc = pourLevel.mistakes - beforeMiss;
+    const doneAfterWrong = pourLevel.done;
+    // filling the BIG (target) cup completes the round
+    for (let k = 0; k < 800 && pourLevel.jars[tgt].level < 0.999; k++) pourLevel.pourInto(tgt, 0.05);
+    return { missInc, doneAfterWrong, tgtLevel: pourLevel.jars[tgt].level, done: pourLevel.done };
+  });
+  expect(r.missInc, "filling the small cup should count as one miss").toBe(1);
+  expect(r.doneAfterWrong, "filling the wrong cup must not end the round").toBe(false);
+  expect(r.tgtLevel).toBeGreaterThan(0.99);
+  expect(r.done, "filling the biggest cup completes the round").toBe(true);
+
+  expect(errors, "console/page errors in Fill It Up:\n" + errors.join("\n")).toEqual([]);
+});
+
+test("Fill It Up rescues a passive player with auto-pour assist", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("pour"));
+  await page.evaluate(() => { state.tier = 0; state.round = 0; pourLevel.startRound(); });
+
+  const a = await page.evaluate(() => {
+    cancelAnimationFrame(pourLevel.raf); pourLevel.raf = null;
+    let t = performance.now();
+    pourLevel.lastT = t;
+    pourLevel.lastActivity = t - 9000;      // long idle → assist should kick in
+    pourLevel.frame(t);
+    const assisting = pourLevel.assisting;
+    for (let k = 0; k < 800 && !pourLevel.done; k++) { t += 50; pourLevel.frame(t); }
+    return { assisting, done: pourLevel.done };
+  });
+  expect(a.assisting, "an idle player should trigger the assist").toBe(true);
+  expect(a.done, "the assist should auto-pour and finish the round for a passive player").toBe(true);
+
+  expect(errors, "console/page errors in Fill It Up assist:\n" + errors.join("\n")).toEqual([]);
 });
 
 test("Zoo Pop surfaces animals and scores only the named target", async ({ page }) => {
@@ -817,7 +876,7 @@ const WORLD_ORDER = {
   num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
   shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
   brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
-          "runway", "feelings", "scavenger", "letternames", "senses"],
+          "runway", "feelings", "scavenger", "letternames", "senses", "pour"],
   animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
   pets: ["petcare", "petmatch", "petfeed", "hideseek"],
   create: ["paint", "story", "dressup"],
@@ -863,7 +922,7 @@ test("the registry is complete and self-consistent", async ({ page }) => {
   expect(r.missingMeta).toEqual([]);
   expect(r.badLevel).toEqual([]);
   expect(r.levelless.sort()).toEqual(["dressup", "paint", "story"]);
-  expect(r.count).toBe(38);
+  expect(r.count).toBe(39);
   expect(errors).toEqual([]);
 });
 
@@ -1794,7 +1853,7 @@ test("no game squats on the scene kit's class prefix", async () => {
 // kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
 // this at the full count; it exists so a refactor can't quietly strip scenery back out,
 // and a new game that ships without a background fails here.
-const SCENERY_FLOOR = 35;
+const SCENERY_FLOOR = 36;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);
