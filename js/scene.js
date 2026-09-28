@@ -226,7 +226,7 @@ const THEME_BIOME = {
   "theme-icecream": "meadow", "theme-pets": "cozy", "theme-dressup": "cozy",
   "theme-feelings": "cozy", "theme-scavenger": "meadow", "theme-senses": "cozy",
   "theme-nightday": "space", "theme-measure": "meadow", "theme-sort": "reef",
-  "theme-cups": "cozy", "theme-dragon": "forest",
+  "theme-cups": "cozy", "theme-dragon": "forest", "theme-pour": "reef",
 };
 
 /* Tinting.

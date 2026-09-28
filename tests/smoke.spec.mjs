@@ -128,9 +128,9 @@ test("a newly shipped game flies a New! flag until she plays it", async ({ page 
   // this drops a game into the current release rather than naming a real one (which
   // would start failing the moment that game got old enough).
   const tagged = await page.evaluate(() => {
-    GAMES.senses.v = +APP_VERSION;
+    GAMES.pour.v = +APP_VERSION;                  // Fill It Up! shipped this release
     GAMES.pattern.v = +APP_VERSION - 5;          // several releases back
-    return { fresh: isNewGame("senses"), aged: isNewGame("pattern"), untagged: isNewGame("snow") };
+    return { fresh: isNewGame("pour"), aged: isNewGame("pattern"), untagged: isNewGame("snow") };
   });
   expect(tagged.fresh).toBe(true);
   expect(tagged.aged).toBe(false);
@@ -144,9 +144,9 @@ test("a newly shipped game flies a New! flag until she plays it", async ({ page 
 
   // Playing it retires the flag — nothing to switch off by hand.
   const afterPlaying = await page.evaluate(() => {
-    completions.senses = 1;
+    completions.pour = 1;
     buildHub();
-    return { flags: document.querySelectorAll("#mapNodes .node-new").length, isNew: isNewGame("senses") };
+    return { flags: document.querySelectorAll("#mapNodes .node-new").length, isNew: isNewGame("pour") };
   });
   expect(afterPlaying.isNew).toBe(false);
   expect(afterPlaying.flags).toBe(0);
@@ -247,7 +247,7 @@ test("a newly shipped game sits at the end of the path and the camera travels th
   await page.goto("/index.html?test=1");
 
   const reveal = await page.evaluate(async () => {
-    GAMES.senses.v = +APP_VERSION;               // as if Five Senses shipped this release
+    GAMES.pour.v = +APP_VERSION;                 // Fill It Up! shipped this release, last on the brain trail
     openCategory("brain");
     const view = document.getElementById("trailView");
     await new Promise((r) => setTimeout(r, 150));
@@ -803,6 +803,58 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
   expect(errors, "console/page errors in Five Senses:\n" + errors.join("\n")).toEqual([]);
 });
 
+test("Fill It Up! pours water, fills a cup, and picks which holds the most", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("pour"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  // tier 0 shows exactly two vessels of different capacity
+  await page.evaluate(() => { state.tier = 0; state.round = 0; pourLevel.startRound(); });
+  await expect(page.locator(".pr-vessel")).toHaveCount(2);
+  const instructions = await page.locator("#instruction").textContent();
+  expect(instructions).toContain("💧");
+
+  // Holding a vessel pours water in: its level rises and cup ticks light up.
+  const poured = await page.evaluate(() => {
+    const v = pourLevel.vessels[0];
+    const before = v.level;
+    for (let i = 0; i < 6; i++) pourLevel.pour(v, 0.2);   // ~full
+    return { before, after: v.level, lit: v.lit, count: document.getElementById("prCount0").textContent };
+  });
+  expect(poured.after).toBeGreaterThan(poured.before);
+  expect(poured.lit).toBeGreaterThan(0);
+
+  // Filling both vessels finishes the round and advances (voice names the bigger one).
+  const advanced = await page.evaluate(async () => {
+    const before = state.round;
+    pourLevel.vessels.forEach(v => { for (let i = 0; i < 8; i++) pourLevel.pour(v, 0.2); });
+    const deadline = Date.now() + 9000;
+    while (Date.now() < deadline) {
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return true;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
+  });
+  expect(advanced).toBe(true);
+
+  // Passive-player rescue: with no interaction the idle helper fills a cup on its own,
+  // so the round always completes (no fail state, no dead end).
+  const rescued = await page.evaluate(async () => {
+    state.busy = false; state.tier = 0; state.round = 0; pourLevel.startRound();
+    pourLevel.lastPour = performance.now() - 6000;      // pretend the child has been idle
+    const start = pourLevel.vessels.map(v => v.level);
+    await new Promise(r => setTimeout(r, 500));          // let the rAF helper pour
+    const now = pourLevel.vessels.map(v => v.level);
+    return now.some((lvl, i) => lvl > start[i]);
+  });
+  expect(rescued).toBe(true);
+
+  expect(errors, "console/page errors in Fill It Up!:\n" + errors.join("\n")).toEqual([]);
+});
+
 
 /* ================= Game registry =================
    Games declare themselves with registerGame() in their own file, and hub.js derives
@@ -817,7 +869,7 @@ const WORLD_ORDER = {
   num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
   shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
   brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
-          "runway", "feelings", "scavenger", "letternames", "senses"],
+          "runway", "feelings", "scavenger", "letternames", "senses", "pour"],
   animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
   pets: ["petcare", "petmatch", "petfeed", "hideseek"],
   create: ["paint", "story", "dressup"],
@@ -863,7 +915,7 @@ test("the registry is complete and self-consistent", async ({ page }) => {
   expect(r.missingMeta).toEqual([]);
   expect(r.badLevel).toEqual([]);
   expect(r.levelless.sort()).toEqual(["dressup", "paint", "story"]);
-  expect(r.count).toBe(38);
+  expect(r.count).toBe(39);
   expect(errors).toEqual([]);
 });
 
@@ -1790,11 +1842,11 @@ test("no game squats on the scene kit's class prefix", async () => {
     .toEqual([]);
 });
 
-// Scenery coverage is a ratchet: it may go up, never down. All 35 levels carry the scene
+// Scenery coverage is a ratchet: it may go up, never down. All levels carry the scene
 // kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
 // this at the full count; it exists so a refactor can't quietly strip scenery back out,
 // and a new game that ships without a background fails here.
-const SCENERY_FLOOR = 35;
+const SCENERY_FLOOR = 36;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);
