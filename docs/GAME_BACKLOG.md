@@ -212,7 +212,7 @@ This file is the shared state between the agents and you:
 - **Estimated complexity:** Low-Medium — SVG picture-graph layout (rows of repeated icons); 3–4 object types in 2–3 colors; no drag (tap the winning group); voice confirms count per group; readable grid layout is the main design challenge
 - **File:** `js/games/tally.js`
 
-### [READY] Shape Drop
+### [IN_REVIEW] Shape Drop
 - **STEM:** Spatial reasoning · spatial fitting — place shape pieces into matching cutout holes · age 2–4
 - **Success:** Child can drag a shape piece (circle, square, triangle) to its matching hole in a scene and feel it "click" into place; at tier 1, must try pieces in multiple holes before finding the fit — demonstrating spatial matching by form through trial-and-error problem-solving
 - **Fills gap:** Spatial reasoning, 2–3 and 3–4 age bands — the STEM doc lists "simple fit" for ages 3–4 as a distinct spatial concept; Where's Teddy? teaches prepositional LANGUAGE (in/on/under); Shadow Match teaches shape-to-silhouette IDENTIFICATION; spatial FITTING (classic shape-sorter toy mechanic — choosing a piece and discovering whether it belongs in a hole) builds a different skill: understanding that form determines fit, learning to try before giving up; zero backlog coverage for this sub-skill

@@ -341,6 +341,11 @@ const DICT = {
     measure_yes_shorter: "Yes! Shorter!",
     measure_no_taller: "That one is shorter! Find the taller one!",
     measure_no_shorter: "That one is taller! Find the shorter one!",
+    shapedrop_show: "Drop the shapes in!",
+    shapedrop_say: "Drag each shape to the hole that fits! Where does it go?",
+    shd_fit: "A {x}! It fits right in!",
+    shd_try: "Try another spot! Where does the {x} go?",
+    shd_look: "Look! The {x} is looking for its home.",
   },
   es: {
     num: ["", "Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"],
@@ -547,7 +552,12 @@ const DICT = {
     measure_yes_taller: "¡Sí! ¡Más alto!",
     measure_yes_shorter: "¡Sí! ¡Más bajo!",
     measure_no_taller: "¡Ese es más bajo! ¡Busca el más alto!",
-    measure_no_shorter: "¡Ese es más alto! ¡Busca el más bajo!"
+    measure_no_shorter: "¡Ese es más alto! ¡Busca el más bajo!",
+    shapedrop_show: "¡Encaja las figuras!",
+    shapedrop_say: "¡Arrastra cada figura al hueco que le queda! ¿Dónde va?",
+    shd_fit: "¡Un {x}! ¡Encaja perfecto!",
+    shd_try: "¡Prueba otro lugar! ¿Dónde va el {x}?",
+    shd_look: "¡Mira! El {x} busca su casita.",
   },
   yue: {
     num: ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"],
@@ -750,7 +760,12 @@ const DICT = {
     measure_yes_taller: "啱喇！高啲！",
     measure_yes_shorter: "啱喇！矮啲！",
     measure_no_taller: "嗰個矮啲！搵高啲嗰個！",
-    measure_no_shorter: "嗰個高啲！搵矮啲嗰個！"
+    measure_no_shorter: "嗰個高啲！搵矮啲嗰個！",
+    shapedrop_show: "放形狀入去！",
+    shapedrop_say: "揂每個形狀去啱佢嘅窿度！放邊度呀？",
+    shd_fit: "一個{x}！啱啱好！",
+    shd_try: "試下第二度！{x}放邊度呀？",
+    shd_look: "睇吓！{x}搵緊佢嘅屋企。",
   }
 };
 

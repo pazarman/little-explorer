@@ -871,6 +871,95 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
   expect(errors, "console/page errors in Five Senses:\n" + errors.join("\n")).toEqual([]);
 });
 
+test("Shape Drop fits pieces into holes and rescues a passive player", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("shapedrop"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  // Tier 0: three distinct shapes, one matching hole each, drawn scenery (not a bare gradient)
+  const t0 = await page.evaluate(() => {
+    state.tier = 0; state.round = 0; state.busy = false; shapedropLevel.startRound();
+    const pieces = [...document.querySelectorAll("#shdTray .shd-piece")];
+    return {
+      holes: document.querySelectorAll("#shdBoard .shd-hole").length,
+      pieces: pieces.length,
+      distinct: new Set(pieces.map(p => p.dataset.shape)).size,
+      scene: !!document.querySelector("#playArea .sc-scene"),
+      instr: document.getElementById("instruction").textContent,
+    };
+  });
+  expect(t0.holes).toBe(3);
+  expect(t0.pieces).toBe(3);
+  expect(t0.distinct).toBe(3);
+  expect(t0.scene).toBe(true);           // composed from the scene kit
+  expect(t0.instr).toContain("🔷");
+
+  // Playing it: each piece dropped on its matching hole fits and finishes the round
+  const played = await page.evaluate(() => {
+    state.tier = 0; state.round = 0; state.busy = false; shapedropLevel.startRound();
+    [...document.querySelectorAll("#shdTray .shd-piece")].forEach(p => {
+      const hole = shapedropLevel.holeFor(p);
+      const r = hole.getBoundingClientRect();
+      shapedropLevel.place(p, hole, { clientX: r.left + 1, clientY: r.top + 1 });
+    });
+    return { fitted: document.querySelectorAll("#shdBoard .shd-piece.shd-fit").length,
+             remaining: shapedropLevel.remaining };
+  });
+  expect(played.fitted).toBe(3);
+  expect(played.remaining).toBe(0);      // the whole level completed
+
+  // A wrong spot is never a fail: it counts a gentle miss and lights the right hole by the 2nd
+  const miss = await page.evaluate(() => {
+    state.busy = false; state.tier = 0; state.round = 0; shapedropLevel.startRound();
+    const piece = document.querySelector("#shdTray .shd-piece");
+    const before = roundMistakes;
+    shapedropLevel.miss(piece); shapedropLevel.miss(piece);
+    const lit = [...document.querySelectorAll(".shd-hole.shd-hint")]
+      .some(h => h.dataset.shape === piece.dataset.shape);
+    return { mistakes: shapedropLevel.mistakes, counted: roundMistakes - before,
+             remaining: shapedropLevel.remaining, lit };
+  });
+  expect(miss.mistakes).toBe(2);
+  expect(miss.counted).toBeGreaterThan(0);   // sfx.bad fed the performance model
+  expect(miss.remaining).toBe(3);            // nothing placed, no fail state
+  expect(miss.lit).toBe(true);               // the matching hole is highlighted to guide her
+
+  // A passive child who never drags is still carried through: the idle assist drops each
+  // piece into its home until the round is done
+  const rescue = await page.evaluate(() => {
+    state.busy = false; state.tier = 1; state.round = 0; shapedropLevel.startRound();
+    let guard = 0;
+    while (shapedropLevel.remaining > 0 && guard++ < 12) {
+      const piece = [...document.querySelectorAll("#shdTray .shd-piece")]
+        .find(p => !p.classList.contains("on-plate"));
+      shapedropLevel.demo(piece, shapedropLevel.holeFor(piece));
+    }
+    return { remaining: shapedropLevel.remaining };
+  });
+  expect(rescue.remaining).toBe(0);
+
+  // Tier 1 doubles one shape (match by form, not elimination); tier 2 adds size matching
+  const tiers = await page.evaluate(() => {
+    state.busy = false; state.tier = 1; state.round = 0; shapedropLevel.startRound();
+    const s1 = [...document.querySelectorAll("#shdTray .shd-piece")].map(p => p.dataset.shape);
+    state.busy = false; state.tier = 2; state.round = 0; shapedropLevel.startRound();
+    const p2 = [...document.querySelectorAll("#shdTray .shd-piece")];
+    return { t1count: s1.length, t1doubled: new Set(s1).size < s1.length,
+             t2count: p2.length, t2sizes: p2.map(p => p.dataset.size).sort(),
+             t2shapes: new Set(p2.map(p => p.dataset.shape)).size };
+  });
+  expect(tiers.t1count).toBe(4);
+  expect(tiers.t1doubled).toBe(true);
+  expect(tiers.t2count).toBe(4);
+  expect(tiers.t2sizes).toEqual(["big", "big", "sm", "sm"]);
+  expect(tiers.t2shapes).toBe(2);
+
+  expect(errors, "console/page errors in Shape Drop:\n" + errors.join("\n")).toEqual([]);
+});
+
 
 /* ================= Game registry =================
    Games declare themselves with registerGame() in their own file, and hub.js derives
@@ -883,7 +972,7 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
 // Pin the exact order so a reshuffle fails here instead of on her screen.
 const WORLD_ORDER = {
   num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
-  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
+  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch", "shapedrop"],
   brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
           "runway", "feelings", "scavenger", "letternames", "senses", "pour"],
   animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
@@ -1862,7 +1951,7 @@ test("no game squats on the scene kit's class prefix", async () => {
 // kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
 // this at the full count; it exists so a refactor can't quietly strip scenery back out,
 // and a new game that ships without a background fails here.
-const SCENERY_FLOOR = 36;
+const SCENERY_FLOOR = 37;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);

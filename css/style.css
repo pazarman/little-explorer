@@ -45,6 +45,7 @@
   body.theme-cups     { background:linear-gradient(#ffd98a, #f7b267 55%, #e07a5f); }
   body.theme-nightday { background:linear-gradient(165deg, #87ceeb 0%, #4a7fbf 40%, #1a3366 100%); }
   body.theme-measure { background:linear-gradient(#bfe8ff, #eaf7d8 55%, #cdeec0); }
+  body.theme-shapedrop { background:linear-gradient(#ffe9c2, #ffd9b0 52%, #f2b98a); }
 
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
             align-items:center; justify-content:center; padding:2vmin;
@@ -1098,6 +1099,34 @@
   .rl-count { color:#ffd23e; font-weight:bold; font-size:clamp(40px,12vmin,110px); z-index:2;
     text-shadow:0 3px 0 rgba(0,0,0,.4); min-height:1.1em; }
 
+  /* ----- Shape Drop (spatial fitting) ----- */
+  .shd-stage { position:absolute; inset:0; z-index:5; }
+  .shd-board { position:absolute; top:5%; left:2vmin; right:2vmin; display:flex; flex-wrap:wrap;
+               justify-content:center; align-items:center; gap:3vmin; padding:2.2vmin;
+               background:rgba(120,78,44,.26); border:4px solid rgba(255,255,255,.4); border-radius:28px; }
+  .shd-hole { position:relative; width:clamp(78px,18vmin,148px); height:clamp(78px,18vmin,148px);
+              display:flex; align-items:center; justify-content:center; }
+  .shd-hole.sm  { width:clamp(50px,11vmin,92px); height:clamp(50px,11vmin,92px); }
+  .shd-hole.big { width:clamp(84px,19vmin,152px); height:clamp(84px,19vmin,152px); }
+  .shd-hole .shd-slot { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .shd-hole.shd-hint { animation:shdHint .7s ease-in-out 4; border-radius:24px; }
+  @keyframes shdHint { 0%,100%{box-shadow:0 0 0 0 rgba(255,210,62,0);} 50%{box-shadow:0 0 0 9px rgba(255,210,62,.8);} }
+  .shd-svg { width:100%; height:100%; display:block; overflow:visible; }
+  .shd-tray { position:absolute; bottom:5%; left:2vmin; right:2vmin; display:flex; flex-wrap:wrap; gap:2.6vmin;
+              justify-content:center; align-items:center; background:rgba(255,255,255,.2); border-radius:22px;
+              padding:1.8vmin; min-height:clamp(66px,15vmin,120px); }
+  .shd-piece { border:none; background:none; padding:0; touch-action:none; cursor:pointer;
+               width:clamp(78px,18vmin,148px); height:clamp(78px,18vmin,148px); line-height:1;
+               filter:drop-shadow(0 4px 4px rgba(0,0,0,.32)); transition:transform .12s ease; }
+  .shd-piece.sm  { width:clamp(50px,11vmin,92px); height:clamp(50px,11vmin,92px); }
+  .shd-piece.big { width:clamp(84px,19vmin,152px); height:clamp(84px,19vmin,152px); }
+  .shd-piece:active { transform:scale(1.07); }
+  .shd-piece.on-plate { pointer-events:none; filter:drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+  .shd-piece.shd-fit { animation:shdFit .4s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes shdFit { 0%{transform:scale(1.18);} 60%{transform:scale(.92);} 100%{transform:scale(1);} }
+  .shd-piece.shd-wake { animation:shdWake .6s ease-in-out infinite; }
+  @keyframes shdWake { 0%,100%{transform:translateY(0) rotate(0);} 50%{transform:translateY(-1.4vmin) rotate(-3deg);} }
+
   @media (prefers-reduced-motion: reduce) {
     /* Disable bouncy/spinning game animations; keep instant opacity changes for feedback */
     .dragon.chomp, .care-pet.happy { animation: none !important; }
@@ -1130,4 +1159,7 @@
     .sc-mote, .sc-drift { animation: none !important; }
     .sc-drift { left:auto; right:22%; }
     .sc-sparkle { opacity: .7 !important; }
+    /* Shape Drop: no idle bob or pulse; the gold hint ring still reads as a static glow */
+    .shd-piece.shd-wake, .shd-piece.shd-fit { animation: none !important; }
+    .shd-hole.shd-hint { animation: none !important; box-shadow:0 0 0 7px rgba(255,210,62,.8) !important; }
   }
