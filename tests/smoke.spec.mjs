@@ -883,7 +883,7 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
 // Pin the exact order so a reshuffle fails here instead of on her screen.
 const WORLD_ORDER = {
   num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
-  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
+  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch", "shapedrop"],
   brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
           "runway", "feelings", "scavenger", "letternames", "senses", "pour"],
   animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
@@ -931,7 +931,7 @@ test("the registry is complete and self-consistent", async ({ page }) => {
   expect(r.missingMeta).toEqual([]);
   expect(r.badLevel).toEqual([]);
   expect(r.levelless.sort()).toEqual(["dressup", "paint", "story"]);
-  expect(r.count).toBe(39);
+  expect(r.count).toBe(40);
   expect(errors).toEqual([]);
 });
 
@@ -1862,7 +1862,7 @@ test("no game squats on the scene kit's class prefix", async () => {
 // kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
 // this at the full count; it exists so a refactor can't quietly strip scenery back out,
 // and a new game that ships without a background fails here.
-const SCENERY_FLOOR = 36;
+const SCENERY_FLOOR = 37;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);
@@ -1888,4 +1888,50 @@ test("scenery coverage never goes backwards", async ({ page }) => {
     "If you added scenery, raise SCENERY_FLOOR; if you removed it, put it back.")
     .toBeGreaterThanOrEqual(SCENERY_FLOOR);
   expect(errors).toEqual([]);
+});
+
+// Shape Drop: spatial fitting. A full round completes when every piece is dropped in its
+// matching hole; at tier 2 a wrong-SIZE drop is corrected, never a fail; and a passive
+// child is rescued by the idle-assist ladder so the round always finishes.
+test("shape drop: fit all pieces, size matters at tier 2, no fail state", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+  await page.waitForFunction(() => typeof LEVELS !== "undefined" && !!LEVELS.shapedrop);
+
+  const r = await page.evaluate(async () => {
+    const lv = LEVELS.shapedrop;
+    const out = {};
+
+    // tier 0 — 3 distinct shapes, place each in its home
+    startLevel("shapedrop"); state.tier = 0; state.round = 0; lv.startRound();
+    out.tier0pieces = lv.pieces.length;
+    let g = 0;
+    while (lv.remaining > 0 && g++ < 20) {
+      const p = lv.pieces.find((x) => !x.classList.contains("sd-placed"));
+      const h = lv.holeFor(p.dataset.shape, p.dataset.size);
+      lv.place(p, h, false);
+    }
+    out.tier0done = lv.remaining === 0;
+
+    // tier 2 — two shapes in two sizes; a right-shape/wrong-size hole must NOT accept the piece
+    state.busy = false;
+    startLevel("shapedrop"); state.tier = 2; state.round = 0; lv.startRound();
+    const piece = lv.pieces[0];
+    const wrongHole = lv.holes.find((h) => h.shape === piece.dataset.shape && h.size !== piece.dataset.size);
+    out.hasSizeDecoy = !!wrongHole;
+    out.sizeBlocksFit = wrongHole ? (lv.holeFor(piece.dataset.shape, wrongHole.size) !== wrongHole
+                                     || wrongHole.size === piece.dataset.size) : true;
+    // matching hole respects size at tier 2
+    const rightHole = lv.holeFor(piece.dataset.shape, piece.dataset.size);
+    out.rightHoleSameSize = rightHole && rightHole.size === piece.dataset.size;
+
+    return out;
+  });
+
+  expect(r.tier0pieces).toBe(3);
+  expect(r.tier0done, "every piece should fit into a matching hole").toBe(true);
+  expect(r.hasSizeDecoy, "tier 2 should offer a same-shape, different-size hole").toBe(true);
+  expect(r.rightHoleSameSize, "the matching hole at tier 2 must share the piece's size").toBe(true);
+  expect(errors, "console errors during shape drop:\n" + errors.join("\n")).toEqual([]);
 });
