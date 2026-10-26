@@ -628,6 +628,56 @@ test("Egg Catch steers a basket and catches only the target color", async ({ pag
   expect(errors, "console/page errors in Egg Catch:\n" + errors.join("\n")).toEqual([]);
 });
 
+test("Shape Drop fits pieces into matching holes and assists after misses", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("shapedrop"));
+  await expect(page.locator("#game")).toBeVisible();
+  await page.evaluate(() => { state.tier = 0; state.round = 0; shapedropLevel.startRound(); });
+  await expect(page.locator(".sd-piece")).toHaveCount(3);
+  await expect(page.locator(".sd-hole")).toHaveCount(3);
+
+  // Drag a real pointer: one piece to the WRONG hole three times, then confirm the
+  // correct hole lights up to rescue a struggling player (assist by the 3rd miss).
+  const assisted = await page.evaluate(() => {
+    const dragTo = (el, x, y) => {
+      const r = el.getBoundingClientRect();
+      el.dispatchEvent(new PointerEvent("pointerdown", { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, bubbles: true, pointerId: 1 }));
+      el.dispatchEvent(new PointerEvent("pointermove", { clientX: x, clientY: y, bubbles: true, pointerId: 1 }));
+      el.dispatchEvent(new PointerEvent("pointerup", { clientX: x, clientY: y, bubbles: true, pointerId: 1 }));
+    };
+    const piece = document.querySelector(".sd-piece");
+    const wrong = shapedropLevel.holes.find(h => h.dataset.shape !== piece.dataset.shape);
+    for (let i = 0; i < 3; i++) { const r = wrong.getBoundingClientRect(); dragTo(piece, r.left + r.width / 2, r.top + r.height / 2); }
+    const correct = shapedropLevel.holeFor(piece);
+    return { miss: shapedropLevel.miss, lit: correct.classList.contains("sd-assist") };
+  });
+  expect(assisted.miss).toBeGreaterThanOrEqual(3);
+  expect(assisted.lit).toBe(true);
+
+  // Now place every piece in its matching hole — the round completes with no fail state.
+  const done = await page.evaluate(async () => {
+    const dragTo = (el, x, y) => {
+      const r = el.getBoundingClientRect();
+      el.dispatchEvent(new PointerEvent("pointerdown", { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, bubbles: true, pointerId: 1 }));
+      el.dispatchEvent(new PointerEvent("pointermove", { clientX: x, clientY: y, bubbles: true, pointerId: 1 }));
+      el.dispatchEvent(new PointerEvent("pointerup", { clientX: x, clientY: y, bubbles: true, pointerId: 1 }));
+    };
+    for (const piece of [...document.querySelectorAll(".sd-piece")]) {
+      const hole = shapedropLevel.holeFor(piece);
+      const r = hole.getBoundingClientRect();
+      dragTo(piece, r.left + r.width / 2, r.top + r.height / 2);
+    }
+    return { filled: document.querySelectorAll(".sd-hole.sd-filled").length, left: shapedropLevel.left };
+  });
+  expect(done.filled).toBe(3);
+  expect(done.left).toBeLessThanOrEqual(0);
+
+  expect(errors, "console/page errors in Shape Drop:\n" + errors.join("\n")).toEqual([]);
+});
+
 test("Feed the Hippo counts feeds and never overfeeds", async ({ page }) => {
   const errors = watchErrors(page);
   await page.addInitScript(SKIP_INTRO);
@@ -883,7 +933,7 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
 // Pin the exact order so a reshuffle fails here instead of on her screen.
 const WORLD_ORDER = {
   num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
-  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
+  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch", "shapedrop"],
   brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
           "runway", "feelings", "scavenger", "letternames", "senses", "pour"],
   animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
@@ -1862,7 +1912,7 @@ test("no game squats on the scene kit's class prefix", async () => {
 // kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
 // this at the full count; it exists so a refactor can't quietly strip scenery back out,
 // and a new game that ships without a background fails here.
-const SCENERY_FLOOR = 36;
+const SCENERY_FLOOR = 37;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);
