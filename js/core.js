@@ -341,6 +341,14 @@ const DICT = {
     measure_yes_shorter: "Yes! Shorter!",
     measure_no_taller: "That one is shorter! Find the taller one!",
     measure_no_shorter: "That one is taller! Find the shorter one!",
+    shapedrop_show: "Fit each shape home!",
+    shapedrop_say: "Drag each shape to the hole that fits it, {n}!",
+    shapedrop_in: "The {shape} fits! It clicked right in!",
+    shapedrop_try: "That hole is a different shape. Find where the {shape} fits!",
+    shapedrop_help: "Let's find where the {shape} goes — try right here!",
+    shapedrop_demo: "Watch! The {shape} fits right here.",
+    sd_circle: "circle", sd_square: "square", sd_triangle: "triangle",
+    sd_star: "star", sd_heart: "heart",
   },
   es: {
     num: ["", "Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"],
@@ -547,7 +555,15 @@ const DICT = {
     measure_yes_taller: "¡Sí! ¡Más alto!",
     measure_yes_shorter: "¡Sí! ¡Más bajo!",
     measure_no_taller: "¡Ese es más bajo! ¡Busca el más alto!",
-    measure_no_shorter: "¡Ese es más alto! ¡Busca el más bajo!"
+    measure_no_shorter: "¡Ese es más alto! ¡Busca el más bajo!",
+    shapedrop_show: "¡Mete cada figura en su lugar!",
+    shapedrop_say: "¡Arrastra cada figura al hueco que le queda, {n}!",
+    shapedrop_in: "¡Encajó! {shape} entró justito.",
+    shapedrop_try: "Ese hueco es de otra figura. ¡Busca dónde va {shape}!",
+    shapedrop_help: "Vamos a buscar dónde va {shape}. ¡Prueba aquí!",
+    shapedrop_demo: "¡Mira! {shape} va aquí.",
+    sd_circle: "el círculo", sd_square: "el cuadrado", sd_triangle: "el triángulo",
+    sd_star: "la estrella", sd_heart: "el corazón",
   },
   yue: {
     num: ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"],
@@ -750,7 +766,15 @@ const DICT = {
     measure_yes_taller: "啱喇！高啲！",
     measure_yes_shorter: "啱喇！矮啲！",
     measure_no_taller: "嗰個矮啲！搵高啲嗰個！",
-    measure_no_shorter: "嗰個高啲！搵矮啲嗰個！"
+    measure_no_shorter: "嗰個高啲！搵矮啲嗰個！",
+    shapedrop_show: "將每個形狀放返屋企！",
+    shapedrop_say: "將每個形狀拖去啱佢嘅窿度，{n}！",
+    shapedrop_in: "啱晒！{shape}啱啱好放到入去！",
+    shapedrop_try: "嗰個窿係第二個形狀。搵下{shape}嘅窿！",
+    shapedrop_help: "我哋搵下{shape}去邊個窿。試下呢度啦！",
+    shapedrop_demo: "睇住！{shape}放呢度！",
+    sd_circle: "圓形", sd_square: "正方形", sd_triangle: "三角形",
+    sd_star: "星星", sd_heart: "心心"
   }
 };
 

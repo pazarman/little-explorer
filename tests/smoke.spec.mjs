@@ -871,6 +871,87 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
   expect(errors, "console/page errors in Five Senses:\n" + errors.join("\n")).toEqual([]);
 });
 
+/* Shape Drop — spatial fitting. Dragging is driven by a pointer loop, so these drive the
+   release handler directly after placing a piece's centre over a hole. Covers: a correct
+   drop snaps home, a wrong hole is refused with no penalty to progress, and — the one that
+   matters most for a no-fail toddler game — a passive player who never acts is carried to
+   the finish by the idle assist (nudge, then the toy demonstrates). */
+test("Shape Drop fits shapes, refuses the wrong hole, and rescues a passive player", async ({ page }) => {
+  test.setTimeout(60000);
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // Boots and draws one hole + one piece per shape (tier 0 = circle/square/triangle).
+  await page.evaluate(() => { startLevel("shapedrop"); state.tier = 0; state.round = 0; shapedropLevel.startRound(); });
+  await expect(page.locator(".sd-hole")).toHaveCount(3);
+  await expect(page.locator(".sd-piece")).toHaveCount(3);
+  expect(await page.locator("#instruction").textContent()).toContain("🧩");
+
+  // A piece dropped on a hole of a different shape is refused (bounces back) but the
+  // round does not advance and nothing is placed — a miss is never a fail.
+  const miss = await page.evaluate(() => {
+    const over = (piece, hole) => {
+      const hr = hole.getBoundingClientRect();
+      piece.style.position = "fixed";
+      piece.style.left = (hr.left + hr.width / 2 - piece.offsetWidth / 2) + "px";
+      piece.style.top = (hr.top + hr.height / 2 - piece.offsetHeight / 2) + "px";
+      shapedropLevel.release(piece, { clientX: hr.left + hr.width / 2, clientY: hr.top + hr.height / 2 },
+        { moved: true, reset() { piece.style.position = ""; piece.style.left = piece.style.top = ""; } });
+    };
+    const piece = shapedropLevel.pieces[0];
+    const wrongHole = shapedropLevel.holes.find(h => h.dataset.shape !== piece.dataset.shape);
+    const before = { round: state.round, placed: shapedropLevel.placed };
+    over(piece, wrongHole);
+    return { round: state.round, placed: shapedropLevel.placed, before, onPlate: piece.classList.contains("on-plate") };
+  });
+  expect(miss.placed, "a wrong drop must not count as placed").toBe(0);
+  expect(miss.onPlate, "a wrong drop must not snap home").toBe(false);
+  expect(miss.round, "a miss must never advance the round").toBe(miss.before.round);
+
+  // Placing every piece in its matching hole completes the round and advances it.
+  const completed = await page.evaluate(async () => {
+    state.busy = false; state.tier = 0; state.round = 0; shapedropLevel.startRound();
+    const before = state.round;
+    for (const piece of [...shapedropLevel.pieces]) {
+      const hole = shapedropLevel.holes.find(h => !h.classList.contains("sd-filled") &&
+        h.dataset.shape === piece.dataset.shape);
+      const hr = hole.getBoundingClientRect();
+      piece.style.position = "fixed";
+      piece.style.left = (hr.left + hr.width / 2 - piece.offsetWidth / 2) + "px";
+      piece.style.top = (hr.top + hr.height / 2 - piece.offsetHeight / 2) + "px";
+      shapedropLevel.release(piece, { clientX: hr.left + hr.width / 2, clientY: hr.top + hr.height / 2 },
+        { moved: true, reset() {} });
+    }
+    const deadline = Date.now() + 9000;
+    while (Date.now() < deadline) {
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return true;
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
+  });
+  expect(completed, "placing every shape should complete the round").toBe(true);
+
+  // The passive player: touch nothing. The idle assist must nudge (hint + hand) and then,
+  // still unaided, demonstrate each piece home until the round finishes on its own.
+  const rescued = await page.evaluate(async () => {
+    state.busy = false; state.tier = 0; state.round = 0; shapedropLevel.startRound();
+    const before = state.round;
+    let sawHint = false;
+    const deadline = Date.now() + 26000;
+    while (Date.now() < deadline) {
+      if (document.querySelector(".sd-hole.sd-hint") || document.querySelector(".sd-arrow")) sawHint = true;
+      if (state.round > before || !document.getElementById("celebrate").classList.contains("hidden")) return { done: true, sawHint };
+      await new Promise(r => setTimeout(r, 150));
+    }
+    return { done: false, sawHint };
+  });
+  expect(rescued.sawHint, "the idle assist must show a hint before demonstrating").toBe(true);
+  expect(rescued.done, "a passive player must be carried to the finish (no fail, no dead end)").toBe(true);
+
+  expect(errors, "console/page errors in Shape Drop:\n" + errors.join("\n")).toEqual([]);
+});
+
 
 /* ================= Game registry =================
    Games declare themselves with registerGame() in their own file, and hub.js derives
@@ -885,7 +966,7 @@ const WORLD_ORDER = {
   num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
   shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
   brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
-          "runway", "feelings", "scavenger", "letternames", "senses", "pour"],
+          "runway", "feelings", "scavenger", "letternames", "senses", "pour", "shapedrop"],
   animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
   pets: ["petcare", "petmatch", "petfeed", "hideseek"],
   create: ["paint", "story", "dressup"],
@@ -931,7 +1012,7 @@ test("the registry is complete and self-consistent", async ({ page }) => {
   expect(r.missingMeta).toEqual([]);
   expect(r.badLevel).toEqual([]);
   expect(r.levelless.sort()).toEqual(["dressup", "paint", "story"]);
-  expect(r.count).toBe(39);
+  expect(r.count).toBe(40);
   expect(errors).toEqual([]);
 });
 
@@ -1862,7 +1943,7 @@ test("no game squats on the scene kit's class prefix", async () => {
 // kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
 // this at the full count; it exists so a refactor can't quietly strip scenery back out,
 // and a new game that ships without a background fails here.
-const SCENERY_FLOOR = 36;
+const SCENERY_FLOOR = 37;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);

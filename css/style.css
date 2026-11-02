@@ -45,6 +45,7 @@
   body.theme-cups     { background:linear-gradient(#ffd98a, #f7b267 55%, #e07a5f); }
   body.theme-nightday { background:linear-gradient(165deg, #87ceeb 0%, #4a7fbf 40%, #1a3366 100%); }
   body.theme-measure { background:linear-gradient(#bfe8ff, #eaf7d8 55%, #cdeec0); }
+  body.theme-shapedrop { background:linear-gradient(#ffe9cf, #ffd59a 52%, #e7b887); }
 
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
             align-items:center; justify-content:center; padding:2vmin;
@@ -1098,6 +1099,44 @@
   .rl-count { color:#ffd23e; font-weight:bold; font-size:clamp(40px,12vmin,110px); z-index:2;
     text-shadow:0 3px 0 rgba(0,0,0,.4); min-height:1.1em; }
 
+  /* ----- Shape Drop (spatial fitting: drag each shape to its matching hole) ----- */
+  .sd-stage { position:absolute; inset:0; z-index:5; display:flex; flex-direction:column;
+              justify-content:space-between; padding:2.5vmin 2vmin; }
+  /* the wooden sorter board that holds the cut-out holes */
+  .sd-board { position:relative; margin:0 auto; width:min(94%,760px);
+              display:flex; flex-wrap:wrap; gap:2.2vmin; justify-content:center; align-content:center;
+              padding:3vmin 2.4vmin; border-radius:28px;
+              background:linear-gradient(#d49a63,#b9743f); border:4px solid #9c5a2c;
+              box-shadow:inset 0 4px 0 rgba(255,255,255,.28), inset 0 -6px 0 rgba(0,0,0,.22), 0 6px 0 rgba(0,0,0,.18); }
+  .sd-hole { position:relative; display:flex; align-items:center; justify-content:center;
+             border-radius:18px; }
+  .sd-hole.sd-big   { width:clamp(72px,19vmin,136px); height:clamp(72px,19vmin,136px); }
+  .sd-hole.sd-small { width:clamp(52px,12vmin,88px);  height:clamp(52px,12vmin,88px); }
+  .sd-hole-svg { width:100%; height:100%;
+                 filter:drop-shadow(inset 0 2px 2px rgba(0,0,0,.4)); }
+  .sd-hole.sd-hint { animation:sdHoleHint 1s ease-in-out infinite; border-radius:20px; }
+  @keyframes sdHoleHint { 0%,100%{box-shadow:0 0 0 0 rgba(255,214,70,0);} 50%{box-shadow:0 0 0 10px rgba(255,214,70,.8);} }
+  .sd-hole.sd-filled { box-shadow:none; }
+  /* the tray of draggable pieces along the bottom */
+  .sd-tray { margin:0 auto; width:min(96%,780px); display:flex; flex-wrap:wrap; gap:2.6vmin;
+             justify-content:center; align-items:center; padding:2vmin;
+             background:rgba(255,255,255,.26); border-radius:22px; min-height:clamp(70px,16vmin,130px); }
+  .sd-piece { border:none; background:none; touch-action:none; line-height:0; cursor:pointer;
+              filter:drop-shadow(0 4px 3px rgba(0,0,0,.32)); }
+  .sd-piece.sd-big   { width:clamp(64px,18vmin,124px); height:clamp(64px,18vmin,124px); }
+  .sd-piece.sd-small { width:clamp(46px,11vmin,82px);  height:clamp(46px,11vmin,82px); }
+  .sd-piece-svg { width:100%; height:100%; display:block; }
+  .sd-piece:active { transform:scale(1.06); }
+  .sd-piece.on-plate { pointer-events:none; animation:sdLand .4s ease; }
+  .sd-piece.sd-home  { filter:drop-shadow(0 2px 2px rgba(0,0,0,.28)); }
+  .sd-piece.sd-bounce { animation:sdBounce .7s ease-in-out infinite; }
+  @keyframes sdLand { 0%{transform:scale(1.25);} 60%{transform:scale(.9);} 100%{transform:scale(1);} }
+  @keyframes sdBounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+  /* the pointing hand the assist floats over the right hole */
+  .sd-arrow { position:absolute; transform:translate(-50%,-110%); font-size:clamp(28px,7vmin,54px);
+              pointer-events:none; z-index:7; animation:sdPoint 1s ease-in-out infinite; }
+  @keyframes sdPoint { 0%,100%{transform:translate(-50%,-110%);} 50%{transform:translate(-50%,-80%);} }
+
   @media (prefers-reduced-motion: reduce) {
     /* Disable bouncy/spinning game animations; keep instant opacity changes for feedback */
     .dragon.chomp, .care-pet.happy { animation: none !important; }
@@ -1130,4 +1169,7 @@
     .sc-mote, .sc-drift { animation: none !important; }
     .sc-drift { left:auto; right:22%; }
     .sc-sparkle { opacity: .7 !important; }
+    /* Shape Drop: the hint still reads via a steady glow, the hand via position alone */
+    .sd-hole.sd-hint { animation: none !important; box-shadow:0 0 0 8px rgba(255,214,70,.75) !important; }
+    .sd-piece.sd-bounce, .sd-arrow, .sd-piece.on-plate { animation: none !important; }
   }
