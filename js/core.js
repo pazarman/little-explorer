@@ -341,6 +341,14 @@ const DICT = {
     measure_yes_shorter: "Yes! Shorter!",
     measure_no_taller: "That one is shorter! Find the taller one!",
     measure_no_shorter: "That one is taller! Find the shorter one!",
+    sd_show: "Shapes home!",
+    sd_say: "Drag each shape to its own hole!",
+    sd_yes: "Yes! A {shape} fits right in!",
+    sd_here: "The {shape} goes here!",
+    sd_find: "Find the {shape} hole! It's the one that matches.",
+    sd_wrong: "That's a {shape}. Let's find the {shape} hole!",
+    shape_circle: "circle", shape_square: "square", shape_triangle: "triangle",
+    shape_star: "star", shape_heart: "heart",
   },
   es: {
     num: ["", "Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"],
@@ -547,7 +555,15 @@ const DICT = {
     measure_yes_taller: "¡Sí! ¡Más alto!",
     measure_yes_shorter: "¡Sí! ¡Más bajo!",
     measure_no_taller: "¡Ese es más bajo! ¡Busca el más alto!",
-    measure_no_shorter: "¡Ese es más alto! ¡Busca el más bajo!"
+    measure_no_shorter: "¡Ese es más alto! ¡Busca el más bajo!",
+    sd_show: "¡A su casita!",
+    sd_say: "¡Arrastra cada figura a su propio hueco!",
+    sd_yes: "¡Sí! ¡El {shape} encaja perfecto!",
+    sd_here: "¡El {shape} va aquí!",
+    sd_find: "¡Busca el hueco del {shape}! Es el que combina.",
+    sd_wrong: "Ese es un {shape}. ¡Busquemos el hueco del {shape}!",
+    shape_circle: "círculo", shape_square: "cuadrado", shape_triangle: "triángulo",
+    shape_star: "estrella", shape_heart: "corazón",
   },
   yue: {
     num: ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"],
@@ -750,7 +766,15 @@ const DICT = {
     measure_yes_taller: "啱喇！高啲！",
     measure_yes_shorter: "啱喇！矮啲！",
     measure_no_taller: "嗰個矮啲！搵高啲嗰個！",
-    measure_no_shorter: "嗰個高啲！搵矮啲嗰個！"
+    measure_no_shorter: "嗰個高啲！搵矮啲嗰個！",
+    sd_show: "放返個形狀！",
+    sd_say: "將每個形狀拖去佢自己嘅窿度！",
+    sd_yes: "啱喇！個{shape}啱啱好放到入去！",
+    sd_here: "個{shape}放呢度！",
+    sd_find: "搵個{shape}嘅窿！就係同佢一樣嗰個。",
+    sd_wrong: "呢個係{shape}。我哋搵返個{shape}嘅窿啦！",
+    shape_circle: "圓形", shape_square: "正方形", shape_triangle: "三角形",
+    shape_star: "星形", shape_heart: "心形",
   }
 };
 

@@ -552,6 +552,68 @@ test("Fill It Up! pours water and teaches capacity", async ({ page }) => {
   expect(errors, "console/page errors in Fill It Up!:\n" + errors.join("\n")).toEqual([]);
 });
 
+test("Shape Drop fits shapes into holes and rescues a passive player", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  await page.evaluate(() => startLevel("shapedrop"));
+  await expect(page.locator("#game")).toBeVisible();
+
+  // Tier 0: three distinct shapes, one hole each; the scene kit paints the room
+  await page.evaluate(() => { state.tier = 0; state.round = 0; shapeDropLevel.startRound(); });
+  await expect(page.locator(".sd-hole")).toHaveCount(3);
+  await expect(page.locator(".sd-piece")).toHaveCount(3);
+  await expect(page.locator("#playArea .sc-scene")).toBeVisible();      // not a bare gradient
+  const instr = await page.locator("#instruction").textContent();
+  expect(instr).toContain("🔷");
+
+  // Tier shape: 0 = 3 one-size, 1 = 4 one-size, 2 = 2 shapes in BIG + SMALL (form AND size)
+  const tiers = await page.evaluate(() => {
+    const read = () => ({ pieces: shapeDropLevel.pieces.length,
+                          sizes: new Set(shapeDropLevel.holes.map(h => h.size)).size });
+    state.busy = false; state.tier = 0; state.round = 0; shapeDropLevel.startRound(); const t0 = read();
+    state.busy = false; state.tier = 1; shapeDropLevel.startRound(); const t1 = read();
+    state.busy = false; state.tier = 2; shapeDropLevel.startRound(); const t2 = read();
+    return { t0, t1, t2 };
+  });
+  expect(tiers.t0).toEqual({ pieces: 3, sizes: 1 });
+  expect(tiers.t1).toEqual({ pieces: 4, sizes: 1 });
+  expect(tiers.t2).toEqual({ pieces: 4, sizes: 2 });   // two sizes present → size must match
+
+  // Passive-player rescue: with no drag at all, the first idle nudge lights the matching
+  // hole and the second actually fits a piece — she can never get stuck.
+  const rescue = await page.evaluate(() => {
+    state.busy = false; state.tier = 0; state.round = 0; shapeDropLevel.startRound();
+    const before = shapeDropLevel.remaining;
+    shapeDropLevel.idleStep();                                   // stage 0: nudge
+    const hinted = document.querySelectorAll(".sd-hole.hint-highlight").length;
+    shapeDropLevel.idleStep();                                   // stage 1: auto-fit one
+    return { before, hinted, after: shapeDropLevel.remaining,
+             placed: document.querySelectorAll(".sd-piece.sd-placed").length };
+  });
+  expect(rescue.before).toBe(3);
+  expect(rescue.hinted).toBeGreaterThan(0);   // help is visible
+  expect(rescue.after).toBe(2);               // a piece was placed for her
+  expect(rescue.placed).toBe(1);
+
+  // Driven only by the assist, a whole level completes (celebrate overlay appears) — no fail state
+  const done = await page.evaluate(async () => {
+    core.cleanup(); startLevel("shapedrop"); state.tier = 0; state.round = 0; shapeDropLevel.startRound();
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const celeb = () => document.querySelector("#celebrate");
+    for (let i = 0; i < 400; i++) {
+      if (celeb() && !celeb().classList.contains("hidden")) return { done: true, rounds: state.round };
+      if (!state.busy && shapeDropLevel.remaining > 0) shapeDropLevel.idleStep();
+      await sleep(60);
+    }
+    return { done: false, rounds: state.round };
+  });
+  expect(done.done, "a passive player should be carried all the way to the celebration").toBe(true);
+
+  expect(errors, "console/page errors in Shape Drop:\n" + errors.join("\n")).toEqual([]);
+});
+
 test("Zoo Pop surfaces animals and scores only the named target", async ({ page }) => {
   const errors = watchErrors(page);
   await page.addInitScript(SKIP_INTRO);
@@ -883,7 +945,7 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
 // Pin the exact order so a reshuffle fails here instead of on her screen.
 const WORLD_ORDER = {
   num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
-  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
+  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch", "shapedrop"],
   brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
           "runway", "feelings", "scavenger", "letternames", "senses", "pour"],
   animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
@@ -931,7 +993,7 @@ test("the registry is complete and self-consistent", async ({ page }) => {
   expect(r.missingMeta).toEqual([]);
   expect(r.badLevel).toEqual([]);
   expect(r.levelless.sort()).toEqual(["dressup", "paint", "story"]);
-  expect(r.count).toBe(39);
+  expect(r.count).toBe(40);
   expect(errors).toEqual([]);
 });
 
@@ -1862,7 +1924,7 @@ test("no game squats on the scene kit's class prefix", async () => {
 // kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
 // this at the full count; it exists so a refactor can't quietly strip scenery back out,
 // and a new game that ships without a background fails here.
-const SCENERY_FLOOR = 36;
+const SCENERY_FLOOR = 37;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);

@@ -45,6 +45,7 @@
   body.theme-cups     { background:linear-gradient(#ffd98a, #f7b267 55%, #e07a5f); }
   body.theme-nightday { background:linear-gradient(165deg, #87ceeb 0%, #4a7fbf 40%, #1a3366 100%); }
   body.theme-measure { background:linear-gradient(#bfe8ff, #eaf7d8 55%, #cdeec0); }
+  body.theme-shapedrop { background:linear-gradient(#ffe3b0, #ffd0a8 52%, #f6b88f); }
 
   .screen { position:absolute; inset:0; display:flex; flex-direction:column;
             align-items:center; justify-content:center; padding:2vmin;
@@ -736,6 +737,28 @@
                     filter:drop-shadow(0 4px 5px rgba(0,0,0,0.4)); transition:transform 0.2s ease; }
   .hideseek-buddy.on-plate { animation:bounceIn 0.4s; }
 
+  /* ----- Shape Drop (drag a shape piece into its matching cutout hole) ----- */
+  .sd-stage { position:absolute; inset:0; z-index:5; display:flex; flex-direction:column; }
+  .sd-board { flex:1; display:flex; flex-wrap:wrap; align-content:center; justify-content:center;
+              gap:2.4vmin; padding:2.4vmin 2vmin 1vmin; }
+  .sd-hole { position:relative; display:flex; align-items:center; justify-content:center;
+             background:rgba(255,255,255,.18); border-radius:22px; box-shadow:inset 0 3px 8px rgba(0,0,0,.14);
+             padding:1vmin; }
+  .sd-hole svg { width:100%; height:100%; display:block; }
+  .sd-tray { display:flex; flex-wrap:wrap; gap:2.6vmin; justify-content:center; align-items:center;
+             background:rgba(255,255,255,.22); border-radius:22px; margin:0 2vmin 2.4vmin; padding:2vmin;
+             min-height:clamp(70px,16vmin,130px); }
+  .sd-piece { border:none; background:none; padding:0; touch-action:none; line-height:0; cursor:grab;
+              filter:drop-shadow(0 4px 4px rgba(0,0,0,.3)); }
+  .sd-piece svg { width:100%; height:100%; display:block; }
+  /* big targets: even the "small" tier-2 piece clears the 44px minimum */
+  .sd-hole.sd-mid, .sd-piece.sd-mid   { width:clamp(72px,17vmin,128px); height:clamp(72px,17vmin,128px); }
+  .sd-hole.sd-big, .sd-piece.sd-big   { width:clamp(80px,19vmin,140px); height:clamp(80px,19vmin,140px); }
+  .sd-hole.sd-small, .sd-piece.sd-small { width:clamp(50px,12vmin,86px); height:clamp(50px,12vmin,86px); }
+  .sd-hole .sd-piece { position:absolute; inset:0; width:100%; height:100%; filter:none; pointer-events:none; }
+  .sd-piece.sd-placed { animation:sdSettle .4s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes sdSettle { 0%{transform:scale(1.18);} 60%{transform:scale(.94);} 100%{transform:scale(1);} }
+
   /* hint-highlight: 2nd-mistake cue used by 10+ games — glowing border pulse */
   .hint-highlight { animation:hintHighlight 1s ease-in-out infinite !important; }
   @keyframes hintHighlight { 0%,100%{box-shadow:0 0 0 0 rgba(255,210,62,0);} 50%{box-shadow:0 0 0 10px rgba(255,210,62,.75);} }
@@ -1105,6 +1128,7 @@
     .mem-card.matched { animation: none !important; }
     .popped { animation: none !important; opacity: 0 !important; }
     .landed { animation: none !important; }
+    .sd-piece.sd-placed { animation: none !important; }
     .floater { animation: none !important; opacity: 0 !important; }
     .count-badge.bump, .yum-badge.bump, .count-num.bump { animation: none !important; }
     .mkey.glow, .numkey.glow { animation: none !important; background: #ffeeaa !important; }
