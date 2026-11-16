@@ -883,7 +883,7 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
 // Pin the exact order so a reshuffle fails here instead of on her screen.
 const WORLD_ORDER = {
   num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
-  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
+  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch", "shapedrop"],
   brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
           "runway", "feelings", "scavenger", "letternames", "senses", "pour"],
   animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
@@ -931,7 +931,7 @@ test("the registry is complete and self-consistent", async ({ page }) => {
   expect(r.missingMeta).toEqual([]);
   expect(r.badLevel).toEqual([]);
   expect(r.levelless.sort()).toEqual(["dressup", "paint", "story"]);
-  expect(r.count).toBe(39);
+  expect(r.count).toBe(40);
   expect(errors).toEqual([]);
 });
 
@@ -1348,6 +1348,74 @@ test("Ocean Colors lights up the answer after repeated misses", async ({ page })
   expect(r.afterOne, "one miss is not yet a hint").toBe(false);
   expect(r.afterTwo, "the second miss must light up the answer").toBe(true);
   expect(r.hintedTheRightOne, "the hint highlighted the wrong fish").toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test("Shape Drop fits every shape into its hole and finishes the round", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  const r = await page.evaluate(async () => {
+    startLevel("shapedrop");
+    state.tier = 0; state.round = 0; shapedropLevel.startRound();
+    const out = {};
+    const pieces = () => [...document.querySelectorAll(".sd-piece")];
+    out.holes = shapedropLevel.holes.length;
+    out.pieces = pieces().length;
+    // Every piece must have a home of its own form.
+    out.everyPieceHasHome = pieces().every((p) =>
+      shapedropLevel.holes.some((h) => h.shape === p.dataset.shape));
+
+    const before = state.round;
+    // Drop each piece into its matching hole (exercise place()/roundComplete()).
+    let guard = 0;
+    while (pieces().length && guard++ < 10) {
+      const p = pieces()[0];
+      const sp = { shape: p.dataset.shape, size: p.dataset.size };
+      const hole = shapedropLevel.holes.find((h) => shapedropLevel.matches(sp, h));
+      shapedropLevel.place(p, hole, sp, null);
+      await new Promise((r) => setTimeout(r, 30));
+    }
+    out.allFilled = shapedropLevel.holes.every((h) => h.filled);
+    // roundComplete advances behind speech — wait for it.
+    for (let i = 0; i < 70 && state.round === before; i++) await new Promise((r) => setTimeout(r, 100));
+    out.advanced = state.round > before;
+    return out;
+  });
+  expect(r.holes, "tier 0 shows three holes").toBe(3);
+  expect(r.pieces, "tier 0 gives three pieces").toBe(3);
+  expect(r.everyPieceHasHome, "a piece had no matching hole").toBe(true);
+  expect(r.allFilled, "every hole should be filled after placing each piece").toBe(true);
+  expect(r.advanced, "filling every hole should finish the round").toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test("Shape Drop rescues a passive player by placing the pieces itself", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.emulateMedia({ reducedMotion: "reduce" });   // place instantly, no fly animation
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // BAR-CONFIG: auto-assist quickly. A child who does nothing must still reach the
+  // end — the game's idle rescue eventually places each piece for her.
+  const r = await page.evaluate(async () => {
+    startLevel("shapedrop");
+    state.tier = 0; state.round = 0; shapedropLevel.startRound();
+    const before = state.round;
+    const pieces = () => document.querySelectorAll(".sd-piece").length;
+    let guard = 0;
+    while (pieces() && guard++ < 10) {
+      shapedropLevel.nudge(1);                              // stage 1 = autoPlace the front piece
+      await new Promise((r) => setTimeout(r, 60));
+    }
+    const out = { allFilled: shapedropLevel.holes.every((h) => h.filled) };
+    for (let i = 0; i < 70 && state.round === before; i++) await new Promise((r) => setTimeout(r, 100));
+    out.advanced = state.round > before;
+    return out;
+  });
+  expect(r.allFilled, "the rescue should place every piece for a passive player").toBe(true);
+  expect(r.advanced, "a passive player should still complete the round").toBe(true);
   expect(errors).toEqual([]);
 });
 
@@ -1862,7 +1930,7 @@ test("no game squats on the scene kit's class prefix", async () => {
 // kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
 // this at the full count; it exists so a refactor can't quietly strip scenery back out,
 // and a new game that ships without a background fails here.
-const SCENERY_FLOOR = 36;
+const SCENERY_FLOOR = 37;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);

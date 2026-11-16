@@ -512,6 +512,31 @@
   .landed { animation:land .5s ease; }
   @keyframes land { 0%{transform:scale(2.2); opacity:0;} 100%{transform:scale(1); opacity:1;} }
 
+  /* ----- shape drop (spatial fitting / shape sorter) ----- */
+  .sd-wrap { position:absolute; inset:0; display:flex; flex-direction:column; z-index:5; }
+  .sd-board { position:relative; flex:1; width:100%; }
+  .sd-hole { position:absolute; transform:translate(-50%,-50%);
+             width:clamp(78px, 21vmin, 132px); height:clamp(78px, 21vmin, 132px);
+             display:flex; align-items:center; justify-content:center; border-radius:18px; }
+  .sd-hole.sd-small { width:clamp(56px, 14vmin, 92px); height:clamp(56px, 14vmin, 92px); }
+  .sd-hole-svg { width:100%; height:100%; display:block; }
+  .sd-filled { background:rgba(255,255,255,.28); }
+  .sd-landed { width:100%; height:100%; animation:land .5s ease; }
+  .sd-landed .sd-shape-svg { width:100%; height:100%; display:block;
+                             filter:drop-shadow(0 4px 5px rgba(0,0,0,.22)); }
+  .sd-tray { margin-top:auto; padding:1.5vmin 0 2vmin; gap:2.4vmin; }
+  .sd-piece { padding:1.4vmin; animation:sdBob 2.4s ease-in-out infinite; }
+  .sd-piece:nth-child(even) { animation-delay:-1.2s; }
+  .sd-piece .sd-shape-svg { display:block; width:clamp(60px, 14vmin, 104px); height:auto;
+                            pointer-events:none; filter:drop-shadow(0 4px 5px rgba(0,0,0,.22)); }
+  .sd-piece.sd-small .sd-shape-svg { width:clamp(44px, 10vmin, 74px); }
+  .sd-no-pick { pointer-events:none; }
+  @keyframes sdBob { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-1.2vmin);} }
+  @media (prefers-reduced-motion: reduce) {
+    .sd-piece { animation:none !important; }
+    .sd-landed { animation:none !important; }
+  }
+
   /* ----- bike ----- */
   /* vmin, not %: a scene.strip tile is 6:1, so the band's height is what sets tree size */
   .treeline { position:absolute; bottom:12%; width:100%; overflow:hidden; white-space:nowrap;
