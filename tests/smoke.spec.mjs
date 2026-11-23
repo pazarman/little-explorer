@@ -883,7 +883,7 @@ test("Five Senses matches an object to the right sense and advances", async ({ p
 // Pin the exact order so a reshuffle fails here instead of on her screen.
 const WORLD_ORDER = {
   num: ["snow", "bike", "pasta", "rocket", "dragon", "fuelup", "hippo"],
-  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch"],
+  shape: ["ocean", "pizza", "trace", "icecream", "eggcatch", "shapedrop"],
   brain: ["memory", "cups", "pattern", "sort", "sortkind", "nightday", "measure",
           "runway", "feelings", "scavenger", "letternames", "senses", "pour"],
   animal: ["music", "whosays", "dino", "body", "dolphin", "meerkat", "monkey"],
@@ -901,6 +901,75 @@ test("every world's trail keeps its exact order", async ({ page }) => {
   expect(actual, "a game moved on its world's trail — check <script> order in index.html")
     .toEqual(WORLD_ORDER);
   expect(errors).toEqual([]);
+});
+
+/* Shape Drop (spatial fitting): every piece has exactly one home. Placing a piece in its
+   matching hole fills it and clears the tray; wrong drops never advance, and the correct
+   hole lights up (then rescues a stuck child with a widened snap) by the ~3rd miss. */
+test("shape drop: pieces fit their homes, misses are forgiving, assist rescues", async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(SKIP_INTRO);
+  await page.goto("/index.html?test=1");
+
+  // --- a full round completes by dropping each piece in its matching hole ---
+  const done = await page.evaluate(async () => {
+    startLevel("shapedrop"); state.tier = 0; state.round = 0; state.busy = false;
+    shapedropLevel.startRound();
+    await new Promise((r) => setTimeout(r, 60));
+    const pieces = [...document.querySelectorAll(".sd-piece")];
+    const start = pieces.length;
+    for (const p of pieces) {
+      p.style.position = "fixed";                   // leave the tray flow first, then measure
+      const hole = [...document.querySelectorAll(".sd-hole")]
+        .find((h) => h.dataset.key === p.dataset.key && !h.classList.contains("sd-filled"));
+      const r = hole.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      p.style.left = (cx - p.offsetWidth / 2) + "px";
+      p.style.top = (cy - p.offsetHeight / 2) + "px";
+      shapedropLevel.release(p, { clientX: cx, clientY: cy }, { moved: true, reset() {} });
+    }
+    return { start, filled: document.querySelectorAll(".sd-hole.sd-filled").length, remaining: shapedropLevel.remaining };
+  });
+  expect(done.start).toBeGreaterThanOrEqual(3);
+  expect(done.filled).toBe(done.start);       // every hole got its piece
+  expect(done.remaining).toBe(0);             // round finished
+
+  // --- a wrong drop never completes, and by the 3rd miss the right home is flagged ---
+  const assist = await page.evaluate(async () => {
+    startLevel("shapedrop"); state.tier = 1; state.round = 0; state.busy = false;
+    shapedropLevel.startRound();
+    await new Promise((r) => setTimeout(r, 60));
+    const p = document.querySelector(".sd-piece");
+    const right = [...document.querySelectorAll(".sd-hole")].find((h) => h.dataset.key === p.dataset.key);
+    const wrong = [...document.querySelectorAll(".sd-hole")].find((h) => h.dataset.key !== p.dataset.key);
+    const dropOn = (hole) => {
+      p.style.position = "fixed";
+      const r = hole.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      p.style.left = (cx - p.offsetWidth / 2) + "px"; p.style.top = (cy - p.offsetHeight / 2) + "px";
+      shapedropLevel.release(p, { clientX: cx, clientY: cy }, { moved: true, reset() {} });
+    };
+    dropOn(wrong); dropOn(wrong); dropOn(wrong);          // three mis-drops → assist on
+    const flagged = right.classList.contains("sd-hint-strong");
+    const stillOpen = !right.classList.contains("sd-filled");
+    // isolate the right home (mark the others filled) so a near-miss can only resolve to it,
+    // then drop JUST OUTSIDE it — the widened assist snap should still seat it.
+    [...document.querySelectorAll(".sd-hole")].forEach((h) => { if (h !== right) h.classList.add("sd-filled"); });
+    p.style.position = "fixed";
+    const rr = right.getBoundingClientRect();
+    const nearX = rr.left + rr.width / 2, nearY = rr.top - rr.height * 0.4;   // above the hole, outside it
+    p.style.left = (nearX - p.offsetWidth / 2) + "px"; p.style.top = (nearY - p.offsetHeight / 2) + "px";
+    const insideRight = (() => { const c = { x: nearX, y: nearY }; return c.x > rr.left && c.x < rr.right && c.y > rr.top && c.y < rr.bottom; })();
+    shapedropLevel.release(p, { clientX: nearX, clientY: nearY }, { moved: true, reset() {} });
+    return { flagged, stillOpen, insideRight, rescued: right.classList.contains("sd-filled") && right.contains(p), misses: shapedropLevel.misses };
+  });
+  expect(assist.stillOpen).toBe(true);        // wrong drops did not fill the home
+  expect(assist.misses).toBe(3);              // and did not falsely count a 4th
+  expect(assist.flagged).toBe(true);          // the correct home is highlighted by the 3rd miss
+  expect(assist.insideRight).toBe(false);     // the rescue drop really was outside the home
+  expect(assist.rescued).toBe(true);          // and the widened snap still caught it
+
+  await page.evaluate(() => { try { cleanupLevel(); } catch (_) {} showHub(); });
+  expect(errors, "console/page errors in shape drop:\n" + errors.join("\n")).toEqual([]);
 });
 
 test("the registry is complete and self-consistent", async ({ page }) => {
@@ -931,7 +1000,7 @@ test("the registry is complete and self-consistent", async ({ page }) => {
   expect(r.missingMeta).toEqual([]);
   expect(r.badLevel).toEqual([]);
   expect(r.levelless.sort()).toEqual(["dressup", "paint", "story"]);
-  expect(r.count).toBe(39);
+  expect(r.count).toBe(40);
   expect(errors).toEqual([]);
 });
 
@@ -1862,7 +1931,7 @@ test("no game squats on the scene kit's class prefix", async () => {
 // kit now — either the static layers or, in a scrolling game, its tileable strip. Leave
 // this at the full count; it exists so a refactor can't quietly strip scenery back out,
 // and a new game that ships without a background fails here.
-const SCENERY_FLOOR = 36;
+const SCENERY_FLOOR = 37;
 
 test("scenery coverage never goes backwards", async ({ page }) => {
   const errors = watchErrors(page);
